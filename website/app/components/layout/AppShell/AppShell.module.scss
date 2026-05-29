@@ -1,0 +1,57 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
+.shell {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 100vh;
+
+  @include respond-down(md) {
+    display: block;
+  }
+}
+
+.leftColumn {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: var(--z-sidebar);
+
+  @include respond-down(md) {
+    display: none;
+  }
+}
+
+.desktopArea {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topHeader {
+  padding: 24px 20px 0 24px;
+}
+
+.contentArea {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+  min-width: 0;
+  padding: 24px 20px 40px 24px;
+
+  @include respond-down(lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mainColumn {
+  min-width: 0;
+}
+
+.rightColumn {
+  min-width: 0;
+
+  @include respond-down(lg) {
+    display: none;
+  }
+}

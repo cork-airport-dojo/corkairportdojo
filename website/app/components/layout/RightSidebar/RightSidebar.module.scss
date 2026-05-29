@@ -1,0 +1,36 @@
+@use "../../../styles/abstracts/mixins" as *;
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0;
+}
+
+.card {
+  @include elevated-panel;
+  padding: 20px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  span {
+    color: var(--color-brand-blue);
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+}
+
+.placeholder {
+  margin: 14px 0 0;
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,127 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.searchWrap {
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  border: 1px solid var(--color-border);
+  background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+          var(--color-surface);
+}
+
+.searchIcon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  outline: none;
+  font-size: 0.98rem;
+
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+}
+
+.shortcut {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconButton {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--color-border);
+  background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+          var(--color-surface);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.profileButton {
+  min-width: 184px;
+  height: 56px;
+  padding: 0 14px 0 10px;
+  border: 1px solid var(--color-border);
+  background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+          var(--color-surface);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  img {
+    width: 34px;
+    height: 34px;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.profileName {
+  font-size: 0.94rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  @include respond-down(xl) {
+    display: none;
+  }
+}
+
+.profileChevron {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+
+  @include respond-down(xl) {
+    display: none;
+  }
+}
+
+.notificationDot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: var(--color-brand-purple);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
