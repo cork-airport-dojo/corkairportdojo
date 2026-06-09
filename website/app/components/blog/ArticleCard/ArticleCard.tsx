@@ -1,57 +1,63 @@
 import { Clock3 } from "lucide-react";
-import { Badge } from "../../common/Badge/Badge";
-import { profile } from "~/lib/constants/profile";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent } from "~/components/ui/card";
 import styles from "./ArticleCard.module.scss";
 
 interface ArticleCardProps {
     title: string;
-    category: string;
     excerpt: string;
+    category: string;
+    image: string;
     author: string;
     date: string;
     readTime: string;
-    image: string;
-    authorImage?: string;
 }
 
 export function ArticleCard({
                                 title,
-                                category,
                                 excerpt,
+                                category,
+                                image,
                                 author,
                                 date,
                                 readTime,
-                                image,
-                                authorImage = profile.avatar,
                             }: ArticleCardProps) {
     return (
-        <article className={styles.card}>
-            <div
-                className={styles.cover}
-                style={{ backgroundImage: `url(${image})` }}
-            />
+        <Card className={styles.card}>
+            <div className={styles.imageWrap}>
+                <img
+                    src={image}
+                    alt={title}
+                    className={styles.image}
+                    onError={(event) => {
+                        event.currentTarget.src = "/logo.png";
+                    }}
+                />
+            </div>
 
-            <div className={styles.content}>
-                <Badge variant="topic">{category}</Badge>
+            <CardContent className={styles.content}>
+                <Badge variant="outline" className={styles.categoryBadge}>
+                    {category}
+                </Badge>
 
                 <h3 className={styles.title}>{title}</h3>
                 <p className={styles.excerpt}>{excerpt}</p>
 
                 <div className={styles.meta}>
-                    <div className={styles.author}>
-                        <img src={authorImage} alt={author} />
-                        <div className={styles.authorInfo}>
-                            <span className={styles.authorName}>{author}</span>
-                            <span className={styles.date}>{date}</span>
+                    <div className={styles.authorRow}>
+                        <img src="/avatar.jpg" alt={author} className={styles.avatar} />
+                        <div className={styles.authorMeta}>
+                            <strong>{author}</strong>
+                            <span>{date}</span>
                         </div>
                     </div>
 
-                    <span className={styles.readTime}>
-            <Clock3 size={14} />
-                        {readTime}
-          </span>
+                    <div className={styles.readTime}>
+                        <Clock3 size={15} />
+                        <span>{readTime}</span>
+                    </div>
                 </div>
-            </div>
-        </article>
+            </CardContent>
+        </Card>
     );
 }

@@ -4,4 +4,5 @@ export default [
     index("routes/_index.tsx"),
     route("modules", "routes/modules.tsx"),
     route("blog", "routes/blog.tsx"),
+    route("write", "routes/write.tsx"),
 ] satisfies RouteConfig;

@@ -1,0 +1,102 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  @include respond-down(md) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.controlButton {
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 0;
+  transition:
+          border-color var(--transition-base),
+          background-color var(--transition-base),
+          color var(--transition-base);
+
+  &:hover {
+    border-color: var(--color-border-hover);
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.trackWrap {
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.slide {
+  flex: 0 0 320px;
+  min-width: 320px;
+
+  @include respond-down(md) {
+    flex: 0 0 100%;
+    min-width: 100%;
+  }
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+  border-radius: 999px;
+  transition:
+          width var(--transition-base),
+          background-color var(--transition-base);
+}
+
+.dotActive {
+  width: 24px;
+  background: #8b5cf6;
+}

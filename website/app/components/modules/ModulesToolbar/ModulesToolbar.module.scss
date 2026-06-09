@@ -1,0 +1,54 @@
+@use "../../../styles/abstracts/mixins" as *;
+
+.toolbar {
+  @include elevated-panel;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.searchWrap {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.searchIcon {
+  color: var(--color-text-muted);
+}
+
+.searchInput {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  outline: none;
+  font-size: 0.96rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filterChip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filterChipActive {
+  color: var(--color-text);
+  border-color: rgba(147, 51, 234, 0.24);
+  background: rgba(147, 51, 234, 0.12);
+}

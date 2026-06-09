@@ -1,8 +1,10 @@
+import { AppShell } from "~/components/layout/AppShell/AppShell";
+import { HomePage } from "~/components/home/HomePage/HomePage";
+
 export default function IndexRoute() {
     return (
-        <div>
-            <h1>Home page route</h1>
-            <p>We will rebuild your current homepage here next.</p>
-        </div>
+        <AppShell>
+            <HomePage />
+        </AppShell>
     );
 }

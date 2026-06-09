@@ -1,30 +1,44 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 18px;
+
+  @include respond-down(md) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
-.title {
-  margin: 0;
-  font-size: 1.9rem;
-  line-height: 1.1;
-  font-weight: 700;
-  color: var(--color-text);
+.left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+
+  h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(1.8rem, 3vw, 2.3rem);
+    line-height: 1.05;
+    font-weight: 800;
+  }
 }
 
-.action {
+.linkAction {
+  color: var(--color-brand-blue);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--color-brand-blue);
-  font-size: 0.95rem;
+  gap: 8px;
+  font-size: 1rem;
   font-weight: 600;
-  transition:
-          color var(--transition-base),
-          transform var(--transition-base);
+  text-decoration: none;
+}
 
-  &:hover {
-    transform: translateX(2px);
-  }
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }

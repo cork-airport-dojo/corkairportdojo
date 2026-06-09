@@ -1,14 +1,12 @@
 import type { LucideIcon } from "lucide-react";
-import { Badge } from "../../common/Badge/Badge";
+import { Card, CardContent } from "~/components/ui/card";
 import styles from "./ModuleCard.module.scss";
-
-type Difficulty = "Beginner" | "Intermediate" | "Advanced";
 
 interface ModuleCardProps {
     title: string;
     description: string;
-    lessons: number;
-    difficulty: Difficulty;
+    lessons: string;
+    difficulty: "Beginner" | "Intermediate" | "Advanced";
     icon: LucideIcon;
 }
 
@@ -19,28 +17,34 @@ export function ModuleCard({
                                difficulty,
                                icon: Icon,
                            }: ModuleCardProps) {
-    const badgeVariant =
+    const difficultyClass =
         difficulty === "Beginner"
-            ? "beginner"
+            ? styles.beginner
             : difficulty === "Intermediate"
-                ? "intermediate"
-                : "advanced";
+                ? styles.intermediate
+                : styles.advanced;
 
     return (
-        <article className={styles.card}>
-            <div className={styles.iconWrap}>
-                <Icon size={28} />
-            </div>
+        <Card className={styles.card}>
+            <CardContent className={styles.content}>
+                <div className={styles.headerRow}>
+                    <div className={styles.iconWrap}>
+                        <Icon size={28} strokeWidth={1.8} />
+                    </div>
 
-            <div className={styles.body}>
-                <h3 className={styles.title}>{title}</h3>
-                <p className={styles.description}>{description}</p>
-            </div>
+                    <div className={styles.textBlock}>
+                        <h3 className={styles.title}>{title}</h3>
+                        <p className={styles.description}>{description}</p>
+                    </div>
+                </div>
 
-            <div className={styles.footer}>
-                <Badge variant={badgeVariant}>{difficulty}</Badge>
-                <span className={styles.lessonCount}>{lessons} Lessons</span>
-            </div>
-        </article>
+                <div className={styles.footerRow}>
+          <span className={`${styles.levelBadge} ${difficultyClass}`}>
+            {difficulty}
+          </span>
+                    <span className={styles.lessons}>{lessons}</span>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

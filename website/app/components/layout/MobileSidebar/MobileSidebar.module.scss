@@ -1,0 +1,24 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
+.mobileOnly {
+  display: none;
+
+  @include respond-down(lg) {
+    display: inline-flex;
+  }
+}
+
+.menuButton {
+  width: 58px;
+  height: 58px;
+  border-color: var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text);
+  border-radius: 0 !important;
+}
+
+.sheetContent {
+  width: 310px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}

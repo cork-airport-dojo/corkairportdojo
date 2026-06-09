@@ -1,0 +1,11 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+
+  @include respond-down(md) {
+    gap: 28px;
+  }
+}

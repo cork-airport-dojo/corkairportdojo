@@ -3,21 +3,34 @@
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
+
+  @include respond-down(md) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.leftZone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
 .searchWrap {
   flex: 1;
-  min-width: 0;
-  height: 56px;
+  min-height: 58px;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 18px;
+  padding: 0 16px;
   border: 1px solid var(--color-border);
-  background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
-          var(--color-surface);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0;
+  min-width: 0;
 }
 
 .searchIcon {
@@ -26,26 +39,30 @@
 }
 
 .searchInput {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  background: transparent;
-  color: var(--color-text);
-  outline: none;
-  font-size: 0.98rem;
-
-  &::placeholder {
-    color: var(--color-text-muted);
-  }
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: var(--color-text) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .shortcut {
-  padding: 6px 10px;
+  min-width: 48px;
+  height: 30px;
+  padding: 0 10px;
   border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.82rem;
-  line-height: 1;
+  font-weight: 600;
+  border-radius: 0;
+
+  @include respond-down(sm) {
+    display: none;
+  }
 }
 
 .actions {
@@ -56,72 +73,58 @@
 
 .iconButton {
   position: relative;
-  width: 56px;
-  height: 56px;
-  border: 1px solid var(--color-border);
-  background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
-          var(--color-surface);
+  width: 58px;
+  height: 58px;
+  border-color: var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
   color: var(--color-text);
+  border-radius: 0 !important;
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #a855f7;
+  color: white;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .profileButton {
-  min-width: 184px;
-  height: 56px;
-  padding: 0 14px 0 10px;
-  border: 1px solid var(--color-border);
-  background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
-          var(--color-surface);
+  min-height: 58px;
+  padding: 0 14px 0 12px;
+  border-color: var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
   color: var(--color-text);
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
+  border-radius: 0 !important;
+}
 
-  img {
-    width: 34px;
-    height: 34px;
-    object-fit: cover;
-    display: block;
-  }
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  object-fit: cover;
 }
 
 .profileName {
-  font-size: 0.94rem;
   font-weight: 600;
-  white-space: nowrap;
 
-  @include respond-down(xl) {
+  @include respond-down(sm) {
     display: none;
   }
 }
 
-.profileChevron {
-  margin-left: auto;
-  color: var(--color-text-secondary);
-
-  @include respond-down(xl) {
-    display: none;
-  }
-}
-
-.notificationDot {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  background: var(--color-brand-purple);
-  color: white;
-  font-size: 0.72rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.profileMenu {
+  min-width: 180px;
 }

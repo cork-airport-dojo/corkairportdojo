@@ -1,0 +1,15 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+
+  @include respond-down(xl) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include respond-down(sm) {
+    grid-template-columns: 1fr;
+  }
+}

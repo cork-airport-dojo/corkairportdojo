@@ -1,0 +1,107 @@
+.editorShell {
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.toolButton {
+  width: 38px;
+  height: 38px;
+  border-color: var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-secondary);
+  border-radius: 0 !important;
+
+  &:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 26px;
+  background: var(--color-border);
+  margin: 0 2px;
+}
+
+.editorBody {
+  min-height: 420px;
+  padding: 20px;
+}
+
+.editorContent {
+  :global(.ProseMirror) {
+    min-height: 380px;
+    outline: none;
+    color: var(--color-text);
+    line-height: 1.75;
+    font-size: 1rem;
+  }
+
+  :global(.ProseMirror p.is-editor-empty:first-child::before) {
+    content: attr(data-placeholder);
+    color: var(--color-text-muted);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  :global(.ProseMirror h1) {
+    margin: 1.2em 0 0.6em;
+    font-size: 2rem;
+    line-height: 1.1;
+    font-weight: 800;
+  }
+
+  :global(.ProseMirror h2) {
+    margin: 1.1em 0 0.55em;
+    font-size: 1.55rem;
+    line-height: 1.15;
+    font-weight: 700;
+  }
+
+  :global(.ProseMirror p) {
+    margin: 0.85em 0;
+  }
+
+  :global(.ProseMirror ul),
+  :global(.ProseMirror ol) {
+    padding-left: 1.4rem;
+    margin: 0.85em 0;
+  }
+
+  :global(.ProseMirror blockquote) {
+    margin: 1em 0;
+    padding-left: 1rem;
+    border-left: 3px solid #8b5cf6;
+    color: var(--color-text-secondary);
+  }
+
+  :global(.ProseMirror a) {
+    color: #60a5fa;
+    text-decoration: underline;
+  }
+
+  :global(.ProseMirror code) {
+    padding: 0.18em 0.4em;
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 0.92em;
+  }
+
+  :global(.ProseMirror pre) {
+    padding: 16px;
+    overflow-x: auto;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--color-border);
+  }
+}

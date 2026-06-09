@@ -1,8 +1,14 @@
+import { ModulesHero } from "~/components/modules/ModulesHero/ModulesHero";
+import { ModulesToolbar } from "~/components/modules/ModulesToolbar/ModulesToolbar";
+import { ModulesGrid } from "~/components/modules/ModulesGrid/ModulesGrid";
+import styles from "./modules.module.scss";
+
 export default function ModulesRoute() {
     return (
-        <div>
-            <h1>Modules page route</h1>
-            <p>We will rebuild your modules page here.</p>
+        <div className={styles.page}>
+            <ModulesHero />
+            <ModulesToolbar />
+            <ModulesGrid />
         </div>
     );
 }

@@ -6,23 +6,29 @@ interface SectionHeaderProps {
     title: string;
     actionLabel?: string;
     actionHref?: string;
+    actions?: React.ReactNode;
 }
 
 export function SectionHeader({
                                   title,
                                   actionLabel,
                                   actionHref,
+                                  actions,
                               }: SectionHeaderProps) {
     return (
         <div className={styles.header}>
-            <h2 className={styles.title}>{title}</h2>
+            <div className={styles.left}>
+                <h2>{title}</h2>
 
-            {actionLabel && actionHref ? (
-                <Link to={actionHref} className={styles.action}>
-                    <span>{actionLabel}</span>
-                    <ArrowRight size={16} />
-                </Link>
-            ) : null}
+                {actionLabel && actionHref && (
+                    <Link to={actionHref} className={styles.linkAction}>
+                        <span>{actionLabel}</span>
+                        <ArrowRight size={18} />
+                    </Link>
+                )}
+            </div>
+
+            {actions && <div className={styles.right}>{actions}</div>}
         </div>
     );
 }

@@ -1,57 +1,83 @@
 @use "../../../styles/abstracts/breakpoints" as *;
 
-.shell {
+.wrapper {
+  min-height: 100vh;
+  background: var(--color-background);
+}
+
+.layout {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   min-height: 100vh;
 
-  @include respond-down(md) {
-    display: block;
+  @include respond-down(lg) {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.leftColumn {
+.sidebarColumn {
+  width: 290px;
+  min-width: 290px;
+  max-width: 290px;
   position: sticky;
   top: 0;
+  align-self: start;
   height: 100vh;
-  z-index: var(--z-sidebar);
+  transition:
+          width var(--transition-base),
+          min-width var(--transition-base),
+          max-width var(--transition-base);
 
-  @include respond-down(md) {
+  @include respond-down(lg) {
     display: none;
   }
 }
 
-.desktopArea {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.topHeader {
-  padding: 24px 20px 0 24px;
-}
-
-.contentArea {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 20px;
-  align-items: start;
-  min-width: 0;
-  padding: 24px 20px 40px 24px;
-
-  @include respond-down(lg) {
-    grid-template-columns: 1fr;
-  }
+.sidebarColumnCollapsed {
+  width: 96px;
+  min-width: 96px;
+  max-width: 96px;
 }
 
 .mainColumn {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.rightColumn {
+.mainInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 22px;
+  padding: 24px 24px 32px;
   min-width: 0;
+  align-items: start;
 
-  @include respond-down(lg) {
-    display: none;
+  @include respond-down(xl) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @include respond-down(md) {
+    padding: 18px 16px 24px;
+    gap: 18px;
+  }
+}
+
+.content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.aside {
+  min-width: 0;
+  position: sticky;
+  top: 24px;
+  align-self: start;
+
+  @include respond-down(xl) {
+    position: static;
+    top: auto;
   }
 }
