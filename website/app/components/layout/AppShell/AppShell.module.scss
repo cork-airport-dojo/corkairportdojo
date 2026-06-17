@@ -6,78 +6,64 @@
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
   min-height: 100vh;
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
 
-  @include respond-down(lg) {
-    grid-template-columns: minmax(0, 1fr);
+  @include respond-down(xl) {
+    grid-template-columns: 1fr;
   }
 }
 
 .sidebarColumn {
-  width: 290px;
-  min-width: 290px;
-  max-width: 290px;
-  position: sticky;
-  top: 0;
-  align-self: start;
-  height: 100vh;
-  transition:
-          width var(--transition-base),
-          min-width var(--transition-base),
-          max-width var(--transition-base);
+  min-width: 0;
+  min-height: 100vh;
 
-  @include respond-down(lg) {
+  @include respond-down(xl) {
     display: none;
   }
 }
 
 .sidebarColumnCollapsed {
   width: 96px;
-  min-width: 96px;
-  max-width: 96px;
 }
 
 .mainColumn {
   min-width: 0;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .mainInner {
+  flex: 1;
+  min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 22px;
-  padding: 24px 24px 32px;
-  min-width: 0;
+  gap: 20px;
+  padding: 20px 20px 24px;
   align-items: start;
 
   @include respond-down(xl) {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr;
   }
+}
 
-  @include respond-down(md) {
-    padding: 18px 16px 24px;
-    gap: 18px;
-  }
+.mainInnerExpanded {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .content {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .aside {
   min-width: 0;
-  position: sticky;
-  top: 24px;
-  align-self: start;
 
   @include respond-down(xl) {
-    position: static;
-    top: auto;
+    display: none;
   }
 }

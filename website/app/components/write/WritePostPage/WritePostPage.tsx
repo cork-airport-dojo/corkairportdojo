@@ -1,157 +1,180 @@
-import { useMemo, useState } from "react";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { RichTextEditor } from "../RichTextEditor/RichTextEditor";
+import { useEffect, useMemo, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import {
+    calculateReadingTime,
+    calculateSeoScore,
+    calculateWordCount,
+} from "~/lib/post-editor";
+import { usePostEditorStore } from "~/store/use-post-editor-store";
+import { useEditorShortcuts } from "~/hooks/use-editor-shortcuts";
+import { PostEditorHeader } from "../PostEditorHeader/PostEditorHeader";
+import { PostEditorCard } from "../PostEditorCard/PostEditorCard";
+import { PostEditorSidebar } from "../PostEditorSidebar/PostEditorSidebar";
+import { CommandPalette } from "../CommandPalette/CommandPalette";
 import styles from "./WritePostPage.module.scss";
 
+async function fakePublishRequest() {
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    return { success: true };
+}
+
 export function WritePostPage() {
-    const [title, setTitle] = useState("");
-    const [excerpt, setExcerpt] = useState("");
-    const [category, setCategory] = useState("");
-    const [tags, setTags] = useState("");
-    const [coverImage, setCoverImage] = useState("");
-    const [content, setContent] = useState("");
+    const titleInputRef = useRef<HTMLInputElement>(null);
+    const editorAnchorRef = useRef<HTMLDivElement>(null);
 
-    const readingStats = useMemo(() => {
-        const plainText = `${title} ${excerpt} ${content}`
-            .replace(/<[^>]*>/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
+    const {
+        title,
+        description,
+        category,
+        tags,
+        coverImage,
+        content,
+        markdownMode,
+        status,
+        commandPaletteOpen,
+        lastSavedAt,
+        setTitle,
+        setDescription,
+        setCategory,
+        addTag,
+        removeTag,
+        setCoverImage,
+        setContent,
+        setMarkdownMode,
+        setStatus,
+        saveDraft,
+        loadDraft,
+        clearDraft,
+        setCommandPaletteOpen,
+    } = usePostEditorStore();
 
-        const wordCount = plainText ? plainText.split(" ").length : 0;
-        const readTime = Math.max(1, Math.ceil(wordCount / 200));
+    useEffect(() => {
+        loadDraft();
+    }, [loadDraft]);
 
-        return {
-            wordCount,
-            readTime,
+    useEffect(() => {
+        const timeout = window.setTimeout(() => {
+            saveDraft();
+        }, 1200);
+
+        return () => window.clearTimeout(timeout);
+    }, [
+        title,
+        description,
+        category,
+        tags,
+        coverImage,
+        content,
+        markdownMode,
+        saveDraft,
+    ]);
+
+    const wordCount = useMemo(() => {
+        return calculateWordCount(`${title} ${description} ${content}`);
+    }, [title, description, content]);
+
+    const readingTime = useMemo(() => calculateReadingTime(wordCount), [wordCount]);
+
+    const seoScore = useMemo(
+        () =>
+            calculateSeoScore({
+                title,
+                description,
+                category,
+                tags,
+                coverImage,
+                content,
+                markdownMode,
+                status,
+            }),
+        [title, description, category, tags, coverImage, content, markdownMode, status]
+    );
+
+    const publishMutation = useMutation({
+        mutationFn: fakePublishRequest,
+        onSuccess: () => {
+            setStatus("published");
+            saveDraft();
+        },
+    });
+
+    useEditorShortcuts({
+        onSaveDraft: saveDraft,
+        onPublish: () => publishMutation.mutate(),
+        onToggleCommandPalette: () => setCommandPaletteOpen(true),
+    });
+
+    useEffect(() => {
+        const onEsc = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setCommandPaletteOpen(false);
         };
-    }, [title, excerpt, content]);
+
+        window.addEventListener("keydown", onEsc);
+        return () => window.removeEventListener("keydown", onEsc);
+    }, [setCommandPaletteOpen]);
 
     return (
-        <section className={styles.page}>
-            <div className={styles.topBar}>
-                <div>
-                    <p className={styles.eyebrow}>Editor</p>
-                    <h1 className={styles.title}>Write a Post</h1>
-                    <p className={styles.subtitle}>
-                        Create a polished article with structured content, metadata, and
-                        publishing controls.
-                    </p>
-                </div>
+        <>
+            <CommandPalette
+                open={commandPaletteOpen}
+                onClose={() => setCommandPaletteOpen(false)}
+                onSaveDraft={saveDraft}
+                onPreview={() => setMarkdownMode(!markdownMode)}
+                onPublish={() => publishMutation.mutate()}
+                onFocusTitle={() => titleInputRef.current?.focus()}
+                onFocusEditor={() =>
+                    editorAnchorRef.current?.scrollIntoView({ behavior: "smooth" })
+                }
+                onClearDraft={clearDraft}
+            />
 
-                <div className={styles.topActions}>
-                    <Button variant="outline" className={styles.secondaryAction}>
-                        Save Draft
-                    </Button>
-                    <Button variant="outline" className={styles.secondaryAction}>
-                        Preview
-                    </Button>
-                    <Button className={styles.primaryAction}>Publish Post</Button>
+            <div className={styles.page}>
+                <PostEditorHeader />
+
+                <div className={styles.layout}>
+                    <motion.div
+                        ref={editorAnchorRef}
+                        className={styles.main}
+                        initial={{ opacity: 0, y: 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.22 }}
+                    >
+                        <PostEditorCard
+                            title={title}
+                            description={description}
+                            category={category}
+                            tags={tags}
+                            coverImage={coverImage}
+                            content={content}
+                            markdownMode={markdownMode}
+                            onTitleChange={setTitle}
+                            onDescriptionChange={setDescription}
+                            onCategoryChange={setCategory}
+                            onAddTag={addTag}
+                            onRemoveTag={removeTag}
+                            onCoverImageChange={setCoverImage}
+                            onContentChange={setContent}
+                            onToggleMarkdownMode={setMarkdownMode}
+                            titleInputRef={titleInputRef}
+                        />
+                    </motion.div>
+
+                    <div className={styles.sidebar}>
+                        <PostEditorSidebar
+                            wordCount={wordCount}
+                            readingTime={readingTime}
+                            seoScore={seoScore}
+                            status={status}
+                            lastSavedAt={lastSavedAt}
+                            markdownMode={markdownMode}
+                            onSaveDraft={saveDraft}
+                            onPreview={() => setMarkdownMode(!markdownMode)}
+                            onPublish={() => publishMutation.mutate()}
+                        />
+                    </div>
                 </div>
             </div>
-
-            <div className={styles.layout}>
-                <div className={styles.main}>
-                    <div className={styles.editorCard}>
-                        <div className={styles.fieldGroup}>
-                            <label className={styles.label}>Post Title</label>
-                            <Input
-                                value={title}
-                                onChange={(event) => setTitle(event.target.value)}
-                                placeholder="Enter your post title..."
-                                className={styles.titleInput}
-                            />
-                        </div>
-
-                        <div className={styles.fieldGroup}>
-                            <label className={styles.label}>Excerpt</label>
-                            <textarea
-                                value={excerpt}
-                                onChange={(event) => setExcerpt(event.target.value)}
-                                placeholder="Write a short summary for your post..."
-                                className={styles.excerptInput}
-                            />
-                        </div>
-
-                        <div className={styles.fieldGroup}>
-                            <label className={styles.label}>Content</label>
-                            <RichTextEditor value={content} onChange={setContent} />
-                        </div>
-                    </div>
-                </div>
-
-                <aside className={styles.sidebar}>
-                    <div className={styles.sideCard}>
-                        <h2>Post Settings</h2>
-
-                        <div className={styles.sideField}>
-                            <label className={styles.label}>Category</label>
-                            <Input
-                                value={category}
-                                onChange={(event) => setCategory(event.target.value)}
-                                placeholder="e.g. React"
-                                className={styles.sideInput}
-                            />
-                        </div>
-
-                        <div className={styles.sideField}>
-                            <label className={styles.label}>Tags</label>
-                            <Input
-                                value={tags}
-                                onChange={(event) => setTags(event.target.value)}
-                                placeholder="e.g. react, typescript, architecture"
-                                className={styles.sideInput}
-                            />
-                        </div>
-
-                        <div className={styles.sideField}>
-                            <label className={styles.label}>Cover Image URL</label>
-                            <Input
-                                value={coverImage}
-                                onChange={(event) => setCoverImage(event.target.value)}
-                                placeholder="https://example.com/cover.jpg"
-                                className={styles.sideInput}
-                            />
-                        </div>
-                    </div>
-
-                    <div className={styles.sideCard}>
-                        <h2>Post Stats</h2>
-
-                        <div className={styles.statsList}>
-                            <div className={styles.statRow}>
-                                <span>Words</span>
-                                <strong>{readingStats.wordCount}</strong>
-                            </div>
-
-                            <div className={styles.statRow}>
-                                <span>Read Time</span>
-                                <strong>{readingStats.readTime} min</strong>
-                            </div>
-
-                            <div className={styles.statRow}>
-                                <span>Status</span>
-                                <strong>Draft</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    {coverImage && (
-                        <div className={styles.sideCard}>
-                            <h2>Cover Preview</h2>
-                            <div className={styles.coverPreview}>
-                                <img
-                                    src={coverImage}
-                                    alt="Cover preview"
-                                    onError={(event) => {
-                                        event.currentTarget.style.display = "none";
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    )}
-                </aside>
-            </div>
-        </section>
+        </>
     );
 }

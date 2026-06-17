@@ -42,7 +42,6 @@ export function Header({
                         placeholder="Search articles, modules, topics..."
                         aria-label="Search articles, modules, topics"
                     />
-                    <span className={styles.shortcut}>⌘K</span>
                 </div>
             </div>
 

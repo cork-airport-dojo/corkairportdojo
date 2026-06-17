@@ -6,9 +6,13 @@ import styles from "./AppShell.module.scss";
 
 interface AppShellProps {
     children: React.ReactNode;
+    hideDefaultRightSidebar?: boolean;
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({
+                             children,
+                             hideDefaultRightSidebar = false,
+                         }: AppShellProps) {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     return (
@@ -26,20 +30,25 @@ export function AppShell({ children }: AppShellProps) {
                 </div>
 
                 <div className={styles.mainColumn}>
-                    <div className={styles.mainInner}>
-                        <main className={styles.content}>
-                            <Header
-                                sidebarCollapsed={sidebarCollapsed}
-                                onToggleSidebarCollapse={() =>
-                                    setSidebarCollapsed((value) => !value)
-                                }
-                            />
-                            {children}
-                        </main>
+                    <Header
+                        sidebarCollapsed={sidebarCollapsed}
+                        onToggleSidebarCollapse={() =>
+                            setSidebarCollapsed((value) => !value)
+                        }
+                    />
 
-                        <aside className={styles.aside}>
-                            <RightSidebar />
-                        </aside>
+                    <div
+                        className={`${styles.mainInner} ${
+                            hideDefaultRightSidebar ? styles.mainInnerExpanded : ""
+                        }`}
+                    >
+                        <main className={styles.content}>{children}</main>
+
+                        {!hideDefaultRightSidebar && (
+                            <aside className={styles.aside}>
+                                <RightSidebar />
+                            </aside>
+                        )}
                     </div>
                 </div>
             </div>

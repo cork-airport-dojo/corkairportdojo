@@ -1,0 +1,100 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.palette {
+  position: fixed;
+  top: 12vh;
+  left: 50%;
+  z-index: 130;
+  width: min(680px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015)),
+          rgba(8, 12, 25, 0.96);
+  box-shadow:
+          0 24px 80px rgba(0, 0, 0, 0.45),
+          0 0 0 1px rgba(139, 92, 246, 0.08);
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--color-text-muted);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  outline: none;
+  font-size: 1rem;
+}
+
+.shortcut {
+  min-width: 42px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.commandList {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.commandItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 12px;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.commandIcon {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #c4b5fd;
+  flex-shrink: 0;
+}
+
+.commandLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.commandHint {
+  color: var(--color-text-muted);
+}

@@ -16,6 +16,7 @@ import {
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { NavLink } from "react-router";
 import { Button } from "~/components/ui/button";
+import { Link } from "react-router";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -85,9 +86,11 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
             </nav>
 
             <div className={styles.footer}>
-                <Button className={styles.writeCta} size="lg">
-                    <PenSquare size={18} />
-                    {!collapsed && <span>Write Post</span>}
+                <Button asChild className={styles.writeCta} size="lg">
+                    <Link to="/write">
+                        <PenSquare size={18} />
+                        {!collapsed && <span>Write Post</span>}
+                    </Link>
                 </Button>
 
                 {!collapsed && (

@@ -1,107 +1,128 @@
 .editorShell {
-  border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 0;
+  background: rgba(17, 24, 39, 1);
+  box-shadow: none;
 }
 
 .toolbar {
   display: flex;
   align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 14px;
-  border-bottom: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.02);
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .toolButton {
-  width: 38px;
-  height: 38px;
-  border-color: var(--color-border);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--color-text-secondary);
+  min-width: 42px;
+  height: 42px;
+  padding: 0 !important;
+  border-color: rgba(255, 255, 255, 0.08);
   border-radius: 0 !important;
-
-  &:hover {
-    color: var(--color-text);
-    background: rgba(255, 255, 255, 0.05);
-  }
-}
-
-.divider {
-  width: 1px;
-  height: 26px;
-  background: var(--color-border);
-  margin: 0 2px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
 }
 
 .editorBody {
-  min-height: 420px;
-  padding: 20px;
+  min-height: 460px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .editorContent {
   :global(.ProseMirror) {
-    min-height: 380px;
+    min-height: 420px;
     outline: none;
-    color: var(--color-text);
-    line-height: 1.75;
-    font-size: 1rem;
+    color: #f8fafc;
+    font-size: 1.05rem;
+    line-height: 1.95;
   }
 
   :global(.ProseMirror p.is-editor-empty:first-child::before) {
     content: attr(data-placeholder);
-    color: var(--color-text-muted);
+    color: #64748b;
     float: left;
     height: 0;
     pointer-events: none;
   }
 
   :global(.ProseMirror h1) {
-    margin: 1.2em 0 0.6em;
+    margin: 1rem 0 0.65rem;
     font-size: 2rem;
-    line-height: 1.1;
+    line-height: 1.08;
     font-weight: 800;
   }
 
   :global(.ProseMirror h2) {
-    margin: 1.1em 0 0.55em;
+    margin: 1rem 0 0.55rem;
     font-size: 1.55rem;
-    line-height: 1.15;
+    line-height: 1.12;
     font-weight: 700;
   }
 
   :global(.ProseMirror p) {
-    margin: 0.85em 0;
+    margin: 0.95rem 0;
   }
 
   :global(.ProseMirror ul),
   :global(.ProseMirror ol) {
+    margin: 0.9rem 0;
     padding-left: 1.4rem;
-    margin: 0.85em 0;
   }
 
   :global(.ProseMirror blockquote) {
-    margin: 1em 0;
+    margin: 1rem 0;
     padding-left: 1rem;
     border-left: 3px solid #8b5cf6;
-    color: var(--color-text-secondary);
+    color: #cbd5e1;
   }
 
-  :global(.ProseMirror a) {
-    color: #60a5fa;
-    text-decoration: underline;
-  }
-
-  :global(.ProseMirror code) {
-    padding: 0.18em 0.4em;
-    background: rgba(255, 255, 255, 0.06);
-    font-size: 0.92em;
+  :global(.ProseMirror img) {
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+    display: block;
   }
 
   :global(.ProseMirror pre) {
-    padding: 16px;
+    margin: 1rem 0;
+    padding: 18px;
     overflow-x: auto;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--color-border);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0;
+    background: rgba(2, 6, 23, 1);
+  }
+
+  :global(.ProseMirror code) {
+    font-size: 0.92em;
+  }
+}
+
+.previewWrap {
+  min-height: 460px;
+  padding: 24px;
+  color: #f8fafc;
+  line-height: 1.9;
+  background: rgba(255, 255, 255, 0.02);
+
+  h1,
+  h2,
+  h3 {
+    color: #f8fafc;
+  }
+
+  pre {
+    padding: 18px;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0;
+    background: rgba(2, 6, 23, 1);
+  }
+
+  code {
+    font-size: 0.92em;
   }
 }

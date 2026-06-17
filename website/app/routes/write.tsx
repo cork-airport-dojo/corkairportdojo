@@ -3,7 +3,7 @@ import { WritePostPage } from "~/components/write/WritePostPage/WritePostPage";
 
 export default function WriteRoute() {
     return (
-        <AppShell>
+        <AppShell hideDefaultRightSidebar>
             <WritePostPage />
         </AppShell>
     );
