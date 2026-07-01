@@ -57,7 +57,8 @@ export const DropdownMenuContent = React.forwardRef<
             ref={ref}
             sideOffset={sideOffset}
             className={cn(
-                "z-50 min-w-[8rem] border border-border bg-popover p-1 text-popover-foreground shadow-md",
+                "z-50 min-w-[8rem] border border-border p-1 text-popover-foreground shadow-lg",
+                "bg-[var(--color-bg-elevated)] backdrop-blur-xl",
                 className
             )}
             {...props}
@@ -99,17 +100,16 @@ export const DropdownMenuCheckboxItem = React.forwardRef<
         checked={checked}
         {...props}
     >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
-      </DropdownMenuPrimitive.ItemIndicator>
-    </span>
+        <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+            <DropdownMenuPrimitive.ItemIndicator>
+                <Check className="h-4 w-4" />
+            </DropdownMenuPrimitive.ItemIndicator>
+        </span>
         {children}
     </DropdownMenuPrimitive.CheckboxItem>
 ));
 
-DropdownMenuCheckboxItem.displayName =
-    DropdownMenuPrimitive.CheckboxItem.displayName;
+DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName;
 
 export const DropdownMenuRadioItem = React.forwardRef<
     React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
@@ -123,11 +123,11 @@ export const DropdownMenuRadioItem = React.forwardRef<
         )}
         {...props}
     >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
-        <Circle className="h-2 w-2 fill-current" />
-      </DropdownMenuPrimitive.ItemIndicator>
-    </span>
+        <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+            <DropdownMenuPrimitive.ItemIndicator>
+                <Circle className="h-2 w-2 fill-current" />
+            </DropdownMenuPrimitive.ItemIndicator>
+        </span>
         {children}
     </DropdownMenuPrimitive.RadioItem>
 ));
