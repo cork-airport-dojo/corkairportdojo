@@ -1,0 +1,371 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+  padding-bottom: 100px;
+}
+
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+
+  @include respond-down(lg) {
+    flex-direction: column;
+  }
+}
+
+.heroMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  min-width: 0;
+
+  @include respond-down(md) {
+    flex-direction: column;
+  }
+}
+
+.avatar {
+  width: 104px;
+  height: 104px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+  flex-shrink: 0;
+}
+
+.heroContent {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eyebrow {
+  color: var(--color-brand-blue);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.name {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+.role {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.bio {
+  max-width: 760px;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 4px;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.heroActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 220px;
+  flex-shrink: 0;
+
+  @include respond-down(lg) {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  @include respond-down(md) {
+    flex-direction: column;
+  }
+}
+
+.primaryAction,
+.secondaryAction {
+  min-height: 44px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+
+  @include respond-down(xl) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include respond-down(sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.statCardContent {
+  padding: 20px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.statLabel {
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.statValue {
+  color: var(--color-text);
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.contentLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+
+  @include respond-down(xl) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mainColumn,
+.rail {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.panel {
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.panelHeader {
+  padding-bottom: 0 !important;
+}
+
+.panelTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+}
+
+.panelIcon {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.panelBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 16px !important;
+}
+
+.list,
+.activityList,
+.linkList,
+.badgeList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.listItemText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  strong {
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  span {
+    color: var(--color-text-secondary);
+    font-size: 0.92rem;
+  }
+}
+
+.listMeta {
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.activityItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.activityDot {
+  width: 8px;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--color-brand-purple);
+  flex-shrink: 0;
+}
+
+.activityText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  strong {
+    color: var(--color-text);
+    font-size: 0.98rem;
+    line-height: 1.4;
+  }
+
+  span {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+  }
+}
+
+.badgeList {
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.badge {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.linkItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  text-decoration: none;
+  transition:
+          border-color var(--transition-base),
+          background-color var(--transition-base);
+
+  &:hover {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-soft);
+  }
+}
+
+.linkLabel {
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.linkValue {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.completionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.completionValue {
+  color: var(--color-text);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.completionText {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.completionButton {
+  min-height: 44px;
+}

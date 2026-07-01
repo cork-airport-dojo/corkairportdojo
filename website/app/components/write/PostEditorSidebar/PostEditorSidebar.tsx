@@ -28,9 +28,9 @@ export function PostEditorSidebar({
     return (
         <motion.aside
             className={styles.sidebar}
-            initial={{ opacity: 0, x: 10 }}
+            initial={{ opacity: 0, x: 8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2, delay: 0.06 }}
+            transition={{ duration: 0.18, delay: 0.06 }}
         >
             <div className={styles.card}>
                 <h2>Post Settings</h2>

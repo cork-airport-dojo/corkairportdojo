@@ -33,7 +33,7 @@ export function MobileSidebar({
                 </SheetTrigger>
 
                 <SheetContent side="left" className={styles.sheetContent}>
-                    <Sidebar collapsed={collapsed} onToggleCollapse={onToggleCollapse} />
+                    <Sidebar collapsed={false} onToggleCollapse={onToggleCollapse} />
                 </SheetContent>
             </Sheet>
         </div>

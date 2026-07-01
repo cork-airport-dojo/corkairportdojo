@@ -66,7 +66,7 @@ export function RichTextEditor({
                 autolink: true,
             }),
             Placeholder.configure({
-                placeholder: "Write your article here...",
+                placeholder: "Start writing your article here...",
             }),
             CodeBlockLowlight.configure({
                 lowlight,
@@ -183,18 +183,9 @@ export function RichTextEditor({
                     type="button"
                     variant="outline"
                     className={styles.toolButton}
-                    onClick={() => editor.chain().focus().toggleBulletList().run()}
+                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
                 >
-                    <List size={16} />
-                </Button>
-
-                <Button
-                    type="button"
-                    variant="outline"
-                    className={styles.toolButton}
-                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                >
-                    <ListOrdered size={16} />
+                    <Code2 size={16} />
                 </Button>
 
                 <Button
@@ -210,14 +201,25 @@ export function RichTextEditor({
                     type="button"
                     variant="outline"
                     className={styles.toolButton}
-                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                    onClick={() => editor.chain().focus().toggleBulletList().run()}
                 >
-                    <Code2 size={16} />
+                    <List size={16} />
+                </Button>
+
+                <Button
+                    type="button"
+                    variant="outline"
+                    className={styles.toolButton}
+                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                >
+                    <ListOrdered size={16} />
                 </Button>
             </div>
 
             <div className={styles.editorBody}>
-                <EditorContent editor={editor} className={styles.editorContent} />
+                <div className={styles.editorContent}>
+                    <EditorContent editor={editor} />
+                </div>
             </div>
         </div>
     );

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
     BookOpen,
     ChevronDown,
@@ -12,31 +13,33 @@ import {
     User,
     Settings,
     LogOut,
+    LogIn,
 } from "lucide-react";
-import { SiGithub } from "@icons-pack/react-simple-icons";
-import { NavLink } from "react-router";
+import {   FiGithub, FiLinkedin } from "react-icons/fi";
+import { NavLink, Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
-import { Link } from "react-router";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./Sidebar.module.scss";
 
-const navItems = [
+const publicNavItems = [
     { to: "/", label: "Home", icon: Home, end: true },
     { to: "/modules", label: "Modules", icon: Layers3 },
     { to: "/blog", label: "Blog", icon: BookOpen },
     { to: "/categories", label: "Categories", icon: FolderKanban },
+    { to: "/tags", label: "Tags", icon: Hash },
+    { to: "/resources", label: "Resources", icon: Bookmark },
     { to: "/about", label: "About", icon: Info },
 ];
 
-const profile = {
-    name: "Chris Murphy",
-    avatar: "/avatar.jpg",
-};
+const privateNavItems = [
+    { to: "/profile", label: "Profile", icon: User },
+];
 
 interface SidebarProps {
     collapsed: boolean;
@@ -44,6 +47,22 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
+    const navigate = useNavigate();
+    const { isAuthenticated, userName, hydrate, logout } = useAuthStore();
+
+    useEffect(() => {
+        hydrate();
+    }, [hydrate]);
+
+    const navItems = isAuthenticated
+        ? [...publicNavItems, ...privateNavItems]
+        : publicNavItems;
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login?redirectTo=%2Fwrite", { replace: true });
+    };
+
     return (
         <aside
             className={`${styles.sidebar} ${
@@ -76,6 +95,7 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                             }
                             title={collapsed ? item.label : undefined}
                         >
+                            <span className={styles.navItemAccent} />
                             <Icon size={18} />
                             {!collapsed && <span>{item.label}</span>}
                         </NavLink>
@@ -84,21 +104,30 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
             </nav>
 
             <div className={styles.footer}>
-                <Button asChild className={styles.writeCta} size="lg">
-                    <Link to="/write">
-                        <PenSquare size={18} />
-                        {!collapsed && <span>Write Post</span>}
-                    </Link>
-                </Button>
+                {isAuthenticated ? (
+                    <Button asChild className={styles.writeCta} size="lg">
+                        <Link to="/write">
+                            <PenSquare size={18} />
+                            {!collapsed && <span>Write Post</span>}
+                        </Link>
+                    </Button>
+                ) : (
+                    <Button asChild variant="outline" className={styles.loginCta} size="lg">
+                        <Link to="/login?redirectTo=%2Fwrite">
+                            <LogIn size={18} />
+                            {!collapsed && <span>Login to Write</span>}
+                        </Link>
+                    </Button>
+                )}
 
-                {!collapsed && (
+                {!collapsed && isAuthenticated && (
                     <>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className={styles.profileCard}>
-                                    <img src={profile.avatar} alt={profile.name} />
+                                    <img src="/avatar.jpg" alt={userName} />
                                     <div className={styles.profileInfo}>
-                                        <strong>{profile.name}</strong>
+                                        <strong>{userName}</strong>
                                         <span>View Profile</span>
                                     </div>
                                     <ChevronDown size={16} className={styles.profileChevron} />
@@ -110,15 +139,17 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                                 side="top"
                                 className={styles.sidebarProfileMenu}
                             >
-                                <DropdownMenuItem>
-                                    <User size={16} />
-                                    <span>Profile</span>
+                                <DropdownMenuItem asChild>
+                                    <Link to="/profile">
+                                        <User size={16} />
+                                        <span>Profile</span>
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <Settings size={16} />
                                     <span>Settings</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleLogout}>
                                     <LogOut size={16} />
                                     <span>Sign out</span>
                                 </DropdownMenuItem>
@@ -126,35 +157,25 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                         </DropdownMenu>
 
                         <div className={styles.socialRow}>
-                            <Button
-                                asChild
-                                variant="outline"
-                                size="icon"
-                                className={`${styles.socialButton} ${styles.githubButton}`}
-                            >
+                            <Button asChild variant="outline" size="icon" className={styles.socialButton}>
                                 <a
                                     href="https://github.com/SentinelMurphy"
                                     target="_blank"
                                     rel="noreferrer"
                                     aria-label="GitHub"
                                 >
-                                    <SiGithub size={16} />
+                                    <FiGithub size={16} />
                                 </a>
                             </Button>
 
-                            <Button
-                                asChild
-                                variant="outline"
-                                size="icon"
-                                className={`${styles.socialButton} ${styles.linkedinButton}`}
-                            >
+                            <Button asChild variant="outline" size="icon" className={styles.socialButton}>
                                 <a
                                     href="https://www.linkedin.com/"
                                     target="_blank"
                                     rel="noreferrer"
                                     aria-label="LinkedIn"
                                 >
-                                    <SiGithub size={16} />
+                                    <FiLinkedin size={16} />
                                 </a>
                             </Button>
                         </div>

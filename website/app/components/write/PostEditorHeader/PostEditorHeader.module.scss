@@ -5,9 +5,8 @@
   gap: 16px;
   min-height: 72px;
   padding: 0 18px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 
 .left {
@@ -19,11 +18,10 @@
 
 .iconWrap,
 .utilityButton {
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.02);
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
   color: var(--color-text);
   display: inline-flex;
   align-items: center;
@@ -44,5 +42,12 @@
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: -0.01em;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.45;
   }
 }

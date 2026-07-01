@@ -1,14 +1,14 @@
 import { motion } from "framer-motion";
-import { PenTool, CopyPlus } from "lucide-react";
+import { CopyPlus, PenTool } from "lucide-react";
 import styles from "./PostEditorHeader.module.scss";
 
 export function PostEditorHeader() {
     return (
         <motion.div
             className={styles.header}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.18 }}
         >
             <div className={styles.left}>
                 <div className={styles.iconWrap}>
@@ -17,6 +17,7 @@ export function PostEditorHeader() {
 
                 <div className={styles.textBlock}>
                     <h1>Create New Article</h1>
+                    <p>Create and publish articles for the CorkAirportDojo community.</p>
                 </div>
             </div>
 

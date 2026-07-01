@@ -1,21 +1,20 @@
-@use "../../../styles/abstracts/mixins" as *;
-
 .toolbar {
-  @include elevated-panel;
-  padding: 20px;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .searchWrap {
-  min-height: 54px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px;
+  padding: 0 14px;
   border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--color-panel);
 }
 
 .searchIcon {
@@ -31,6 +30,20 @@
   font-size: 0.96rem;
 }
 
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filterLabel {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .filterGroup {
   display: flex;
   flex-wrap: wrap;
@@ -41,14 +54,23 @@
   min-height: 40px;
   padding: 0 14px;
   border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--color-panel);
   color: var(--color-text-secondary);
   font-weight: 600;
   cursor: pointer;
+  transition:
+          border-color var(--transition-base),
+          background-color var(--transition-base),
+          color var(--transition-base);
+
+  &:hover {
+    background: var(--color-hover, #1c2230);
+    color: var(--color-text);
+  }
 }
 
 .filterChipActive {
   color: var(--color-text);
-  border-color: rgba(147, 51, 234, 0.24);
-  background: rgba(147, 51, 234, 0.12);
+  border-color: var(--color-brand-purple);
+  background: rgba(109, 93, 252, 0.12);
 }

@@ -3,14 +3,14 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
   min-width: 0;
 }
 
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 18px;
+  gap: 24px;
   align-items: start;
 
   @include respond-down(xl) {

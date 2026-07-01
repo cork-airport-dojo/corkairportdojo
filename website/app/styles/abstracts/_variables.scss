@@ -1,30 +1,37 @@
 :root {
-  --color-bg: #0a0c18;
-  --color-bg-elevated: #111424;
-  --color-surface: #171b2d;
-  --color-surface-soft: #1b2035;
+  --color-bg: #080a0f;
+  --color-bg-elevated: #0d1016;
+  --color-surface: #11141b;
+  --color-panel: #151922;
+  --color-surface-soft: #1a1f29;
 
-  --color-text: #f5f7ff;
-  --color-text-secondary: #a7afc4;
-  --color-text-muted: #7e869e;
+  --color-text: #f5f7fa;
+  --color-text-secondary: #a7b0be;
+  --color-text-muted: #94a3b8;
 
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 255, 255, 0.14);
+  --color-border: #242a36;
+  --color-border-hover: #323b4a;
 
-  --color-brand-blue: #60a5fa;
-  --color-brand-purple: #9333ea;
+  --color-brand-blue: #3b82f6;
+  --color-brand-purple: #6d5dfc;
+  --color-brand-purple-hover: #7c6eff;
 
-  --gradient-brand: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
-  --glow-purple: 0 12px 30px rgba(147, 51, 234, 0.25);
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
 
   --font-body:
-          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Geist Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           sans-serif;
   --font-heading:
-          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Geist Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           sans-serif;
 
-  --transition-base: 180ms ease;
+  --transition-base: 200ms ease;
+
+  --layout-sidebar-width: 260px;
+  --layout-sidebar-collapsed-width: 88px;
+  --layout-right-rail-width: 320px;
 
   --z-sidebar: 30;
   --z-header: 40;

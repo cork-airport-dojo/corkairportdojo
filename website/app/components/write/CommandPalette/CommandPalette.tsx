@@ -6,7 +6,6 @@ import {
     Focus,
     Save,
     Search,
-    Sparkles,
     Trash2,
     Upload,
 } from "lucide-react";
@@ -106,9 +105,9 @@ export function CommandPalette({
 
                     <motion.div
                         className={styles.palette}
-                        initial={{ opacity: 0, y: 18, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.18 }}
                     >
                         <div className={styles.searchRow}>
@@ -136,9 +135,12 @@ export function CommandPalette({
                                 >
                                     <span className={styles.commandIcon}>{item.icon}</span>
                                     <span className={styles.commandLabel}>{item.label}</span>
-                                    <Sparkles size={14} className={styles.commandHint} />
                                 </button>
                             ))}
+
+                            {filtered.length === 0 && (
+                                <div className={styles.emptyState}>No commands found.</div>
+                            )}
                         </div>
                     </motion.div>
                 </>

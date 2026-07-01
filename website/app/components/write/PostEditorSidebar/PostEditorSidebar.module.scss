@@ -1,18 +1,15 @@
 .sidebar {
   position: sticky;
-  top: 20px;
+  top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .card {
-  padding: 22px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 0;
-  background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01)),
-          rgba(22, 28, 48, 0.96);
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
 
   h2 {
     margin: 0 0 18px;
@@ -52,7 +49,7 @@
 .savedRow {
   margin-top: 18px;
   padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid var(--color-border);
 }
 
 .actionStack {
@@ -63,19 +60,19 @@
 
 .secondaryButton,
 .primaryButton {
-  min-height: 52px;
+  min-height: 44px;
   border-radius: 0 !important;
 }
 
 .secondaryButton {
-  border-color: rgba(255, 255, 255, 0.07);
-  background: rgba(255, 255, 255, 0.035);
+  border-color: var(--color-border);
+  background: var(--color-panel);
   color: var(--color-text);
 }
 
 .primaryButton {
   border: none;
-  background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+  background: var(--color-brand-purple);
   color: white;
 }
 

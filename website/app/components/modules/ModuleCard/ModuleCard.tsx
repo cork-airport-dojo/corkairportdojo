@@ -29,7 +29,7 @@ export function ModuleCard({
             <CardContent className={styles.content}>
                 <div className={styles.headerRow}>
                     <div className={styles.iconWrap}>
-                        <Icon size={28} strokeWidth={1.8} />
+                        <Icon size={22} strokeWidth={1.9} />
                     </div>
 
                     <div className={styles.textBlock}>
@@ -39,9 +39,9 @@ export function ModuleCard({
                 </div>
 
                 <div className={styles.footerRow}>
-          <span className={`${styles.levelBadge} ${difficultyClass}`}>
-            {difficulty}
-          </span>
+                    <span className={`${styles.levelBadge} ${difficultyClass}`}>
+                        {difficulty}
+                    </span>
                     <span className={styles.lessons}>{lessons}</span>
                 </div>
             </CardContent>

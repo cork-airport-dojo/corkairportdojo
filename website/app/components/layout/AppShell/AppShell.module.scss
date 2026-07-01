@@ -8,7 +8,16 @@
 .layout {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 310px minmax(0, 1fr);
+  grid-template-columns: var(--layout-sidebar-width) minmax(0, 1fr);
+  transition: grid-template-columns var(--transition-base);
+
+  @include respond-down(xl) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.layoutCollapsed {
+  grid-template-columns: var(--layout-sidebar-collapsed-width) minmax(0, 1fr);
 
   @include respond-down(xl) {
     grid-template-columns: 1fr;
@@ -25,7 +34,7 @@
 }
 
 .sidebarColumnCollapsed {
-  width: 96px;
+  width: var(--layout-sidebar-collapsed-width);
 }
 
 .mainColumn {
@@ -39,13 +48,19 @@
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 20px;
-  padding: 20px 20px 24px;
+  grid-template-columns: minmax(0, 1fr) var(--layout-right-rail-width);
+  gap: 24px;
+  padding: 0 24px 24px;
   align-items: start;
 
   @include respond-down(xl) {
     grid-template-columns: 1fr;
+    padding: 0 20px 20px;
+  }
+
+  @include respond-down(md) {
+    gap: 20px;
+    padding: 0 16px 16px;
   }
 }
 
@@ -57,7 +72,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+  padding-bottom: 80px;
 }
 
 .aside {

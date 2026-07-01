@@ -26,32 +26,38 @@ export function ModulesToolbar() {
                 />
             </div>
 
-            <div className={styles.filterGroup}>
-                {topics.map((topic, index) => (
-                    <button
-                        key={topic}
-                        type="button"
-                        className={`${styles.filterChip} ${
-                            index === 0 ? styles.filterChipActive : ""
-                        }`}
-                    >
-                        {topic}
-                    </button>
-                ))}
+            <div className={styles.filterSection}>
+                <div className={styles.filterLabel}>Topics</div>
+                <div className={styles.filterGroup}>
+                    {topics.map((topic, index) => (
+                        <button
+                            key={topic}
+                            type="button"
+                            className={`${styles.filterChip} ${
+                                index === 0 ? styles.filterChipActive : ""
+                            }`}
+                        >
+                            {topic}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            <div className={styles.filterGroup}>
-                {difficulties.map((difficulty, index) => (
-                    <button
-                        key={difficulty}
-                        type="button"
-                        className={`${styles.filterChip} ${
-                            index === 0 ? styles.filterChipActive : ""
-                        }`}
-                    >
-                        {difficulty}
-                    </button>
-                ))}
+            <div className={styles.filterSection}>
+                <div className={styles.filterLabel}>Level</div>
+                <div className={styles.filterGroup}>
+                    {difficulties.map((difficulty, index) => (
+                        <button
+                            key={difficulty}
+                            type="button"
+                            className={`${styles.filterChip} ${
+                                index === 0 ? styles.filterChipActive : ""
+                            }`}
+                        >
+                            {difficulty}
+                        </button>
+                    ))}
+                </div>
             </div>
         </section>
     );

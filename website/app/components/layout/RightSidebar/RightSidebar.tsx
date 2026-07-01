@@ -60,15 +60,15 @@ export function RightSidebar() {
                     <div className={styles.weatherContent}>
                         <div className={styles.weatherBodyTop}>
                             <div className={styles.weatherBodyIcon}>
-                                <Wind size={54} strokeWidth={1.8} />
+                                <Wind size={44} strokeWidth={1.8} />
                             </div>
 
                             <div className={styles.weatherText}>
                                 <h4>Yellow Wind Warning</h4>
                                 <p className={styles.weatherLocation}>Cork, Ireland</p>
                                 <span className={styles.weatherTime}>
-                  18:00 Today - 03:00 Tomorrow
-                </span>
+                                    18:00 Today - 03:00 Tomorrow
+                                </span>
                             </div>
                         </div>
 

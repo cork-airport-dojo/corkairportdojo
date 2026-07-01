@@ -1,12 +1,12 @@
 import { AppShell } from "~/components/layout/AppShell/AppShell";
 import { AuthGuard } from "~/components/auth/AuthGuard/AuthGuard";
-import { WritePostPage } from "~/components/write/WritePostPage/WritePostPage";
+import { ProfilePage } from "~/components/profile/ProfilePage/ProfilePage";
 
-export default function WriteRoute() {
+export default function ProfileRoute() {
     return (
         <AuthGuard>
             <AppShell hideDefaultRightSidebar>
-                <WritePostPage />
+                <ProfilePage />
             </AppShell>
         </AuthGuard>
     );

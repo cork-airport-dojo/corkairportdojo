@@ -1,4 +1,4 @@
-import { modules } from "../../../lib/constants/modules";
+import { modules } from "~/lib/constants/modules";
 import { ModuleCard } from "../ModuleCard/ModuleCard";
 import styles from "./ModulesGrid.module.scss";
 

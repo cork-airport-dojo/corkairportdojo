@@ -1,12 +1,15 @@
+import { useEffect } from "react";
 import {
     Bell,
     ChevronDown,
+    LogIn,
     LogOut,
     Moon,
     Search,
     Settings,
     User,
 } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import {
@@ -16,6 +19,7 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { MobileSidebar } from "../MobileSidebar/MobileSidebar";
+import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./Header.module.scss";
 
 interface HeaderProps {
@@ -27,6 +31,18 @@ export function Header({
                            sidebarCollapsed,
                            onToggleSidebarCollapse,
                        }: HeaderProps) {
+    const navigate = useNavigate();
+    const { isAuthenticated, userName, hydrate, logout } = useAuthStore();
+
+    useEffect(() => {
+        hydrate();
+    }, [hydrate]);
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login?redirectTo=%2Fwrite", { replace: true });
+    };
+
     return (
         <header className={styles.header}>
             <div className={styles.leftZone}>
@@ -42,6 +58,7 @@ export function Header({
                         placeholder="Search articles, modules, topics..."
                         aria-label="Search articles, modules, topics"
                     />
+                    <span className={styles.shortcut}>⌘K</span>
                 </div>
             </div>
 
@@ -67,30 +84,41 @@ export function Header({
                     <span className={styles.badge}>2</span>
                 </Button>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className={styles.profileButton}>
-                            <img src="/avatar.jpg" alt="Chris Murphy" className={styles.avatar} />
-                            <span className={styles.profileName}>Chris Murphy</span>
-                            <ChevronDown size={16} />
-                        </Button>
-                    </DropdownMenuTrigger>
+                {isAuthenticated ? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className={styles.profileButton}>
+                                <img src="/avatar.jpg" alt={userName} className={styles.avatar} />
+                                <span className={styles.profileName}>{userName}</span>
+                                <ChevronDown size={16} />
+                            </Button>
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className={styles.profileMenu}>
-                        <DropdownMenuItem>
-                            <User size={16} />
-                            <span>Profile</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Settings size={16} />
-                            <span>Settings</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <LogOut size={16} />
-                            <span>Sign out</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        <DropdownMenuContent align="end" className={styles.profileMenu}>
+                            <DropdownMenuItem asChild>
+                                <Link to="/profile">
+                                    <User size={16} />
+                                    <span>Profile</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Settings size={16} />
+                                <span>Settings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleLogout}>
+                                <LogOut size={16} />
+                                <span>Sign out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : (
+                    <Button asChild variant="outline" className={styles.loginButton}>
+                        <Link to="/login?redirectTo=%2Fwrite">
+                            <LogIn size={16} />
+                            <span>Login</span>
+                        </Link>
+                    </Button>
+                )}
             </div>
         </header>
     );

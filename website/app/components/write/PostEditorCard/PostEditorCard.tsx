@@ -57,23 +57,38 @@ export function PostEditorCard({
     return (
         <motion.section
             className={styles.card}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: 0.04 }}
+            transition={{ duration: 0.18, delay: 0.04 }}
         >
             <div className={styles.titleArea}>
-                <Input
-                    ref={titleInputRef}
-                    value={title}
-                    onChange={(event) => onTitleChange(event.target.value)}
-                    className={styles.titleInput}
-                    placeholder="Article Title"
-                />
+                <div className={styles.fieldBlock}>
+                    <label className={styles.fieldLabel}>Title</label>
+                    <Input
+                        ref={titleInputRef}
+                        value={title}
+                        onChange={(event) => onTitleChange(event.target.value)}
+                        className={styles.titleInput}
+                        placeholder="Add your title here..."
+                    />
+                </div>
 
-                {/*<div className={styles.slugRow}>
+                <div className={styles.slugRow}>
                     <span>Slug</span>
-                    <code>{slug || "auto-genera"}</code>
-                </div>*/}
+                    <code>{slug || "your-post-slug"}</code>
+                </div>
+            </div>
+
+            <div className={styles.descriptionBlock}>
+                <label className={styles.label}>
+                    Description <span>Appears in search results and previews</span>
+                </label>
+                <textarea
+                    value={description}
+                    onChange={(event) => onDescriptionChange(event.target.value)}
+                    placeholder="Write a short description of your article..."
+                    className={styles.descriptionInput}
+                />
             </div>
 
             <div className={styles.metaRow}>
@@ -83,11 +98,11 @@ export function PostEditorCard({
                     <div className={styles.tagList}>
                         {tags.map((tag) => (
                             <span key={tag} className={styles.tagChip}>
-                {tag}
+                                {tag}
                                 <button type="button" onClick={() => onRemoveTag(tag)}>
-                  <X size={13} />
-                </button>
-              </span>
+                                    <X size={13} />
+                                </button>
+                            </span>
                         ))}
                     </div>
 
@@ -110,7 +125,7 @@ export function PostEditorCard({
                             className={styles.metaButton}
                             onClick={handleTagSubmit}
                         >
-                            Add
+                            Add Tag
                         </Button>
                     </div>
                 </div>
@@ -122,27 +137,21 @@ export function PostEditorCard({
                         onChange={(event) => onCategoryChange(event.target.value)}
                         className={styles.select}
                     >
-                        <option>Web Development</option>
                         <option>React</option>
-                        <option>TypeScript</option>
                         <option>Next.js</option>
-                        <option>DevOps</option>
+                        <option>TypeScript</option>
+                        <option>Node.js</option>
+                        <option>Security</option>
+                        <option>Database</option>
+                        <option>AI</option>
+                        <option>Cloud</option>
+                        <option>Web Development</option>
                     </select>
                 </div>
             </div>
 
-            <div className={styles.descriptionBlock}>
-                <label className={styles.label}>Description</label>
-                <textarea
-                    value={description}
-                    onChange={(event) => onDescriptionChange(event.target.value)}
-                    className={styles.descriptionInput}
-                    placeholder="Write a short summary that explains what this article covers..."
-                />
-            </div>
-
             <div className={styles.coverBlock}>
-                <label className={styles.label}>Cover Image Upload</label>
+                <label className={styles.label}>Cover Image</label>
 
                 <input
                     ref={fileInputRef}
@@ -152,8 +161,14 @@ export function PostEditorCard({
                     onChange={(event) => {
                         const file = event.target.files?.[0];
                         if (!file) return;
-                        const objectUrl = URL.createObjectURL(file);
-                        onCoverImageChange(objectUrl);
+
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            if (typeof reader.result === "string") {
+                                onCoverImageChange(reader.result);
+                            }
+                        };
+                        reader.readAsDataURL(file);
                     }}
                 />
 
@@ -166,35 +181,37 @@ export function PostEditorCard({
                     <span>{coverImage ? "Change cover image" : "Upload cover image"}</span>
                 </button>
 
-                {coverImage && (
-                    <div className={styles.coverPreview}>
+                <div className={styles.coverPreview}>
+                    {coverImage ? (
                         <img src={coverImage} alt="Cover preview" />
-                    </div>
-                )}
+                    ) : (
+                        <div className={styles.coverEmpty}>No image selected</div>
+                    )}
+                </div>
             </div>
 
             <div className={styles.editorSection}>
                 <div className={styles.editorSectionHeader}>
                     <div>
                         <h2>TipTap Editor</h2>
-                        <p>Write article here...</p>
+                        <p>Write your article using the structured editor or preview markdown.</p>
                     </div>
 
                     <div className={styles.modeSwitch}>
-                        <Button
+                        <button
                             type="button"
                             className={!markdownMode ? styles.modeActive : ""}
                             onClick={() => onToggleMarkdownMode(false)}
                         >
                             Editor
-                        </Button>
-                        <Button
+                        </button>
+                        <button
                             type="button"
                             className={markdownMode ? styles.modeActive : ""}
                             onClick={() => onToggleMarkdownMode(true)}
                         >
                             Markdown
-                        </Button>
+                        </button>
                     </div>
                 </div>
 
@@ -203,11 +220,11 @@ export function PostEditorCard({
                     markdownMode={markdownMode}
                     onChange={onContentChange}
                 />
-            </div>
 
-            <div className={styles.bottomBar}>
-                <span>Autosave enabled</span>
-                <span>Developer publishing workspace</span>
+                <div className={styles.bottomBar}>
+                    <span>Words update as you type.</span>
+                    <span>Use the command palette for quick actions.</span>
+                </div>
             </div>
         </motion.section>
     );

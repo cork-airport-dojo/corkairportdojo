@@ -1,64 +1,88 @@
 import * as React from "react";
 import { cn } from "~/lib/utils";
 
-export const Card = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-    <div
-        ref={ref}
-        className={cn("border bg-card text-card-foreground shadow-sm", className)}
-        {...props}
-    />
-));
+function Card({
+                  className,
+                  ...props
+              }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card"
+            className={cn(
+                "border border-[var(--color-border)] bg-[var(--color-panel)] text-[var(--color-text)] rounded-none shadow-none",
+                className
+            )}
+            {...props}
+        />
+    );
+}
 
-Card.displayName = "Card";
+function CardHeader({
+                        className,
+                        ...props
+                    }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-header"
+            className={cn("flex flex-col gap-2 p-6", className)}
+            {...props}
+        />
+    );
+}
 
-export const CardHeader = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex flex-col gap-1.5 p-6", className)} {...props} />
-));
+function CardTitle({
+                       className,
+                       ...props
+                   }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-title"
+            className={cn(
+                "text-[var(--color-text)] text-base font-semibold leading-none tracking-tight",
+                className
+            )}
+            {...props}
+        />
+    );
+}
 
-CardHeader.displayName = "CardHeader";
+function CardDescription({
+                             className,
+                             ...props
+                         }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-description"
+            className={cn("text-[var(--color-text-secondary)] text-sm", className)}
+            {...props}
+        />
+    );
+}
 
-export const CardTitle = React.forwardRef<
-    HTMLParagraphElement,
-    React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-    <h3
-        ref={ref}
-        className={cn("font-semibold leading-none tracking-tight", className)}
-        {...props}
-    />
-));
+function CardContent({
+                         className,
+                         ...props
+                     }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-content"
+            className={cn("p-6 pt-0", className)}
+            {...props}
+        />
+    );
+}
 
-CardTitle.displayName = "CardTitle";
+function CardFooter({
+                        className,
+                        ...props
+                    }: React.ComponentProps<"div">) {
+    return (
+        <div
+            data-slot="card-footer"
+            className={cn("flex items-center p-6 pt-0", className)}
+            {...props}
+        />
+    );
+}
 
-export const CardDescription = React.forwardRef<
-    HTMLParagraphElement,
-    React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
-));
-
-CardDescription.displayName = "CardDescription";
-
-export const CardContent = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
-));
-
-CardContent.displayName = "CardContent";
-
-export const CardFooter = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
-));
-
-CardFooter.displayName = "CardFooter";
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };

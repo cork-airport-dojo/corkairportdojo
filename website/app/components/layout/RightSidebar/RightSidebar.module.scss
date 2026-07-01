@@ -3,15 +3,13 @@
 .rail {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   min-width: 0;
 }
 
 .sidebarCard {
-  border-color: var(--color-border);
-  background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
-          var(--color-surface);
+  border: 1px solid #313949;
+  background: #151922;
   box-shadow: none;
   border-radius: 0 !important;
 }
@@ -24,30 +22,12 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-top: 18px !important;
+  padding-top: 16px !important;
 }
 
 .weatherCard {
-  position: relative;
-  border: 1px solid rgba(251, 146, 60, 0.55);
-  background:
-          linear-gradient(180deg, rgba(251, 146, 60, 0.08), rgba(255, 255, 255, 0.01)),
-          var(--color-surface);
-  box-shadow:
-          0 0 0 1px rgba(251, 146, 60, 0.12),
-          0 0 22px rgba(251, 146, 60, 0.16),
-          0 0 44px rgba(251, 146, 60, 0.08);
-}
-
-.weatherCard::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  pointer-events: none;
-  border: 1px solid rgba(251, 146, 60, 0.45);
-  box-shadow:
-          0 0 18px rgba(251, 146, 60, 0.18),
-          inset 0 0 18px rgba(251, 146, 60, 0.04);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  background: #171922;
 }
 
 .weatherHeader h3 {
@@ -88,7 +68,7 @@
 
   h4 {
     margin: 0;
-    font-size: 1.55rem;
+    font-size: 1.45rem;
     font-weight: 700;
     color: #ffd08a;
     line-height: 1.15;
@@ -98,20 +78,20 @@
 .weatherLocation {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   line-height: 1.4;
 }
 
 .weatherTime {
   color: var(--color-text-muted);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   line-height: 1.45;
 }
 
 .weatherSummary {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 0.96rem;
+  font-size: 0.95rem;
   line-height: 1.55;
 }
 
@@ -119,8 +99,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #60a5fa;
-  font-size: 1rem;
+  color: var(--color-brand-blue);
+  font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
 }
@@ -149,7 +129,7 @@
   width: 8px;
   height: 8px;
   margin-top: 8px;
-  background: #8b5cf6;
+  background: var(--color-brand-purple);
   border-radius: 999px;
   flex-shrink: 0;
 }
@@ -192,8 +172,8 @@
 .moduleIcon {
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(99, 102, 241, 0.18);
-  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   flex-shrink: 0;
 }
 

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { motion } from "framer-motion";
 import {
     calculateReadingTime,
     calculateSeoScore,
@@ -67,6 +66,7 @@ export function WritePostPage() {
         coverImage,
         content,
         markdownMode,
+        status,
         saveDraft,
     ]);
 
@@ -99,32 +99,37 @@ export function WritePostPage() {
         },
     });
 
+    const handlePreview = () => setMarkdownMode(!markdownMode);
+    const handlePublish = () => publishMutation.mutate();
+    const handleOpenCommandPalette = () => setCommandPaletteOpen(true);
+    const handleCloseCommandPalette = () => setCommandPaletteOpen(false);
+
     useEditorShortcuts({
         onSaveDraft: saveDraft,
-        onPublish: () => publishMutation.mutate(),
-        onToggleCommandPalette: () => setCommandPaletteOpen(true),
+        onPublish: handlePublish,
+        onToggleCommandPalette: handleOpenCommandPalette,
     });
 
     useEffect(() => {
         const onEsc = (event: KeyboardEvent) => {
-            if (event.key === "Escape") setCommandPaletteOpen(false);
+            if (event.key === "Escape") handleCloseCommandPalette();
         };
 
         window.addEventListener("keydown", onEsc);
         return () => window.removeEventListener("keydown", onEsc);
-    }, [setCommandPaletteOpen]);
+    }, []);
 
     return (
         <>
             <CommandPalette
                 open={commandPaletteOpen}
-                onClose={() => setCommandPaletteOpen(false)}
+                onClose={handleCloseCommandPalette}
                 onSaveDraft={saveDraft}
-                onPreview={() => setMarkdownMode(!markdownMode)}
-                onPublish={() => publishMutation.mutate()}
+                onPreview={handlePreview}
+                onPublish={handlePublish}
                 onFocusTitle={() => titleInputRef.current?.focus()}
                 onFocusEditor={() =>
-                    editorAnchorRef.current?.scrollIntoView({ behavior: "smooth" })
+                    editorAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
                 }
                 onClearDraft={clearDraft}
             />
@@ -133,13 +138,7 @@ export function WritePostPage() {
                 <PostEditorHeader />
 
                 <div className={styles.layout}>
-                    <motion.div
-                        ref={editorAnchorRef}
-                        className={styles.main}
-                        initial={{ opacity: 0, y: 14 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.22 }}
-                    >
+                    <div ref={editorAnchorRef} className={styles.main}>
                         <PostEditorCard
                             title={title}
                             description={description}
@@ -158,7 +157,7 @@ export function WritePostPage() {
                             onToggleMarkdownMode={setMarkdownMode}
                             titleInputRef={titleInputRef}
                         />
-                    </motion.div>
+                    </div>
 
                     <div className={styles.sidebar}>
                         <PostEditorSidebar
@@ -169,8 +168,8 @@ export function WritePostPage() {
                             lastSavedAt={lastSavedAt}
                             markdownMode={markdownMode}
                             onSaveDraft={saveDraft}
-                            onPreview={() => setMarkdownMode(!markdownMode)}
-                            onPublish={() => publishMutation.mutate()}
+                            onPreview={handlePreview}
+                            onPublish={handlePublish}
                         />
                     </div>
                 </div>

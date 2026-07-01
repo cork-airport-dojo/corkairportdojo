@@ -17,7 +17,11 @@ export function AppShell({
 
     return (
         <div className={styles.wrapper}>
-            <div className={styles.layout}>
+            <div
+                className={`${styles.layout} ${
+                    sidebarCollapsed ? styles.layoutCollapsed : ""
+                }`}
+            >
                 <div
                     className={`${styles.sidebarColumn} ${
                         sidebarCollapsed ? styles.sidebarColumnCollapsed : ""
