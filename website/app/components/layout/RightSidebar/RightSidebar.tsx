@@ -1,19 +1,25 @@
+import { useEffect, useMemo } from "react";
 import {
+    AlertTriangle,
     ArrowRight,
     BookMarked,
+    Info,
     Megaphone,
     TriangleAlert,
     Wind,
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { RailCardHeader } from "~/components/common/RailCardHeader/RailCardHeader";
+import type { CorkWeatherAlert } from "~/lib/constants/weather-warnings";
+import {
+    formatWeatherDateTime,
+    getWeatherAlertAccent,
+} from "~/lib/constants/weather-warnings";
+import { useNoticesStore, type ImportantNotice } from "~/store/use-notices-store";
+import { useModuleViewsStore } from "~/store/use-module-views-store";
+import { useCustomModulesStore } from "~/store/use-custom-modules-store";
+import { getAllModules } from "~/lib/get-all-modules";
 import styles from "./RightSidebar.module.scss";
-
-const notices = [
-    "CorkAirportClub will close for the summer period.",
-    "We plan to reopen again in September.",
-    "Please sign up early for the new modules on the website.",
-];
 
 const recentlyRead = [
     {
@@ -38,68 +44,189 @@ const recentlyRead = [
     },
 ];
 
-const popularModules = [
-    { title: "React Fundamentals", lessons: "12 Lessons" },
-    { title: "TypeScript Essentials", lessons: "15 Lessons" },
-    { title: "Authentication & Security", lessons: "11 Lessons" },
-];
+interface RightSidebarProps {
+    weatherAlert?: CorkWeatherAlert | null;
+}
 
-export function RightSidebar() {
+function getNoticeAccent(notice: ImportantNotice) {
+    if (notice.severity === "closure") {
+        return {
+            dot: "#ef4444",
+            text: "#fca5a5",
+            background: "rgba(239, 68, 68, 0.08)",
+            border: "rgba(239, 68, 68, 0.3)",
+            icon: AlertTriangle,
+        };
+    }
+
+    if (notice.severity === "warning") {
+        return {
+            dot: "#f59e0b",
+            text: "#fcd34d",
+            background: "rgba(245, 158, 11, 0.08)",
+            border: "rgba(245, 158, 11, 0.3)",
+            icon: TriangleAlert,
+        };
+    }
+
+    return {
+        dot: "#3b82f6",
+        text: "#93c5fd",
+        background: "rgba(59, 130, 246, 0.08)",
+        border: "rgba(59, 130, 246, 0.3)",
+        icon: Info,
+    };
+}
+
+export function RightSidebar({ weatherAlert }: RightSidebarProps) {
+    const { notices, hydrate, clearInactiveNotices, getVisibleNotices } = useNoticesStore();
+    const { views, hydrate: hydrateModuleViews, getViews } = useModuleViewsStore();
+    const { modules: customModules, hydrate: hydrateCustomModules } = useCustomModulesStore();
+
+    useEffect(() => {
+        hydrate();
+        clearInactiveNotices();
+    }, [hydrate, clearInactiveNotices]);
+
+    useEffect(() => {
+        hydrateModuleViews();
+        hydrateCustomModules();
+    }, [hydrateModuleViews, hydrateCustomModules]);
+
+    const visibleNotices = useMemo(() => getVisibleNotices(), [notices, getVisibleNotices]);
+
+    const popularModules = useMemo(() => {
+        return getAllModules(customModules)
+            .map((module) => ({
+                ...module,
+                totalViews: getViews(module.id, module.views),
+            }))
+            .sort((a, b) => b.totalViews - a.totalViews)
+            .slice(0, 3);
+    }, [customModules, views, getViews]);
+
+    const showWeatherCard = weatherAlert?.hasAlert;
+    const alertAccent = getWeatherAlertAccent(weatherAlert?.level ?? null);
+
+    const timeLabel =
+        weatherAlert?.onset && weatherAlert?.expiry
+            ? `${formatWeatherDateTime(weatherAlert.onset)} - ${formatWeatherDateTime(
+                weatherAlert.expiry
+            )}`
+            : null;
+
     return (
         <div className={styles.rail}>
-            <Card className={`${styles.sidebarCard} ${styles.weatherCard}`}>
-                <CardHeader className={styles.cardHeader}>
-                    <RailCardHeader
-                        title="Weather Alert"
-                        icon={<TriangleAlert size={18} className={styles.weatherAlertIcon} />}
-                        className={styles.weatherHeader}
-                    />
-                </CardHeader>
+            {showWeatherCard && weatherAlert && (
+                <Card
+                    className={`${styles.sidebarCard} ${styles.weatherCard}`}
+                    style={{
+                        borderColor: alertAccent.border,
+                    }}
+                >
+                    <CardHeader className={styles.cardHeader}>
+                        <RailCardHeader
+                            title={
+                                weatherAlert.level
+                                    ? `${weatherAlert.level.toUpperCase()} Weather Alert`
+                                    : "Weather Alert"
+                            }
+                            icon={
+                                <TriangleAlert
+                                    size={18}
+                                    className={styles.weatherAlertIcon}
+                                    style={{ color: alertAccent.text }}
+                                />
+                            }
+                            className={styles.weatherHeader}
+                        />
+                    </CardHeader>
 
-                <CardContent className={styles.cardBody}>
-                    <div className={styles.weatherContent}>
-                        <div className={styles.weatherBodyTop}>
-                            <div className={styles.weatherBodyIcon}>
-                                <Wind size={44} strokeWidth={1.8} />
+                    <CardContent className={styles.cardBody}>
+                        <div className={styles.weatherContent}>
+                            <div className={styles.weatherBodyTop}>
+                                <div
+                                    className={styles.weatherBodyIcon}
+                                    style={{ color: alertAccent.text }}
+                                >
+                                    <Wind size={44} strokeWidth={1.8} />
+                                </div>
+
+                                <div className={styles.weatherText}>
+                                    <h4 style={{ color: alertAccent.title }}>
+                                        {weatherAlert.headline}
+                                    </h4>
+                                    <p className={styles.weatherLocation}>Cork, Ireland</p>
+                                    {timeLabel && (
+                                        <span className={styles.weatherTime}>{timeLabel}</span>
+                                    )}
+                                </div>
                             </div>
 
-                            <div className={styles.weatherText}>
-                                <h4>Yellow Wind Warning</h4>
-                                <p className={styles.weatherLocation}>Cork, Ireland</p>
-                                <span className={styles.weatherTime}>
-                                    18:00 Today - 03:00 Tomorrow
-                                </span>
-                            </div>
+                            <p className={styles.weatherSummary}>
+                                {weatherAlert.description}
+                            </p>
+
+                            <a
+                                href={weatherAlert.sourceUrl}
+                                className={styles.weatherLink}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                View Details <ArrowRight size={15} />
+                            </a>
                         </div>
+                    </CardContent>
+                </Card>
+            )}
 
-                        <p className={styles.weatherSummary}>Strong winds expected.</p>
+            {visibleNotices.length > 0 && (
+                <Card className={styles.sidebarCard}>
+                    <CardHeader className={styles.cardHeader}>
+                        <RailCardHeader
+                            title="Important Notices"
+                            icon={<Megaphone size={18} />}
+                        />
+                    </CardHeader>
 
-                        <a href="#" className={styles.weatherLink}>
-                            View Details <ArrowRight size={15} />
-                        </a>
-                    </div>
-                </CardContent>
-            </Card>
+                    <CardContent className={styles.cardBody}>
+                        <div className={styles.noticeList}>
+                            {visibleNotices.map((notice) => {
+                                const accent = getNoticeAccent(notice);
+                                const NoticeIcon = accent.icon;
 
-            <Card className={styles.sidebarCard}>
-                <CardHeader className={styles.cardHeader}>
-                    <RailCardHeader
-                        title="Important Notices"
-                        icon={<Megaphone size={18} />}
-                    />
-                </CardHeader>
+                                return (
+                                    <div
+                                        key={notice.id}
+                                        className={styles.noticePanel}
+                                        style={{
+                                            borderColor: accent.border,
+                                            background: accent.background,
+                                        }}
+                                    >
+                                        <div className={styles.noticeSeverityIcon} style={{ color: accent.text }}>
+                                            <NoticeIcon size={15} />
+                                        </div>
 
-                <CardContent className={styles.cardBody}>
-                    <div className={styles.noticeList}>
-                        {notices.map((notice) => (
-                            <div key={notice} className={styles.noticeItem}>
-                                <span className={styles.noticeDot} />
-                                <p>{notice}</p>
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+                                        <div className={styles.noticeBody}>
+                                            <div className={styles.noticeBadges}>
+                                                <span className={styles.noticeSeverityLabel}>
+                                                    {notice.severity}
+                                                </span>
+                                                {notice.pinned && (
+                                                    <span className={styles.noticePinnedLabel}>Pinned</span>
+                                                )}
+                                            </div>
+
+                                            <p>{notice.message}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             <Card className={styles.sidebarCard}>
                 <CardHeader className={styles.cardHeader}>
@@ -139,11 +266,11 @@ export function RightSidebar() {
                 <CardContent className={styles.cardBody}>
                     <div className={styles.moduleList}>
                         {popularModules.map((module) => (
-                            <div key={module.title} className={styles.moduleItem}>
+                            <div key={module.id} className={styles.moduleItem}>
                                 <div className={styles.moduleIcon} />
                                 <div className={styles.moduleContent}>
                                     <strong>{module.title}</strong>
-                                    <span>{module.lessons}</span>
+                                    <span>{module.totalViews} views</span>
                                 </div>
                             </div>
                         ))}

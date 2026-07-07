@@ -1,13 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionHeader } from "../../common/SectionHeader/SectionHeader";
-import { modules } from "~/lib/constants/modules";
+import { useCustomModulesStore } from "~/store/use-custom-modules-store";
+import { getAllModules } from "~/lib/get-all-modules";
 import { ModuleCard } from "../../modules/ModuleCard/ModuleCard";
 import styles from "./FeaturedModulesSection.module.scss";
 
 export function FeaturedModulesSection() {
     const trackRef = useRef<HTMLDivElement>(null);
     const [activeIndex, setActiveIndex] = useState(0);
+
+    const { modules: customModules, hydrate } = useCustomModulesStore();
+
+    useEffect(() => {
+        hydrate();
+    }, [hydrate]);
+
+    const featuredModules = useMemo(() => {
+        return getAllModules(customModules).filter((module) => module.featured);
+    }, [customModules]);
 
     const scrollByAmount = (direction: "left" | "right") => {
         if (!trackRef.current) return;
@@ -98,9 +109,11 @@ export function FeaturedModulesSection() {
 
             <div className={styles.trackWrap}>
                 <div className={styles.track} ref={trackRef}>
-                    {modules.map((module) => (
+                    {featuredModules.map((module) => (
                         <div key={module.title} className={styles.slide}>
                             <ModuleCard
+                                key={module.id}
+                                id={module.id}
                                 title={module.title}
                                 description={module.description}
                                 lessons={module.lessons}
@@ -113,7 +126,7 @@ export function FeaturedModulesSection() {
             </div>
 
             <div className={styles.dots}>
-                {modules.map((module, index) => (
+                {featuredModules.map((module, index) => (
                     <button
                         key={module.title}
                         type="button"

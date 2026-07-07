@@ -1,10 +1,20 @@
+import { useEffect } from "react";
 import { Award, Bookmark, Clock3, FileText, MapPin, PencilLine } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { NoticeManager } from "~/components/admin/NoticeManager/NoticeManager";
+import { ModuleManager } from "~/components/admin/ModuleManager/ModuleManager";
 import { profile } from "~/lib/constants/profile";
+import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./ProfilePage.module.scss";
 
 export function ProfilePage() {
+    const { hydrate, isAdmin } = useAuthStore();
+
+    useEffect(() => {
+        hydrate();
+    }, [hydrate]);
+
     return (
         <div className={styles.page}>
             <section className={styles.hero}>
@@ -45,6 +55,10 @@ export function ProfilePage() {
                     </Button>
                 </div>
             </section>
+
+            {isAdmin && <NoticeManager />}
+            {isAdmin && <ModuleManager />}
+
 
             <section className={styles.statsGrid}>
                 {profile.stats.map((stat) => (
@@ -149,56 +163,6 @@ export function ProfilePage() {
                                         {item}
                                     </span>
                                 ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className={styles.panel}>
-                        <CardHeader className={styles.panelHeader}>
-                            <div className={styles.panelTitleRow}>
-                                <div className={styles.panelIcon}>
-                                    <MapPin size={16} />
-                                </div>
-                                <h2>Links</h2>
-                            </div>
-                        </CardHeader>
-                        <CardContent className={styles.panelBody}>
-                            <div className={styles.linkList}>
-                                {profile.socials.map((item) => (
-                                    <a
-                                        key={item.label}
-                                        href={item.href}
-                                        className={styles.linkItem}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        <span className={styles.linkLabel}>{item.label}</span>
-                                        <span className={styles.linkValue}>{item.value}</span>
-                                    </a>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className={styles.panel}>
-                        <CardHeader className={styles.panelHeader}>
-                            <div className={styles.panelTitleRow}>
-                                <div className={styles.panelIcon}>
-                                    <Clock3 size={16} />
-                                </div>
-                                <h2>Profile Completion</h2>
-                            </div>
-                        </CardHeader>
-                        <CardContent className={styles.panelBody}>
-                            <div className={styles.completionBlock}>
-                                <div className={styles.completionValue}>84%</div>
-                                <p className={styles.completionText}>
-                                    Your profile is almost complete. Add more public links and update
-                                    your bio to finish setup.
-                                </p>
-                                <Button variant="outline" className={styles.completionButton}>
-                                    Complete Profile
-                                </Button>
                             </div>
                         </CardContent>
                     </Card>

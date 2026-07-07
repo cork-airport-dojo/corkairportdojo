@@ -1,9 +1,11 @@
-import { Clock3 } from "lucide-react";
+import { Clock3, FolderOpen } from "lucide-react";
+import { Link } from "react-router";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent } from "~/components/ui/card";
 import styles from "./ArticleCard.module.scss";
 
 interface ArticleCardProps {
+    id: string;
     title: string;
     excerpt: string;
     category: string;
@@ -11,9 +13,11 @@ interface ArticleCardProps {
     author: string;
     date: string;
     readTime: string;
+    resourceCount?: number;
 }
 
 export function ArticleCard({
+                                id,
                                 title,
                                 excerpt,
                                 category,
@@ -21,9 +25,11 @@ export function ArticleCard({
                                 author,
                                 date,
                                 readTime,
+                                resourceCount = 0,
                             }: ArticleCardProps) {
     return (
         <Card className={styles.card}>
+            <Link to={`/blog/${id}`} className={styles.cardLink}>
             <div className={styles.imageWrap}>
                 <img
                     src={image}
@@ -36,9 +42,16 @@ export function ArticleCard({
             </div>
 
             <CardContent className={styles.content}>
-                <Badge variant="outline" className={styles.categoryBadge}>
-                    {category}
-                </Badge>
+                <div className={styles.topRow}>
+                    <Badge variant="outline" className={styles.categoryBadge}>
+                        {category}
+                    </Badge>
+
+                    <div className={styles.resourceCount}>
+                        <FolderOpen size={14} />
+                        <span>{resourceCount}</span>
+                    </div>
+                </div>
 
                 <h3 className={styles.title}>{title}</h3>
                 <p className={styles.excerpt}>{excerpt}</p>
@@ -58,6 +71,7 @@ export function ArticleCard({
                     </div>
                 </div>
             </CardContent>
+            </Link>
         </Card>
     );
 }

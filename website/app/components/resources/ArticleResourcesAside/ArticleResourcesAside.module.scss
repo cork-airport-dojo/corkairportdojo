@@ -1,0 +1,92 @@
+.aside {
+  position: sticky;
+  top: 24px;
+}
+
+.card {
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.header {
+  padding-bottom: 0 !important;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+}
+
+.iconWrap {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 16px !important;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+          border-color var(--transition-base),
+          background-color var(--transition-base);
+
+  &:hover {
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-soft);
+  }
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    color: var(--color-text);
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  span {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+  }
+}

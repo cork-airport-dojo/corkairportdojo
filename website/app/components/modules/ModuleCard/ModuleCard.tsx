@@ -1,16 +1,20 @@
-import type { LucideIcon } from "lucide-react";
+import { Link } from "react-router";
+import { BookOpen } from "lucide-react";
+import type { ModuleDifficulty } from "~/lib/constants/modules";
 import { Card, CardContent } from "~/components/ui/card";
 import styles from "./ModuleCard.module.scss";
 
 interface ModuleCardProps {
+    id: string;
     title: string;
     description: string;
-    lessons: string;
-    difficulty: "Beginner" | "Intermediate" | "Advanced";
-    icon: LucideIcon;
+    difficulty: ModuleDifficulty;
+    lessons: number;
+    icon: React.ComponentType<{ size?: number }>;
 }
 
 export function ModuleCard({
+                               id,
                                title,
                                description,
                                lessons,
@@ -26,6 +30,7 @@ export function ModuleCard({
 
     return (
         <Card className={styles.card}>
+            <Link to={`/modules/${id}`} className={styles.cardLink}>
             <CardContent className={styles.content}>
                 <div className={styles.headerRow}>
                     <div className={styles.iconWrap}>
@@ -45,6 +50,7 @@ export function ModuleCard({
                     <span className={styles.lessons}>{lessons}</span>
                 </div>
             </CardContent>
+            </Link>
         </Card>
     );
 }

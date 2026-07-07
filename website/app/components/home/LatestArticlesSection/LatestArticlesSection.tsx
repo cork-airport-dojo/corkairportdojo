@@ -2,54 +2,26 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionHeader } from "../../common/SectionHeader/SectionHeader";
 import { ArticleCard } from "../../blog/ArticleCard/ArticleCard";
+import { posts } from "~/lib/constants/posts";
 import styles from "./LatestArticlesSection.module.scss";
 
-const articles = [
-    {
-        title: "Understanding Next.js 14 App Router",
-        excerpt:
-            "Explore layouts, nested routing, server components and rendering patterns in the new app router.",
-        category: "Next.js",
-        image: "https://picsum.photos/seed/nextjs-article/900/600",
-        author: "Chris Murphy",
-        date: "June 2, 2026",
-        readTime: "6 min read",
-    },
-    {
-        title: "TypeScript Tips for Better Development",
-        excerpt:
-            "Use smarter typing patterns, utility types and cleaner interfaces to improve maintainability.",
-        category: "TypeScript",
-        image: "https://picsum.photos/seed/typescript-article/900/600",
-        author: "Chris Murphy",
-        date: "May 28, 2026",
-        readTime: "5 min read",
-    },
-    {
-        title: "Database Design Principles Every Developer Should Know",
-        excerpt:
-            "Learn practical schema design, normalization trade-offs and indexing ideas that matter in real apps.",
-        category: "Database",
-        image: "https://picsum.photos/seed/database-article/900/600",
-        author: "Chris Murphy",
-        date: "May 20, 2026",
-        readTime: "7 min read",
-    },
-    {
-        title: "Why React Architecture Matters",
-        excerpt:
-            "A practical guide to structuring scalable React applications with better boundaries and shared logic.",
-        category: "React",
-        image: "https://picsum.photos/seed/react-architecture/900/600",
-        author: "Chris Murphy",
-        date: "May 12, 2026",
-        readTime: "8 min read",
-    },
-];
+
 
 export function LatestArticlesSection() {
     const trackRef = useRef<HTMLDivElement>(null);
     const [activeIndex, setActiveIndex] = useState(0);
+
+    const articles = posts.slice(0, 4).map((post) => ({
+        id: post.id,
+        title: post.title,
+        excerpt: post.excerpt,
+        category: post.category,
+        image: post.image,
+        author: post.author,
+        date: post.date,
+        readTime: post.readTime,
+        resourceCount: post.resourceIds?.length ?? 0,
+    }));
 
     const scrollByAmount = (direction: "left" | "right") => {
         if (!trackRef.current) return;
@@ -141,16 +113,8 @@ export function LatestArticlesSection() {
             <div className={styles.trackWrap}>
                 <div className={styles.track} ref={trackRef}>
                     {articles.map((article) => (
-                        <div key={article.title} className={styles.slide}>
-                            <ArticleCard
-                                title={article.title}
-                                excerpt={article.excerpt}
-                                category={article.category}
-                                image={article.image}
-                                author={article.author}
-                                date={article.date}
-                                readTime={article.readTime}
-                            />
+                        <div key={article.id} className={styles.slide}>
+                            <ArticleCard {...article} />
                         </div>
                     ))}
                 </div>
