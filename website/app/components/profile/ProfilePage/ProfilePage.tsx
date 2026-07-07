@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { NoticeManager } from "~/components/admin/NoticeManager/NoticeManager";
 import { ModuleManager } from "~/components/admin/ModuleManager/ModuleManager";
+import { HeroCTAButtonManager } from "~/components/admin/HeroCTAButtonManager/HeroCTAButtonManager";
 import { profile } from "~/lib/constants/profile";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./ProfilePage.module.scss";
@@ -58,6 +59,7 @@ export function ProfilePage() {
 
             {isAdmin && <NoticeManager />}
             {isAdmin && <ModuleManager />}
+            {isAdmin && <HeroCTAButtonManager/>}
 
 
             <section className={styles.statsGrid}>

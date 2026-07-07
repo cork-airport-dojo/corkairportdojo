@@ -1,5 +1,8 @@
-import { BookOpen, Layers3, Newspaper, Users, PenTool, Boxes } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { BookOpen, Users, PenTool, Boxes } from "lucide-react";
+import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
+import { useHeroCTAStore } from "~/store/use-hero-cta-store";
 import styles from "./HeroSection.module.scss";
 
 const highlights = [
@@ -26,6 +29,13 @@ const highlights = [
 ];
 
 export function HeroSection() {
+    const { buttons, hydrate, getVisibleButtons } = useHeroCTAStore();
+
+    useEffect(() => {
+        hydrate();
+    }, [hydrate]);
+
+    const visibleButtons = useMemo(() => getVisibleButtons(), [buttons, getVisibleButtons]);
     return (
         <section className={styles.hero}>
             <div className={styles.content}>
@@ -42,27 +52,22 @@ export function HeroSection() {
                     </p>
 
                     <div className={styles.actions}>
-                        <Button className={styles.primaryButton} size="lg">
-                            <Layers3 size={18} />
-                            <span>Browse Modules</span>
-                        </Button>
-
-                        <Button
-                            variant="outline"
-                            className={styles.secondaryButton}
-                            size="lg"
-                        >
-                            <Newspaper size={18} />
-                            <span>Read Articles</span>
-                        </Button>
-
-                        <Button
-                            variant="outline"
-                            className={styles.registerButton}
-                            size="lg"
-                        >
-                            <span>Register next term</span>
-                        </Button>
+                        {visibleButtons.map((button) => (
+                            <Button
+                                key={button.id}
+                                asChild
+                                variant={
+                                    button.variant === "outline"
+                                        ? "outline"
+                                        : button.variant === "secondary"
+                                            ? "secondary"
+                                            : "default"
+                                }
+                                className={styles.heroButton}
+                            >
+                                <Link to={button.href}>{button.label}</Link>
+                            </Button>
+                        ))}
                     </div>
 
                     <div className={styles.highlights}>
