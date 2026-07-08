@@ -32,15 +32,21 @@ export function Header({
                            onToggleSidebarCollapse,
                        }: HeaderProps) {
     const navigate = useNavigate();
-    const { isAuthenticated, userName, hydrate, logout } = useAuthStore();
+    const {
+        isAuthenticated,
+        userName,
+        avatarUrl,
+        hydrate,
+        signOut,
+    } = useAuthStore();
 
     useEffect(() => {
-        hydrate();
+        void hydrate();
     }, [hydrate]);
 
-    const handleLogout = () => {
-        logout();
-        navigate("/login?redirectTo=%2Fwrite", { replace: true });
+    const handleLogout = async () => {
+        await signOut();
+        navigate("/", { replace: true });
     };
 
     return (
@@ -88,7 +94,13 @@ export function Header({
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className={styles.profileButton}>
-                                <img src="/avatar.jpg" alt={userName} className={styles.avatar} />
+                                {avatarUrl ? (
+                                    <img src={avatarUrl} alt={userName} className={styles.avatar} />
+                                ) : (
+                                    <div className={styles.avatarFallback}>
+                                        {userName.slice(0, 1).toUpperCase() || "U"}
+                                    </div>
+                                )}
                                 <span className={styles.profileName}>{userName}</span>
                                 <ChevronDown size={16} />
                             </Button>
@@ -105,7 +117,7 @@ export function Header({
                                 <Settings size={16} />
                                 <span>Settings</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleLogout}>
+                            <DropdownMenuItem onClick={() => void handleLogout()}>
                                 <LogOut size={16} />
                                 <span>Sign out</span>
                             </DropdownMenuItem>
@@ -113,7 +125,7 @@ export function Header({
                     </DropdownMenu>
                 ) : (
                     <Button asChild variant="outline" className={styles.loginButton}>
-                        <Link to="/login?redirectTo=%2Fwrite">
+                        <Link to="/login">
                             <LogIn size={16} />
                             <span>Login</span>
                         </Link>

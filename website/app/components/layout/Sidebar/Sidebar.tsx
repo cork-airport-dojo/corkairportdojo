@@ -15,7 +15,7 @@ import {
     LogOut,
     LogIn,
 } from "lucide-react";
-import {   FiGithub, FiLinkedin } from "react-icons/fi";
+import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { NavLink, Link, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import {
@@ -30,16 +30,14 @@ import styles from "./Sidebar.module.scss";
 const publicNavItems = [
     { to: "/", label: "Home", icon: Home, end: true },
     { to: "/modules", label: "Modules", icon: Layers3 },
-    { to: "/blog", label: "Blog", icon: BookOpen },
+    { to: "/blog", label: "Articles", icon: BookOpen },
     { to: "/categories", label: "Categories", icon: FolderKanban },
     { to: "/tags", label: "Tags", icon: Hash },
     { to: "/resources", label: "Resources", icon: Bookmark },
     { to: "/about", label: "About", icon: Info },
 ];
 
-const privateNavItems = [
-    { to: "/profile", label: "Profile", icon: User },
-];
+const privateNavItems = [{ to: "/profile", label: "Profile", icon: User }];
 
 interface SidebarProps {
     collapsed: boolean;
@@ -48,19 +46,25 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
     const navigate = useNavigate();
-    const { isAuthenticated, userName, hydrate, logout } = useAuthStore();
+    const {
+        isAuthenticated,
+        userName,
+        avatarUrl,
+        hydrate,
+        signOut,
+    } = useAuthStore();
 
     useEffect(() => {
-        hydrate();
+        void hydrate();
     }, [hydrate]);
 
     const navItems = isAuthenticated
         ? [...publicNavItems, ...privateNavItems]
         : publicNavItems;
 
-    const handleLogout = () => {
-        logout();
-        navigate("/login?redirectTo=%2Fwrite", { replace: true });
+    const handleLogout = async () => {
+        await signOut();
+        navigate("/", { replace: true });
     };
 
     return (
@@ -125,7 +129,13 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className={styles.profileCard}>
-                                    <img src="/avatar.jpg" alt={userName} />
+                                    {avatarUrl ? (
+                                        <img src={avatarUrl} alt={userName} />
+                                    ) : (
+                                        <div className={styles.avatarFallback}>
+                                            {userName.slice(0, 1).toUpperCase() || "U"}
+                                        </div>
+                                    )}
                                     <div className={styles.profileInfo}>
                                         <strong>{userName}</strong>
                                         <span>View Profile</span>
@@ -149,7 +159,7 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                                     <Settings size={16} />
                                     <span>Settings</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleLogout}>
+                                <DropdownMenuItem onClick={() => void handleLogout()}>
                                     <LogOut size={16} />
                                     <span>Sign out</span>
                                 </DropdownMenuItem>

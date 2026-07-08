@@ -16,7 +16,7 @@ function AppBoot() {
     const { hydrate } = useAuthStore();
 
     useEffect(() => {
-        hydrate();
+        void hydrate();
     }, [hydrate]);
 
     return <Outlet />;

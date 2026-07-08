@@ -1,46 +1,32 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { ArrowLeft, LogIn, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
+import {   FiGithub } from "react-icons/fi";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./login.module.scss";
 
 export default function LoginRoute() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const {
-        isAuthenticated,
-        login,
-        hydrate,
-        consumeAuthMessage,
-    } = useAuthStore();
-
-    const [name, setName] = useState("Chris Murphy");
-    const [notice, setNotice] = useState<string | null>(null);
+    const { isAuthenticated, isLoading, hydrate, signInWithGitHub } = useAuthStore();
 
     useEffect(() => {
-        hydrate();
-        const message = consumeAuthMessage();
-        if (message) {
-            setNotice(message);
-        }
-    }, [hydrate, consumeAuthMessage]);
+        void hydrate();
+    }, [hydrate]);
 
     const redirectTo = useMemo(() => {
-        return searchParams.get("redirectTo") || "/";
+        return searchParams.get("redirectTo") || "/profile";
     }, [searchParams]);
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (!isLoading && isAuthenticated) {
             navigate(redirectTo, { replace: true });
         }
-    }, [isAuthenticated, navigate, redirectTo]);
+    }, [isAuthenticated, isLoading, navigate, redirectTo]);
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        login(name.trim() || "Chris Murphy");
-        navigate(redirectTo, { replace: true });
+    const handleGitHubLogin = async () => {
+        await signInWithGitHub(redirectTo);
     };
 
     return (
@@ -55,8 +41,6 @@ export default function LoginRoute() {
                     </Button>
                 </div>
 
-                {notice && <div className={styles.notice}>{notice}</div>}
-
                 <div className={styles.header}>
                     <div className={styles.iconWrap}>
                         <ShieldCheck size={18} />
@@ -66,32 +50,28 @@ export default function LoginRoute() {
                         <span className={styles.eyebrow}>Authentication</span>
                         <h1>Sign in to CorkAirportDojo</h1>
                         <p>
-                            You need to log in to access protected pages like your profile and the write editor.
+                            Continue with GitHub to access protected areas like your
+                            profile and article writing features.
                         </p>
                     </div>
                 </div>
 
-                <form className={styles.form} onSubmit={handleSubmit}>
-                    <div className={styles.field}>
-                        <label htmlFor="name">Display Name</label>
-                        <Input
-                            id="name"
-                            value={name}
-                            onChange={(event) => setName(event.target.value)}
-                            placeholder="Enter your name"
-                        />
-                    </div>
-
+                <div className={styles.form}>
                     <div className={styles.redirectHint}>
                         After login, you will return to:
                         <code>{redirectTo}</code>
                     </div>
 
-                    <Button type="submit" className={styles.submitButton}>
-                        <LogIn size={16} />
-                        Sign In
+                    <Button
+                        type="button"
+                        className={styles.submitButton}
+                        onClick={() => void handleGitHubLogin()}
+                        disabled={isLoading}
+                    >
+                        <FiGithub size={16} />
+                        {isLoading ? "Checking session..." : "Sign in with GitHub"}
                     </Button>
-                </form>
+                </div>
             </div>
         </div>
     );

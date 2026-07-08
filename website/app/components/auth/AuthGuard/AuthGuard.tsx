@@ -9,22 +9,29 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
     const navigate = useNavigate();
     const location = useLocation();
-    const { isAuthenticated, hydrate } = useAuthStore();
+    const { isAuthenticated, isLoading, hydrate } = useAuthStore();
 
     useEffect(() => {
-        hydrate();
+        void hydrate();
     }, [hydrate]);
 
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (!isLoading && !isAuthenticated) {
             const redirectTo = encodeURIComponent(
                 `${location.pathname}${location.search}${location.hash}`
             );
             navigate(`/login?redirectTo=${redirectTo}`, { replace: true });
         }
-    }, [isAuthenticated, location.pathname, location.search, location.hash, navigate]);
+    }, [
+        isAuthenticated,
+        isLoading,
+        location.pathname,
+        location.search,
+        location.hash,
+        navigate,
+    ]);
 
-    if (!isAuthenticated) return null;
+    if (isLoading || !isAuthenticated) return null;
 
     return <>{children}</>;
 }

@@ -1,13 +1,26 @@
 import { useEffect } from "react";
 import { Clock3, FolderOpen } from "lucide-react";
-import type { BlogPost } from "~/lib/constants/posts";
 import { resources } from "~/lib/constants/resources";
 import { ArticleResourcesAside } from "~/components/resources/ArticleResourcesAside/ArticleResourcesAside";
 import { useRecentArticlesStore } from "~/store/use-recent-articles-store";
 import styles from "./ArticlePage.module.scss";
 
+export interface ArticlePagePost {
+    id: string;
+    title: string;
+    category: string;
+    excerpt: string;
+    author: string;
+    date: string;
+    readTime: string;
+    image: string;
+    featured?: boolean;
+    resourceIds?: string[];
+    body: string[];
+}
+
 interface ArticlePageProps {
-    post: BlogPost;
+    post: ArticlePagePost;
 }
 
 export function ArticlePage({ post }: ArticlePageProps) {

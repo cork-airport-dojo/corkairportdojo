@@ -1,8 +1,10 @@
+import { AppShell } from "~/components/layout/AppShell/AppShell";
+import { ArticlesPage } from "~/components/articles/ArticlesPage/ArticlesPage";
+
 export default function BlogRoute() {
     return (
-        <div>
-            <h1>Blog page route</h1>
-            <p>We will rebuild your blog page here.</p>
-        </div>
+        <AppShell hideDefaultRightSidebar>
+            <ArticlesPage />
+        </AppShell>
     );
 }

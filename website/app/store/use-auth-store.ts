@@ -1,150 +1,109 @@
 import { create } from "zustand";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "~/lib/supabase/browser";
 
-const AUTH_STORAGE_KEY = "corkairportdojo-auth";
-const AUTH_MESSAGE_KEY = "corkairportdojo-auth-message";
-
-export type UserRole = "admin" | "student";
+export type UserRole = "admin" | "editor" | "viewer";
 
 interface AuthState {
     isAuthenticated: boolean;
+    isLoading: boolean;
+    user: User | null;
     userName: string;
-    role: UserRole;
+    avatarUrl: string;
+    role: UserRole | null;
     isAdmin: boolean;
-    authMessage: string | null;
-    login: (userName?: string, role?: UserRole) => void;
-    logout: () => void;
-    hydrate: () => void;
-    setAuthMessage: (message: string | null) => void;
-    consumeAuthMessage: () => string | null;
+    hydrate: () => Promise<void>;
+    signInWithGitHub: (redirectTo?: string) => Promise<void>;
+    signOut: () => Promise<void>;
+    setRole: (role: UserRole | null) => void;
+}
+
+function getUserName(user: User | null) {
+    if (!user) return "";
+
+    const metadata = user.user_metadata ?? {};
+    return (
+        metadata.full_name ||
+        metadata.name ||
+        metadata.user_name ||
+        metadata.preferred_username ||
+        user.email ||
+        ""
+    );
+}
+
+function getAvatarUrl(user: User | null) {
+    if (!user) return "";
+
+    const metadata = user.user_metadata ?? {};
+    return metadata.avatar_url || "";
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-    isAuthenticated: true,
-    userName: "Chris Murphy",
-    role: "admin",
-    isAdmin: true,
-    authMessage: null,
+    isAuthenticated: false,
+    isLoading: true,
+    user: null,
+    userName: "",
+    avatarUrl: "",
+    role: null,
+    isAdmin: false,
 
-    login: (userName = "Chris Murphy", role = "admin") => {
-        localStorage.setItem(
-            AUTH_STORAGE_KEY,
-            JSON.stringify({
-                isAuthenticated: true,
-                userName,
-                role,
-            })
-        );
-
-        localStorage.removeItem(AUTH_MESSAGE_KEY);
+    hydrate: async () => {
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
 
         set({
-            isAuthenticated: true,
-            userName,
-            role,
-            isAdmin: role === "admin",
-            authMessage: null,
+            isAuthenticated: Boolean(user),
+            isLoading: false,
+            user: user ?? null,
+            userName: getUserName(user ?? null),
+            avatarUrl: getAvatarUrl(user ?? null),
+            role: null,
+            isAdmin: false,
         });
     },
 
-    logout: () => {
-        localStorage.setItem(
-            AUTH_STORAGE_KEY,
-            JSON.stringify({
-                isAuthenticated: false,
-                userName: "",
-                role: "student",
-            })
-        );
+    signInWithGitHub: async (redirectTo = "/profile") => {
+        const callbackUrl = new URL("http://localhost:5173/auth/callback");
+        callbackUrl.searchParams.set("next", redirectTo);
 
-        localStorage.setItem(
-            AUTH_MESSAGE_KEY,
-            "You have been signed out. Please log in again to continue."
-        );
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "github",
+            options: {
+                redirectTo: callbackUrl.toString(),
+            },
+        });
+
+        if (error) {
+            console.error("GitHub sign-in failed:", error);
+            throw error;
+        }
+    },
+
+    signOut: async () => {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+            console.error("GitHub sign-out failed:", error);
+            throw error;
+        }
 
         set({
             isAuthenticated: false,
+            isLoading: false,
+            user: null,
             userName: "",
-            role: "student",
+            avatarUrl: "",
+            role: null,
             isAdmin: false,
-            authMessage: "You have been signed out. Please log in again to continue.",
         });
     },
 
-    hydrate: () => {
-        const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-        const storedMessage = localStorage.getItem(AUTH_MESSAGE_KEY);
-
-        if (!raw) {
-            localStorage.setItem(
-                AUTH_STORAGE_KEY,
-                JSON.stringify({
-                    isAuthenticated: true,
-                    userName: "Chris Murphy",
-                    role: "admin",
-                })
-            );
-
-            set({
-                isAuthenticated: true,
-                userName: "Chris Murphy",
-                role: "admin",
-                isAdmin: true,
-                authMessage: storedMessage,
-            });
-
-            return;
-        }
-
-        try {
-            const parsed = JSON.parse(raw) as {
-                isAuthenticated?: boolean;
-                userName?: string;
-                role?: UserRole;
-            };
-
-            const role = parsed.role === "admin" ? "admin" : "student";
-
-            set({
-                isAuthenticated: Boolean(parsed.isAuthenticated),
-                userName: parsed.userName || "",
-                role,
-                isAdmin: role === "admin",
-                authMessage: storedMessage,
-            });
-        } catch {
-            localStorage.setItem(
-                AUTH_STORAGE_KEY,
-                JSON.stringify({
-                    isAuthenticated: true,
-                    userName: "Chris Murphy",
-                    role: "admin",
-                })
-            );
-
-            set({
-                isAuthenticated: true,
-                userName: "Chris Murphy",
-                role: "admin",
-                isAdmin: true,
-                authMessage: storedMessage,
-            });
-        }
-    },
-
-    setAuthMessage: (message) => {
-        if (message) {
-            localStorage.setItem(AUTH_MESSAGE_KEY, message);
-        } else {
-            localStorage.removeItem(AUTH_MESSAGE_KEY);
-        }
-
-        set({ authMessage: message });
-    },
-
-    consumeAuthMessage: () => {
-        const message = localStorage.getItem(AUTH_MESSAGE_KEY);
-        localStorage.removeItem(AUTH_MESSAGE_KEY);
-        set({ authMessage: null });
-        return message;
+    setRole: (role) => {
+        set({
+            role,
+            isAdmin: role === "admin",
+        });
     },
 }));

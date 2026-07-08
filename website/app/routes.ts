@@ -10,4 +10,9 @@ export default [
     route("profile", "routes/profile.tsx"),
     route("login", "routes/login.tsx"),
     route("resources", "routes/resources.tsx"),
+    route("api/articles", "routes/api.articles.ts"),
+    route("api/modules/featured", "routes/api.modules.featured.ts"),
+    route("api/weather", "routes/api.weather.ts"),
+    route("api/articles/:slug", "routes/api.articles.$slug.ts"),
+    route("auth/callback", "routes/auth.callback.tsx")
 ] satisfies RouteConfig;
