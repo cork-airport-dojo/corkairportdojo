@@ -7,6 +7,22 @@
           var(--color-surface);
 }
 
+.heroButtonAuth {
+  min-height: 58px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 0 !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
+  color: white;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  font: inherit;
+}
+
 .content {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);

@@ -13,7 +13,6 @@ import {
     User,
     Settings,
     LogOut,
-    LogIn,
 } from "lucide-react";
 import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { NavLink, Link, useNavigate } from "react-router";
@@ -24,6 +23,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { GitHubLoginButton } from "~/components/auth/GitHubLoginButton/GitHubLoginButton";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./Sidebar.module.scss";
 
@@ -116,12 +116,13 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                         </Link>
                     </Button>
                 ) : (
-                    <Button asChild variant="outline" className={styles.loginCta} size="lg">
-                        <Link to="/login?redirectTo=%2Fwrite">
-                            <LogIn size={18} />
-                            {!collapsed && <span>Login to Write</span>}
-                        </Link>
-                    </Button>
+                    <GitHubLoginButton
+                        redirectTo="/write"
+                        className={`${styles.loginCta} ${collapsed ? styles.loginCtaCollapsed : ""}`}
+                        label="Sign in with GitHub"
+                        iconOnly={collapsed}
+                        title="Sign in with GitHub"
+                    />
                 )}
 
                 {!collapsed && isAuthenticated && (

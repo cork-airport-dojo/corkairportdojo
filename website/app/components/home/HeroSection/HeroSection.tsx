@@ -2,7 +2,9 @@ import { useEffect, useMemo } from "react";
 import { BookOpen, Users, PenTool, Boxes } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
+import { GitHubLoginButton } from "~/components/auth/GitHubLoginButton/GitHubLoginButton";
 import { useHeroCTAStore } from "~/store/use-hero-cta-store";
+import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./HeroSection.module.scss";
 
 const highlights = [
@@ -28,14 +30,28 @@ const highlights = [
     },
 ];
 
+function isGitHubSignInButton(label: string, href: string) {
+    const normalizedLabel = label.trim().toLowerCase();
+    const normalizedHref = href.trim().toLowerCase();
+
+    return (
+        normalizedHref === "/login" ||
+        normalizedLabel === "sign in with github" ||
+        normalizedLabel === "register next term"
+    );
+}
+
 export function HeroSection() {
     const { buttons, hydrate, getVisibleButtons } = useHeroCTAStore();
+    const { isAuthenticated, hydrate: hydrateAuth } = useAuthStore();
 
     useEffect(() => {
         hydrate();
-    }, [hydrate]);
+        void hydrateAuth();
+    }, [hydrate, hydrateAuth]);
 
     const visibleButtons = useMemo(() => getVisibleButtons(), [buttons, getVisibleButtons]);
+
     return (
         <section className={styles.hero}>
             <div className={styles.content}>
@@ -52,22 +68,40 @@ export function HeroSection() {
                     </p>
 
                     <div className={styles.actions}>
-                        {visibleButtons.map((button) => (
-                            <Button
-                                key={button.id}
-                                asChild
-                                variant={
-                                    button.variant === "outline"
-                                        ? "outline"
-                                        : button.variant === "secondary"
-                                            ? "secondary"
-                                            : "default"
-                                }
-                                className={styles.heroButton}
-                            >
-                                <Link to={button.href}>{button.label}</Link>
-                            </Button>
-                        ))}
+                        {visibleButtons.map((button) => {
+                            const variant =
+                                button.variant === "outline"
+                                    ? "outline"
+                                    : button.variant === "secondary"
+                                        ? "secondary"
+                                        : "default";
+
+                            const shouldRenderGitHubSignIn =
+                                !isAuthenticated &&
+                                isGitHubSignInButton(button.label, button.href);
+
+                            if (shouldRenderGitHubSignIn) {
+                                return (
+                                    <GitHubLoginButton
+                                        key={button.id}
+                                        redirectTo="/profile"
+                                        label="Sign in with GitHub"
+                                        className={`${styles.heroButton} ${styles.heroButtonAuth}`}
+                                    />
+                                );
+                            }
+
+                            return (
+                                <Button
+                                    key={button.id}
+                                    asChild
+                                    variant={variant}
+                                    className={styles.heroButton}
+                                >
+                                    <Link to={button.href}>{button.label}</Link>
+                                </Button>
+                            );
+                        })}
                     </div>
 
                     <div className={styles.highlights}>

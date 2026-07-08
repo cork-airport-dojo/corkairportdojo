@@ -55,6 +55,15 @@ const defaultButtons: HeroCTAButton[] = [
         order: 3,
         isCustom: false,
     },
+    {
+        id: "sign-in-with-github",
+        label: "Sign in with GitHub",
+        href: "/login",
+        enabled: true,
+        variant: "secondary",
+        order: 3,
+        isCustom: false,
+    },
 ];
 
 function readStoredButtons(): HeroCTAButton[] {

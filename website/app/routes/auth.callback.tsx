@@ -7,16 +7,15 @@ export async function loader({ request }: { request: Request }) {
     const next = url.searchParams.get("next") || "/profile";
 
     if (!code) {
-        return redirect("/login?error=missing_code");
+        return redirect("/login");
     }
 
     const { supabase, responseHeaders } = createRequestSupabaseServerClient(request);
-
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
         console.error("OAuth callback exchange failed:", error);
-        return redirect("/login?error=oauth_callback_failed", {
+        return redirect("/login", {
             headers: responseHeaders,
         });
     }
