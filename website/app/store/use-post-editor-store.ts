@@ -4,7 +4,14 @@ import {
     type PostEditorFormData,
 } from "~/lib/post-editor";
 
+interface StoredDraftPayload extends PostEditorFormData {
+    articleId: string | null;
+    articleSlug: string | null;
+}
+
 interface PostEditorState extends PostEditorFormData {
+    articleId: string | null;
+    articleSlug: string | null;
     commandPaletteOpen: boolean;
     lastSavedAt: string | null;
     setTitle: (value: string) => void;
@@ -18,6 +25,7 @@ interface PostEditorState extends PostEditorFormData {
     setMarkdownMode: (value: boolean) => void;
     setStatus: (value: "draft" | "review" | "published") => void;
     setCommandPaletteOpen: (value: boolean) => void;
+    setArticleIdentity: (input: { articleId: string; articleSlug: string }) => void;
     saveDraft: () => void;
     loadDraft: () => void;
     clearDraft: () => void;
@@ -36,6 +44,8 @@ const initialState: PostEditorFormData = {
 
 export const usePostEditorStore = create<PostEditorState>((set, get) => ({
     ...initialState,
+    articleId: null,
+    articleSlug: null,
     commandPaletteOpen: false,
     lastSavedAt: null,
 
@@ -62,10 +72,16 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
     setStatus: (value) => set({ status: value }),
     setCommandPaletteOpen: (value) => set({ commandPaletteOpen: value }),
 
+    setArticleIdentity: ({ articleId, articleSlug }) =>
+        set({
+            articleId,
+            articleSlug,
+        }),
+
     saveDraft: () => {
         const state = get();
 
-        const payload: PostEditorFormData = {
+        const payload: StoredDraftPayload = {
             title: state.title,
             description: state.description,
             category: state.category,
@@ -74,6 +90,8 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
             content: state.content,
             markdownMode: state.markdownMode,
             status: state.status,
+            articleId: state.articleId,
+            articleSlug: state.articleSlug,
         };
 
         localStorage.setItem(POST_EDITOR_STORAGE_KEY, JSON.stringify(payload));
@@ -85,9 +103,18 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
         if (!draft) return;
 
         try {
-            const parsed = JSON.parse(draft) as PostEditorFormData;
+            const parsed = JSON.parse(draft) as StoredDraftPayload;
             set({
-                ...parsed,
+                title: parsed.title ?? "",
+                description: parsed.description ?? "",
+                category: parsed.category ?? "Web Development",
+                tags: parsed.tags ?? [],
+                coverImage: parsed.coverImage ?? "",
+                content: parsed.content ?? "",
+                markdownMode: parsed.markdownMode ?? false,
+                status: parsed.status ?? "draft",
+                articleId: parsed.articleId ?? null,
+                articleSlug: parsed.articleSlug ?? null,
             });
         } catch {
             localStorage.removeItem(POST_EDITOR_STORAGE_KEY);
@@ -98,6 +125,8 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
         localStorage.removeItem(POST_EDITOR_STORAGE_KEY);
         set({
             ...initialState,
+            articleId: null,
+            articleSlug: null,
             lastSavedAt: null,
         });
     },

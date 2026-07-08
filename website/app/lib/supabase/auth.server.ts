@@ -1,9 +1,13 @@
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from "@supabase/ssr";
+import {
+    createServerClient,
+    parseCookieHeader,
+    serializeCookieHeader,
+} from "@supabase/ssr";
+import type { User } from "@supabase/supabase-js";
 import { getSupabaseServerEnv } from "~/lib/supabase/env.server";
 
 export function createRequestSupabaseServerClient(request: Request) {
     const { supabaseUrl, supabaseAnonKey } = getSupabaseServerEnv();
-
     const responseHeaders = new Headers();
 
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -13,7 +17,11 @@ export function createRequestSupabaseServerClient(request: Request) {
             },
             setAll(cookies) {
                 for (const cookie of cookies) {
-                    const serialized = serializeCookieHeader(cookie.name, cookie.value, cookie.options);
+                    const serialized = serializeCookieHeader(
+                        cookie.name,
+                        cookie.value,
+                        cookie.options
+                    );
                     responseHeaders.append("Set-Cookie", serialized);
                 }
             },
@@ -23,7 +31,9 @@ export function createRequestSupabaseServerClient(request: Request) {
     return { supabase, responseHeaders };
 }
 
-export async function getRequestUser(request: Request) {
+export async function getRequestUser(
+    request: Request
+): Promise<{ user: User | null; responseHeaders: Headers }> {
     const { supabase, responseHeaders } = createRequestSupabaseServerClient(request);
 
     const {
@@ -31,15 +41,20 @@ export async function getRequestUser(request: Request) {
         error,
     } = await supabase.auth.getUser();
 
+    console.log("SSR authenticated user id:", user?.id);
+    console.log("SSR authenticated user email:", user?.email);
+
     if (error) {
-        console.error("Failed to get request user:", error);
+        console.error("Failed to get request user from cookie session:", error);
         return { user: null, responseHeaders };
     }
 
     return { user, responseHeaders };
 }
 
-export async function requireRequestUser(request: Request) {
+export async function requireRequestUser(
+    request: Request
+): Promise<{ user: User; responseHeaders: Headers }> {
     const { user, responseHeaders } = await getRequestUser(request);
 
     if (!user) {

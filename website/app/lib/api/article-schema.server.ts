@@ -50,4 +50,9 @@ export const createArticleSchema = z.object({
     published: z.boolean().optional().default(false),
 });
 
+export const updateArticleSchema = createArticleSchema.extend({
+    id: z.string().uuid("Article id must be a valid UUID."),
+});
+
 export type CreateArticleInput = z.infer<typeof createArticleSchema>;
+export type UpdateArticleInput = z.infer<typeof updateArticleSchema>;

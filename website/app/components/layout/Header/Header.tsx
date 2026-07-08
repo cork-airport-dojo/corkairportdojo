@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import {
     Bell,
     ChevronDown,
-    LogIn,
     LogOut,
     Moon,
     Search,
@@ -18,6 +17,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { GitHubLoginButton } from "~/components/auth/GitHubLoginButton/GitHubLoginButton";
 import { MobileSidebar } from "../MobileSidebar/MobileSidebar";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./Header.module.scss";
@@ -124,12 +124,11 @@ export function Header({
                         </DropdownMenuContent>
                     </DropdownMenu>
                 ) : (
-                    <Button asChild variant="outline" className={styles.loginButton}>
-                        <Link to="/login">
-                            <LogIn size={16} />
-                            <span>Login</span>
-                        </Link>
-                    </Button>
+                    <GitHubLoginButton
+                        redirectTo="/profile"
+                        className={styles.loginButton}
+                        label="Sign in with GitHub"
+                    />
                 )}
             </div>
         </header>

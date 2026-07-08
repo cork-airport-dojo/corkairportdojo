@@ -1,7 +1,14 @@
 import { data } from "react-router";
-import { createArticleSchema } from "~/lib/api/article-schema.server";
+import {
+    createArticleSchema,
+    updateArticleSchema,
+} from "~/lib/api/article-schema.server";
 import { requireUserRole } from "~/lib/api/authz.server";
-import { createArticle, getPublishedArticles } from "~/lib/api/articles.server";
+import {
+    createArticle,
+    getPublishedArticles,
+    updateArticle,
+} from "~/lib/api/articles.server";
 import { requireRequestUser } from "~/lib/supabase/auth.server";
 
 export async function loader() {
@@ -10,11 +17,13 @@ export async function loader() {
 }
 
 export async function action({ request }: { request: Request }) {
-    if (request.method.toUpperCase() !== "POST") {
+    const method = request.method.toUpperCase();
+
+    if (method !== "POST" && method !== "PATCH") {
         return data(
             {
                 error: "MethodNotAllowed",
-                message: "Only POST is allowed for this endpoint.",
+                message: "Only POST and PATCH are allowed for this endpoint.",
             },
             { status: 405 }
         );
@@ -43,13 +52,44 @@ export async function action({ request }: { request: Request }) {
         );
     }
 
-    const parsed = createArticleSchema.safeParse(json);
+    if (method === "POST") {
+        const parsed = createArticleSchema.safeParse(json);
+
+        if (!parsed.success) {
+            return new Response(
+                JSON.stringify({
+                    error: "ValidationFailed",
+                    message: "The article payload is invalid.",
+                    issues: parsed.error.flatten(),
+                }),
+                {
+                    status: 400,
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...Object.fromEntries(headers.entries()),
+                    },
+                }
+            );
+        }
+
+        const article = await createArticle(parsed.data, user.id);
+
+        return new Response(JSON.stringify({ article }), {
+            status: 201,
+            headers: {
+                "Content-Type": "application/json",
+                ...Object.fromEntries(headers.entries()),
+            },
+        });
+    }
+
+    const parsed = updateArticleSchema.safeParse(json);
 
     if (!parsed.success) {
         return new Response(
             JSON.stringify({
                 error: "ValidationFailed",
-                message: "The article payload is invalid.",
+                message: "The article update payload is invalid.",
                 issues: parsed.error.flatten(),
             }),
             {
@@ -62,10 +102,10 @@ export async function action({ request }: { request: Request }) {
         );
     }
 
-    const article = await createArticle(parsed.data, user.id);
+    const article = await updateArticle(parsed.data, user.id);
 
     return new Response(JSON.stringify({ article }), {
-        status: 201,
+        status: 200,
         headers: {
             "Content-Type": "application/json",
             ...Object.fromEntries(headers.entries()),

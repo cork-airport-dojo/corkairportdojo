@@ -1,10 +1,17 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 import {
     calculateReadingTime,
     calculateSeoScore,
     calculateWordCount,
+    createSlug,
 } from "~/lib/post-editor";
+import {
+    createArticleRequest,
+    updateArticleRequest,
+} from "~/lib/api/article-create";
+import { useAuthStore } from "~/store/use-auth-store";
 import { usePostEditorStore } from "~/store/use-post-editor-store";
 import { useEditorShortcuts } from "~/hooks/use-editor-shortcuts";
 import { PostEditorHeader } from "../PostEditorHeader/PostEditorHeader";
@@ -13,16 +20,22 @@ import { PostEditorSidebar } from "../PostEditorSidebar/PostEditorSidebar";
 import { CommandPalette } from "../CommandPalette/CommandPalette";
 import styles from "./WritePostPage.module.scss";
 
-async function fakePublishRequest() {
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    return { success: true };
+function htmlToParagraphs(content: string) {
+    return content
+        .split(/\n{2,}/)
+        .map((chunk) => chunk.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim())
+        .filter(Boolean);
 }
 
 export function WritePostPage() {
+    const navigate = useNavigate();
     const titleInputRef = useRef<HTMLInputElement>(null);
     const editorAnchorRef = useRef<HTMLDivElement>(null);
 
+    const { userName } = useAuthStore();
+
     const {
+        articleId,
         title,
         description,
         category,
@@ -46,6 +59,7 @@ export function WritePostPage() {
         loadDraft,
         clearDraft,
         setCommandPaletteOpen,
+        setArticleIdentity,
     } = usePostEditorStore();
 
     useEffect(() => {
@@ -59,6 +73,7 @@ export function WritePostPage() {
 
         return () => window.clearTimeout(timeout);
     }, [
+        articleId,
         title,
         description,
         category,
@@ -70,10 +85,7 @@ export function WritePostPage() {
         saveDraft,
     ]);
 
-    const wordCount = useMemo(() => {
-        return calculateWordCount(`${title} ${description} ${content}`);
-    }, [title, description, content]);
-
+    const wordCount = useMemo(() => calculateWordCount(content), [content]);
     const readingTime = useMemo(() => calculateReadingTime(wordCount), [wordCount]);
 
     const seoScore = useMemo(
@@ -91,21 +103,76 @@ export function WritePostPage() {
         [title, description, category, tags, coverImage, content, markdownMode, status]
     );
 
-    const publishMutation = useMutation({
-        mutationFn: fakePublishRequest,
-        onSuccess: () => {
-            setStatus("published");
+    const saveMutation = useMutation({
+        mutationFn: async (published: boolean) => {
+            const generatedSlug = createSlug(title);
+
+            if (!title.trim()) {
+                throw new Error("Please enter a title before saving.");
+            }
+
+            const paragraphs = htmlToParagraphs(content);
+
+            if (!paragraphs.length) {
+                throw new Error("Please add article content before saving.");
+            }
+
+            const payload = {
+                slug: generatedSlug,
+                title: title.trim(),
+                excerpt: description.trim(),
+                body: paragraphs,
+                category: category.trim() || "General",
+                author_name: userName || "CorkAirportDojo",
+                cover_image: coverImage.trim(),
+                read_time: `${readingTime} min read`,
+                featured: false,
+                published,
+            };
+
+            if (articleId) {
+                return updateArticleRequest({
+                    id: articleId,
+                    ...payload,
+                });
+            }
+
+            return createArticleRequest(payload);
+        },
+        onSuccess: (article, published) => {
+            setArticleIdentity({
+                articleId: article.id,
+                articleSlug: article.slug,
+            });
+
+            setStatus(published ? "published" : "draft");
             saveDraft();
+
+            if (published) {
+                navigate(`/blog/${article.slug}`);
+            }
         },
     });
 
-    const handlePreview = () => setMarkdownMode(!markdownMode);
-    const handlePublish = () => publishMutation.mutate();
+    const handleSaveDraft = () => {
+        setStatus("draft");
+        saveMutation.mutate(false);
+    };
+
+    const handlePublish = () => {
+        setStatus("published");
+        saveMutation.mutate(true);
+    };
+
+    const handlePreview = () => {
+        setMarkdownMode(!markdownMode);
+    };
+
     const handleOpenCommandPalette = () => setCommandPaletteOpen(true);
     const handleCloseCommandPalette = () => setCommandPaletteOpen(false);
 
     useEditorShortcuts({
-        onSaveDraft: saveDraft,
+        onSaveDraft: handleSaveDraft,
         onPublish: handlePublish,
         onToggleCommandPalette: handleOpenCommandPalette,
     });
@@ -124,12 +191,15 @@ export function WritePostPage() {
             <CommandPalette
                 open={commandPaletteOpen}
                 onClose={handleCloseCommandPalette}
-                onSaveDraft={saveDraft}
+                onSaveDraft={handleSaveDraft}
                 onPreview={handlePreview}
                 onPublish={handlePublish}
                 onFocusTitle={() => titleInputRef.current?.focus()}
                 onFocusEditor={() =>
-                    editorAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+                    editorAnchorRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                    })
                 }
                 onClearDraft={clearDraft}
             />
@@ -167,12 +237,19 @@ export function WritePostPage() {
                             status={status}
                             lastSavedAt={lastSavedAt}
                             markdownMode={markdownMode}
-                            onSaveDraft={saveDraft}
+                            onSaveDraft={handleSaveDraft}
                             onPreview={handlePreview}
                             onPublish={handlePublish}
+                            isSaving={saveMutation.isPending}
                         />
                     </div>
                 </div>
+
+                {saveMutation.isError && (
+                    <div style={{ color: "var(--color-danger, #ef4444)" }}>
+                        {(saveMutation.error as Error).message}
+                    </div>
+                )}
             </div>
         </>
     );

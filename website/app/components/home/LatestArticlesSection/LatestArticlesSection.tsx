@@ -2,25 +2,42 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionHeader } from "../../common/SectionHeader/SectionHeader";
 import { ArticleCard } from "../../blog/ArticleCard/ArticleCard";
-import { posts } from "~/lib/constants/posts";
+import { fetchArticles, type PublicArticle } from "~/lib/api/articles";
 import styles from "./LatestArticlesSection.module.scss";
-
-
 
 export function LatestArticlesSection() {
     const trackRef = useRef<HTMLDivElement>(null);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [articles, setArticles] = useState<PublicArticle[]>([]);
 
-    const articles = posts.slice(0, 4).map((post) => ({
-        id: post.id,
-        title: post.title,
-        excerpt: post.excerpt,
-        category: post.category,
-        image: post.image,
-        author: post.author,
-        date: post.date,
-        readTime: post.readTime,
-        resourceCount: post.resourceIds?.length ?? 0,
+    useEffect(() => {
+        async function load() {
+            try {
+                const data = await fetchArticles();
+                setArticles(data.slice(0, 4));
+            } catch (error) {
+                console.error("Failed to load latest articles:", error);
+                setArticles([]);
+            }
+        }
+
+        void load();
+    }, []);
+
+    const cardArticles = articles.map((article) => ({
+        id: article.slug,
+        title: article.title,
+        excerpt: article.excerpt ?? "",
+        category: article.category ?? "General",
+        image: article.cover_image ?? "/logo.png",
+        author: article.author_name ?? "CorkAirportDojo",
+        date: new Date(article.created_at).toLocaleDateString("en-IE", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+        }),
+        readTime: article.read_time ?? "Article",
+        resourceCount: 0,
     }));
 
     const scrollByAmount = (direction: "left" | "right") => {
@@ -78,7 +95,25 @@ export function LatestArticlesSection() {
         return () => {
             track.removeEventListener("scroll", handleScroll);
         };
-    }, []);
+    }, [cardArticles.length]);
+
+    if (cardArticles.length === 0) {
+        return (
+            <section className={styles.section}>
+                <div className={styles.topRow}>
+                    <SectionHeader
+                        title="Latest Articles"
+                        actionLabel="View all"
+                        actionHref="/blog"
+                    />
+                </div>
+
+                <div className={styles.emptyState}>
+                    <p>No published articles yet.</p>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className={styles.section}>
@@ -112,7 +147,7 @@ export function LatestArticlesSection() {
 
             <div className={styles.trackWrap}>
                 <div className={styles.track} ref={trackRef}>
-                    {articles.map((article) => (
+                    {cardArticles.map((article) => (
                         <div key={article.id} className={styles.slide}>
                             <ArticleCard {...article} />
                         </div>
@@ -121,7 +156,7 @@ export function LatestArticlesSection() {
             </div>
 
             <div className={styles.dots}>
-                {articles.map((article, index) => (
+                {cardArticles.map((article, index) => (
                     <button
                         key={article.title}
                         type="button"

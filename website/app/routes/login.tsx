@@ -1,9 +1,11 @@
-import { useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router";
+import { useEffect, useMemo, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { useAuthStore } from "~/store/use-auth-store";
 
 export default function LoginRoute() {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const hasStarted = useRef(false);
     const { isAuthenticated, isLoading, hydrate, signInWithGitHub } = useAuthStore();
 
     const redirectTo = useMemo(() => {
@@ -15,10 +17,17 @@ export default function LoginRoute() {
     }, [hydrate]);
 
     useEffect(() => {
-        if (!isLoading && !isAuthenticated) {
-            void signInWithGitHub(redirectTo);
+        if (hasStarted.current) return;
+        if (isLoading) return;
+
+        if (isAuthenticated) {
+            navigate(redirectTo, { replace: true });
+            return;
         }
-    }, [isAuthenticated, isLoading, redirectTo, signInWithGitHub]);
+
+        hasStarted.current = true;
+        void signInWithGitHub(redirectTo);
+    }, [isAuthenticated, isLoading, navigate, redirectTo, signInWithGitHub]);
 
     return null;
 }

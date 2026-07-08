@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { getSupabaseServerEnv } from "./env.server";
+import { getSupabaseServerEnv } from "~/lib/supabase/env.server";
 
 export function getSupabaseServerClient() {
     const { supabaseUrl, supabaseAnonKey } = getSupabaseServerEnv();
@@ -7,6 +7,8 @@ export function getSupabaseServerClient() {
     return createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
             persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
         },
     });
 }
@@ -22,6 +24,7 @@ export function getSupabaseAdminClient() {
         auth: {
             persistSession: false,
             autoRefreshToken: false,
+            detectSessionInUrl: false,
         },
     });
 }

@@ -80,16 +80,6 @@ export function HeroSection() {
                                 !isAuthenticated &&
                                 isGitHubSignInButton(button.label, button.href);
 
-                            if (shouldRenderGitHubSignIn) {
-                                return (
-                                    <GitHubLoginButton
-                                        key={button.id}
-                                        redirectTo="/profile"
-                                        label="Sign in with GitHub"
-                                        className={`${styles.heroButton} ${styles.heroButtonAuth}`}
-                                    />
-                                );
-                            }
 
                             return (
                                 <Button

@@ -16,7 +16,12 @@ export async function getUserRole(userId: string): Promise<AppUserRole | null> {
         return null;
     }
 
-    return (data?.role as AppUserRole | undefined) ?? null;
+    const role = (data?.role as AppUserRole | undefined) ?? null;
+
+    console.log("getUserRole userId:", userId);
+    console.log("getUserRole resolved role:", role);
+
+    return role;
 }
 
 export async function requireUserRole(
@@ -24,6 +29,9 @@ export async function requireUserRole(
     allowedRoles: AppUserRole[]
 ): Promise<AppUserRole> {
     const role = await getUserRole(userId);
+
+    console.log("requireUserRole allowed roles:", allowedRoles);
+    console.log("requireUserRole actual role:", role);
 
     if (!role || !allowedRoles.includes(role)) {
         throw new Response(

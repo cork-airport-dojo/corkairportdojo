@@ -12,6 +12,7 @@ interface PostEditorSidebarProps {
     onSaveDraft: () => void;
     onPreview: () => void;
     onPublish: () => void;
+    isSaving?: boolean;
 }
 
 export function PostEditorSidebar({
@@ -24,6 +25,7 @@ export function PostEditorSidebar({
                                       onSaveDraft,
                                       onPreview,
                                       onPublish,
+                                      isSaving = false,
                                   }: PostEditorSidebarProps) {
     return (
         <motion.aside
@@ -79,8 +81,9 @@ export function PostEditorSidebar({
                         variant="outline"
                         className={styles.secondaryButton}
                         onClick={onSaveDraft}
+                        disabled={isSaving}
                     >
-                        Save Draft
+                        {isSaving ? "Saving..." : "Save Draft"}
                     </Button>
 
                     <Button
@@ -88,6 +91,7 @@ export function PostEditorSidebar({
                         variant="outline"
                         className={styles.secondaryButton}
                         onClick={onPreview}
+                        disabled={isSaving}
                     >
                         Preview
                     </Button>
@@ -96,8 +100,9 @@ export function PostEditorSidebar({
                         type="button"
                         className={styles.primaryButton}
                         onClick={onPublish}
+                        disabled={isSaving}
                     >
-                        Publish Post
+                        {isSaving ? "Saving..." : "Publish Post"}
                     </Button>
                 </div>
             </div>

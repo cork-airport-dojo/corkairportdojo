@@ -8,6 +8,7 @@ import {
 } from "react-router";
 import { QueryProvider } from "~/components/providers/QueryProvider";
 import { useAuthStore } from "~/store/use-auth-store";
+import { supabase } from "~/lib/supabase/browser";
 
 import "./app.css";
 import "./styles/app.scss";
@@ -17,6 +18,16 @@ function AppBoot() {
 
     useEffect(() => {
         void hydrate();
+
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange(() => {
+            void hydrate();
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, [hydrate]);
 
     return <Outlet />;
