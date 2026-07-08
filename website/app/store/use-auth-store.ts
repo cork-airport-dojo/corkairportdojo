@@ -13,6 +13,7 @@ interface AuthState {
     role: UserRole | null;
     isAdmin: boolean;
     hydrate: () => Promise<void>;
+    signInWithGitHub: (redirectTo?: string) => Promise<void>;
     signOut: () => Promise<void>;
     setRole: (role: UserRole | null) => void;
 }
@@ -21,6 +22,7 @@ function getUserName(user: User | null) {
     if (!user) return "";
 
     const metadata = user.user_metadata ?? {};
+
     return (
         metadata.full_name ||
         metadata.name ||
@@ -63,11 +65,28 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
     },
 
+    signInWithGitHub: async (redirectTo = "/profile") => {
+        const callbackUrl = new URL("http://localhost:5173/auth/callback");
+        callbackUrl.searchParams.set("next", redirectTo);
+
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "github",
+            options: {
+                redirectTo: callbackUrl.toString(),
+            },
+        });
+
+        if (error) {
+            console.error("GitHub sign-in failed:", error);
+            throw error;
+        }
+    },
+
     signOut: async () => {
         const { error } = await supabase.auth.signOut();
 
         if (error) {
-            console.error("Sign out failed:", error);
+            console.error("GitHub sign-out failed:", error);
             throw error;
         }
 

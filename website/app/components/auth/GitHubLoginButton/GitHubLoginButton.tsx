@@ -1,6 +1,5 @@
 import { FiGithub } from "react-icons/fi";
-import { useMemo } from "react";
-import { supabase } from "~/lib/supabase/browser";
+import { useAuthStore } from "~/store/use-auth-store";
 
 interface GitHubLoginButtonProps {
     redirectTo?: string;
@@ -17,23 +16,10 @@ export function GitHubLoginButton({
                                       iconOnly = false,
                                       title,
                                   }: GitHubLoginButtonProps) {
-    const callbackUrl = useMemo(() => {
-        const url = new URL("http://localhost:5173/auth/callback");
-        url.searchParams.set("next", redirectTo);
-        return url.toString();
-    }, [redirectTo]);
+    const { signInWithGitHub } = useAuthStore();
 
     const handleLogin = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: "github",
-            options: {
-                redirectTo: callbackUrl,
-            },
-        });
-
-        if (error) {
-            console.error("GitHub OAuth error:", error);
-        }
+        await signInWithGitHub(redirectTo);
     };
 
     return (
