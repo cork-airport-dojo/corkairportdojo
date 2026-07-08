@@ -1,48 +1,38 @@
 import { useEffect, useMemo } from "react";
+import { Link } from "react-router";
 import {
     AlertTriangle,
     ArrowRight,
     BookMarked,
+    CloudRain,
+    CloudSnow,
+    CloudSun,
     Info,
     Megaphone,
+    Sun,
     TriangleAlert,
+    Waves,
     Wind,
+    Zap,
+    type LucideIcon,
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { RailCardHeader } from "~/components/common/RailCardHeader/RailCardHeader";
-import type { CorkWeatherAlert } from "~/lib/constants/weather-warnings";
+import type {
+    CorkWeatherAlert,
+    WeatherAlertIconKey,
+} from "~/lib/constants/weather-warnings";
 import {
     formatWeatherDateTime,
     getWeatherAlertAccent,
+    getWeatherAlertIconKey,
 } from "~/lib/constants/weather-warnings";
 import { useNoticesStore, type ImportantNotice } from "~/store/use-notices-store";
 import { useModuleViewsStore } from "~/store/use-module-views-store";
 import { useCustomModulesStore } from "~/store/use-custom-modules-store";
+import { useRecentArticlesStore } from "~/store/use-recent-articles-store";
 import { getAllModules } from "~/lib/get-all-modules";
 import styles from "./RightSidebar.module.scss";
-
-const recentlyRead = [
-    {
-        title: "Understanding Next.js 14 App Router",
-        category: "Next.js",
-        readAt: "Today",
-    },
-    {
-        title: "TypeScript Tips for Better Development",
-        category: "TypeScript",
-        readAt: "Yesterday",
-    },
-    {
-        title: "Database Design Principles",
-        category: "Database",
-        readAt: "2 days ago",
-    },
-    {
-        title: "Why React Architecture Matters",
-        category: "React",
-        readAt: "Last week",
-    },
-];
 
 interface RightSidebarProps {
     weatherAlert?: CorkWeatherAlert | null;
@@ -78,10 +68,51 @@ function getNoticeAccent(notice: ImportantNotice) {
     };
 }
 
+function getWeatherIconComponent(iconKey: WeatherAlertIconKey): LucideIcon {
+    switch (iconKey) {
+        case "zap":
+            return Zap;
+        case "cloud-snow":
+            return CloudSnow;
+        case "cloud-rain":
+            return CloudRain;
+        case "waves":
+            return Waves;
+        case "cloud-sun":
+            return CloudSun;
+        case "sun":
+            return Sun;
+        case "wind":
+        default:
+            return Wind;
+    }
+}
+
+function formatRecentReadTime(value: string) {
+    const timestamp = new Date(value).getTime();
+    if (!Number.isFinite(timestamp)) return "Recently";
+
+    const diffMs = Date.now() - timestamp;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffHours < 1) return "Just now";
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+
+    return "Last week";
+}
+
 export function RightSidebar({ weatherAlert }: RightSidebarProps) {
     const { notices, hydrate, clearInactiveNotices, getVisibleNotices } = useNoticesStore();
     const { views, hydrate: hydrateModuleViews, getViews } = useModuleViewsStore();
     const { modules: customModules, hydrate: hydrateCustomModules } = useCustomModulesStore();
+    const {
+        articles: recentArticlesState,
+        hydrate: hydrateRecentArticles,
+        getRecentArticles,
+    } = useRecentArticlesStore();
 
     useEffect(() => {
         hydrate();
@@ -91,9 +122,15 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
     useEffect(() => {
         hydrateModuleViews();
         hydrateCustomModules();
-    }, [hydrateModuleViews, hydrateCustomModules]);
+        hydrateRecentArticles();
+    }, [hydrateModuleViews, hydrateCustomModules, hydrateRecentArticles]);
 
     const visibleNotices = useMemo(() => getVisibleNotices(), [notices, getVisibleNotices]);
+
+    const recentArticles = useMemo(
+        () => getRecentArticles(),
+        [recentArticlesState, getRecentArticles]
+    );
 
     const popularModules = useMemo(() => {
         return getAllModules(customModules)
@@ -107,6 +144,7 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
 
     const showWeatherCard = weatherAlert?.hasAlert;
     const alertAccent = getWeatherAlertAccent(weatherAlert?.level ?? null);
+    const WeatherIcon = getWeatherIconComponent(getWeatherAlertIconKey(weatherAlert));
 
     const timeLabel =
         weatherAlert?.onset && weatherAlert?.expiry
@@ -149,7 +187,7 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
                                     className={styles.weatherBodyIcon}
                                     style={{ color: alertAccent.text }}
                                 >
-                                    <Wind size={44} strokeWidth={1.8} />
+                                    <WeatherIcon size={44} strokeWidth={1.8} />
                                 </div>
 
                                 <div className={styles.weatherText}>
@@ -204,7 +242,10 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
                                             background: accent.background,
                                         }}
                                     >
-                                        <div className={styles.noticeSeverityIcon} style={{ color: accent.text }}>
+                                        <div
+                                            className={styles.noticeSeverityIcon}
+                                            style={{ color: accent.text }}
+                                        >
                                             <NoticeIcon size={15} />
                                         </div>
 
@@ -214,7 +255,9 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
                                                     {notice.severity}
                                                 </span>
                                                 {notice.pinned && (
-                                                    <span className={styles.noticePinnedLabel}>Pinned</span>
+                                                    <span className={styles.noticePinnedLabel}>
+                                                        Pinned
+                                                    </span>
                                                 )}
                                             </div>
 
@@ -228,32 +271,34 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
                 </Card>
             )}
 
-            <Card className={styles.sidebarCard}>
-                <CardHeader className={styles.cardHeader}>
-                    <RailCardHeader
-                        title="Recently Read"
-                        icon={<BookMarked size={18} />}
-                    />
-                </CardHeader>
+            {recentArticles.length > 0 && (
+                <Card className={styles.sidebarCard}>
+                    <CardHeader className={styles.cardHeader}>
+                        <RailCardHeader
+                            title="Recently Read"
+                            icon={<BookMarked size={18} />}
+                        />
+                    </CardHeader>
 
-                <CardContent className={styles.cardBody}>
-                    <div className={styles.recentList}>
-                        {recentlyRead.map((article) => (
-                            <button
-                                key={article.title}
-                                className={styles.recentItem}
-                                type="button"
-                            >
-                                <strong>{article.title}</strong>
-                                <div className={styles.recentMeta}>
-                                    <span>{article.category}</span>
-                                    <span>{article.readAt}</span>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+                    <CardContent className={styles.cardBody}>
+                        <div className={styles.recentList}>
+                            {recentArticles.map((article) => (
+                                <Link
+                                    key={article.id}
+                                    to={article.href}
+                                    className={styles.recentItem}
+                                >
+                                    <strong>{article.title}</strong>
+                                    <div className={styles.recentMeta}>
+                                        <span>{article.category}</span>
+                                        <span>{formatRecentReadTime(article.readAt)}</span>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             <Card className={styles.sidebarCard}>
                 <CardHeader className={styles.cardHeader}>

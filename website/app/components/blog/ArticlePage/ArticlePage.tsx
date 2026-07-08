@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { Clock3, FolderOpen } from "lucide-react";
-import type {BlogPost} from "~/lib/constants/posts";
+import type { BlogPost } from "~/lib/constants/posts";
 import { resources } from "~/lib/constants/resources";
 import { ArticleResourcesAside } from "~/components/resources/ArticleResourcesAside/ArticleResourcesAside";
+import { useRecentArticlesStore } from "~/store/use-recent-articles-store";
 import styles from "./ArticlePage.module.scss";
 
 interface ArticlePageProps {
@@ -12,6 +14,17 @@ export function ArticlePage({ post }: ArticlePageProps) {
     const linkedResources = resources.filter((resource) =>
         post.resourceIds?.includes(resource.id)
     );
+
+    const { addArticle } = useRecentArticlesStore();
+
+    useEffect(() => {
+        addArticle({
+            id: post.id,
+            title: post.title,
+            category: post.category,
+            href: `/blog/${post.id}`,
+        });
+    }, [addArticle, post.id, post.title, post.category]);
 
     return (
         <div className={styles.page}>

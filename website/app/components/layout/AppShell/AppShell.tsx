@@ -47,7 +47,10 @@ export function AppShell({
                         }
                     />
 
-                    <div className={styles.mainInner}>
+                    <div className={`${styles.mainInner} ${
+                        hideDefaultRightSidebar ? styles.mainInnerExpanded : ""
+                    }`}>
+
                         <main className={styles.content}>
                             <DojoClosureBanner notice={closureNotice} />
                             {children}

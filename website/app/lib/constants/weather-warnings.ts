@@ -16,8 +16,26 @@ export interface MetEireannWarning {
 }
 
 export type WeatherAlertLevel = "yellow" | "orange" | "red" | null;
-/*const FORCE_WEATHER_ALERT: "red" | "orange" | "yellow" | null = "red";*/
-const FORCE_WEATHER_ALERT = null;
+export type WeatherKindScoreMap = Record<WeatherAlertKind, number>;
+
+export type WeatherAlertKind =
+    | "wind"
+    | "rain"
+    | "storm"
+    | "snow"
+    | "flood"
+    | "heat"
+    | "sun"
+    | "general";
+
+export type WeatherAlertIconKey =
+    | "wind"
+    | "cloud-rain"
+    | "zap"
+    | "cloud-snow"
+    | "waves"
+    | "cloud-sun"
+    | "sun";
 
 export interface CorkWeatherAlert {
     hasAlert: boolean;
@@ -47,6 +65,115 @@ const levelPriority: Record<Exclude<WeatherAlertLevel, null>, number> = {
     orange: 2,
     yellow: 1,
 };
+
+const FORCE_WEATHER_ALERT: WeatherAlertLevel = null;
+
+
+function createWeatherKindScoreMap(): WeatherKindScoreMap {
+    return {
+        wind: 0,
+        rain: 0,
+        storm: 0,
+        snow: 0,
+        flood: 0,
+        heat: 0,
+        sun: 0,
+        general: 0,
+    };
+}
+
+function addWeightedMatches(
+    scores: WeatherKindScoreMap,
+    text: string,
+    weight: number
+) {
+    const value = text.toLowerCase();
+
+    const add = (kind: WeatherAlertKind, keywords: string[]) => {
+        for (const keyword of keywords) {
+            if (value.includes(keyword)) {
+                scores[kind] += weight;
+            }
+        }
+    };
+
+    add("heat", [
+        "heat",
+        "hot",
+        "very warm",
+        "warm weather",
+        "heat wave",
+        "heatwave",
+        "high temperature",
+        "high temperatures",
+        "temperature",
+        "temperatures",
+        "uv",
+        "humid nights",
+        "tropical nights",
+        "dehydration",
+        "heat stress",
+        "wildfires",
+        "forest fires",
+        "drought",
+    ]);
+
+    add("storm", [
+        "thunder",
+        "thunderstorm",
+        "thunderstorms",
+        "lightning",
+        "storm",
+        "storms",
+        "hail",
+    ]);
+
+    add("rain", [
+        "rain",
+        "heavy rain",
+        "shower",
+        "showers",
+        "downpour",
+    ]);
+
+    add("snow", [
+        "snow",
+        "ice",
+        "icy",
+        "frost",
+        "sleet",
+        "freezing",
+    ]);
+
+    add("flood", [
+        "flood",
+        "flooding",
+        "coastal",
+        "wave",
+        "waves",
+        "water safety",
+        "watersafety",
+        "waterways",
+        "lakes",
+        "beaches",
+    ]);
+
+    add("wind", [
+        "wind",
+        "winds",
+        "windy",
+        "gale",
+        "gust",
+        "gusts",
+    ]);
+
+    add("sun", [
+        "sun",
+        "sunny",
+        "sunshine",
+    ]);
+}
+
 
 function normalizeLevel(level?: string): WeatherAlertLevel {
     const value = level?.trim().toLowerCase();
@@ -89,6 +216,32 @@ function compareWarnings(a: MetEireannWarning, b: MetEireannWarning) {
     return onsetB - onsetA;
 }
 
+function buildDebugAlert(level: WeatherAlertLevel): CorkWeatherAlert | null {
+    if (!level) return null;
+
+    return {
+        hasAlert: true,
+        headline:
+            level === "red"
+                ? "Red Wind Warning"
+                : level === "orange"
+                    ? "Orange Wind Warning"
+                    : "Yellow Wind Warning",
+        description:
+            level === "red"
+                ? "Severe dangerous weather conditions. CorkAirportDojo is closed and students should stay at home."
+                : level === "orange"
+                    ? "High-impact weather conditions expected. CorkAirportDojo is closed and students should stay at home."
+                    : "Weather conditions may cause local disruption in Cork.",
+        level,
+        type: "Wind",
+        issued: new Date().toISOString(),
+        onset: new Date().toISOString(),
+        expiry: new Date(Date.now() + 1000 * 60 * 60 * 6).toISOString(),
+        sourceUrl: CORK_WARNING_PAGE_URL,
+    };
+}
+
 export function formatWeatherDateTime(value: string | null) {
     if (!value) return null;
 
@@ -101,7 +254,6 @@ export function formatWeatherDateTime(value: string | null) {
         return value;
     }
 }
-
 
 export function getWeatherAlertAccent(level: WeatherAlertLevel) {
     if (level === "red") {
@@ -130,6 +282,94 @@ export function getWeatherAlertAccent(level: WeatherAlertLevel) {
     };
 }
 
+export function getWeatherAlertKind(
+    alert: CorkWeatherAlert | null | undefined
+): WeatherAlertKind {
+    const scores = createWeatherKindScoreMap();
+
+    const typeText = alert?.type ?? "";
+    const headlineText = alert?.headline ?? "";
+    const descriptionText = alert?.description ?? "";
+
+    addWeightedMatches(scores, typeText, 6);
+    addWeightedMatches(scores, headlineText, 4);
+    addWeightedMatches(scores, descriptionText, 1);
+
+    const rankedKinds: WeatherAlertKind[] = [
+        "heat",
+        "storm",
+        "rain",
+        "snow",
+        "flood",
+        "wind",
+        "sun",
+        "general",
+    ];
+
+    let bestKind: WeatherAlertKind = "general";
+    let bestScore = 0;
+
+    for (const kind of rankedKinds) {
+        const score = scores[kind];
+        if (score > bestScore) {
+            bestKind = kind;
+            bestScore = score;
+        }
+    }
+
+    return bestScore > 0 ? bestKind : "general";
+}
+
+export function getWeatherAlertIconKey(
+    alert: CorkWeatherAlert | null | undefined
+): WeatherAlertIconKey {
+    const kind = getWeatherAlertKind(alert);
+
+    switch (kind) {
+        case "storm":
+            return "zap";
+        case "snow":
+            return "cloud-snow";
+        case "rain":
+            return "cloud-rain";
+        case "flood":
+            return "waves";
+        case "heat":
+            return "cloud-sun";
+        case "sun":
+            return "sun";
+        case "wind":
+        case "general":
+        default:
+            return "wind";
+    }
+}
+
+export function getWeatherAlertKindLabel(
+    alert: CorkWeatherAlert | null | undefined
+) {
+    const kind = getWeatherAlertKind(alert);
+
+    switch (kind) {
+        case "storm":
+            return "Storm";
+        case "snow":
+            return "Snow / Ice";
+        case "rain":
+            return "Rain";
+        case "flood":
+            return "Flood / Coastal";
+        case "heat":
+            return "Heat";
+        case "sun":
+            return "Sun";
+        case "wind":
+            return "Wind";
+        default:
+            return "General";
+    }
+}
+
 export function getDojoClosureNotice(
     alert: CorkWeatherAlert | null | undefined
 ): DojoClosureNotice {
@@ -153,7 +393,11 @@ export function getDojoClosureNotice(
         onsetTime !== null &&
         onsetTime <= twoDaysFromNow;
 
-    if (!redWithinTwoDays) {
+    const orangeNow = level === "orange";
+
+    const shouldClose = redWithinTwoDays || orangeNow || level === "red";
+
+    if (!shouldClose) {
         return {
             shouldClose: false,
             title: "",
@@ -162,7 +406,7 @@ export function getDojoClosureNotice(
         };
     }
 
-    if (onsetTime > now) {
+    if (level === "red" && onsetTime !== null && onsetTime > now) {
         return {
             shouldClose: true,
             title: "CorkAirportDojo will close due to an upcoming Red weather alert",
@@ -174,38 +418,21 @@ export function getDojoClosureNotice(
 
     return {
         shouldClose: true,
-        title: "CorkAirportDojo is closed due to a Red weather alert",
+        title:
+            level === "red"
+                ? "CorkAirportDojo is closed due to a Red weather alert"
+                : "CorkAirportDojo is closed due to a high weather alert",
         message:
             "Students should stay at home until the warning has passed and it is safe to travel again.",
         level,
     };
 }
 
-export async function getCorkWeatherAlert(): Promise<CorkWeatherAlert> {
-    if (FORCE_WEATHER_ALERT) {
-        return {
-            hasAlert: true,
-            headline:
-                FORCE_WEATHER_ALERT === "red"
-                    ? "Red Wind Warning"
-                    : FORCE_WEATHER_ALERT === "orange"
-                        ? "Orange Wind Warning"
-                        : "Yellow Wind Warning",
-            description:
-                FORCE_WEATHER_ALERT === "red"
-                    ? "Severe dangerous weather conditions. CorkAirportDojo is closed and students should stay at home."
-                    : FORCE_WEATHER_ALERT === "orange"
-                        ? "High-impact weather conditions expected. CorkAirportDojo is closed and students should stay at home."
-                        : "Weather conditions may cause local disruption in Cork.",
-            level: FORCE_WEATHER_ALERT,
-            type: "Wind",
-            issued: new Date().toISOString(),
-            onset: new Date().toISOString(),
-            /*onset: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2).toISOString(),*/
-            expiry: new Date(Date.now() + 1000 * 60 * 60 * 6).toISOString(),
-            sourceUrl: "https://www.met.ie/warnings/today/cork",
-        };
-    }
+export async function getCorkWeatherAlert(
+    debugLevel: WeatherAlertLevel = FORCE_WEATHER_ALERT
+): Promise<CorkWeatherAlert> {
+    const debugAlert = buildDebugAlert(debugLevel);
+    if (debugAlert) return debugAlert;
 
     try {
         const response = await fetch(CORK_WARNING_URL, {
