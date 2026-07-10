@@ -99,6 +99,8 @@ export const useAuthStore = create<AuthState>((set) => ({
             role: null,
             isAdmin: false,
         });
+
+        window.location.assign("/logout");
     },
 
     setRole: (role) => {

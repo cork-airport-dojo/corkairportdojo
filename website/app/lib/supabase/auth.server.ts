@@ -7,10 +7,10 @@ import type { User } from "@supabase/supabase-js";
 import { getSupabaseServerEnv } from "~/lib/supabase/env.server";
 
 export function createRequestSupabaseServerClient(request: Request) {
-    const { supabaseUrl, supabaseAnonKey } = getSupabaseServerEnv();
+    const { supabaseUrl, supabasePublishableKey } = getSupabaseServerEnv();
     const responseHeaders = new Headers();
 
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
         cookies: {
             getAll() {
                 return parseCookieHeader(request.headers.get("Cookie") ?? "");

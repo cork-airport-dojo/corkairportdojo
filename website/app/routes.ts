@@ -9,6 +9,7 @@ export default [
     route("write", "routes/write.tsx"),
     route("profile", "routes/profile.tsx"),
     route("login", "routes/login.tsx"),
+    route("logout", "routes/logout.tsx"),
     route("resources", "routes/resources.tsx"),
     route("api/articles", "routes/api.articles.ts"),
     route("api/modules/featured", "routes/api.modules.featured.ts"),

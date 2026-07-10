@@ -136,7 +136,7 @@ export async function updateArticle(
         );
     }
 
-    if (existing.created_by !== userId) {
+    if (existing.created_by !== userId && !["admin", "editor"].includes(role)) {
         throw new Response(
             JSON.stringify({
                 error: "Forbidden",

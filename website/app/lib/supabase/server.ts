@@ -2,9 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import { getSupabaseServerEnv } from "~/lib/supabase/env.server";
 
 export function getSupabaseServerClient() {
-    const { supabaseUrl, supabaseAnonKey } = getSupabaseServerEnv();
+    const { supabaseUrl, supabasePublishableKey } = getSupabaseServerEnv();
 
-    return createClient(supabaseUrl, supabaseAnonKey, {
+    return createClient(supabaseUrl, supabasePublishableKey, {
         auth: {
             persistSession: false,
             autoRefreshToken: false,
@@ -14,13 +14,9 @@ export function getSupabaseServerClient() {
 }
 
 export function getSupabaseAdminClient() {
-    const { supabaseUrl, supabaseServiceRoleKey } = getSupabaseServerEnv();
+    const { supabaseUrl, supabaseSecretKey } = getSupabaseServerEnv();
 
-    if (!supabaseServiceRoleKey) {
-        throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
-    }
-
-    return createClient(supabaseUrl, supabaseServiceRoleKey, {
+    return createClient(supabaseUrl, supabaseSecretKey, {
         auth: {
             persistSession: false,
             autoRefreshToken: false,

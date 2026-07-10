@@ -58,12 +58,15 @@
 }
 
 .weatherText {
-  display: flex;
-  flex-direction: column;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
   gap: 6px;
   min-width: 0;
 
-  h4 {
+  h3 {
     margin: 0;
     font-size: 1.45rem;
     font-weight: 700;

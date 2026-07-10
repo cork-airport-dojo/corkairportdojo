@@ -36,9 +36,13 @@ export const createArticleSchema = z.object({
     cover_image: z
         .string()
         .trim()
-        .url("Cover image must be a valid URL.")
+        .refine(
+            (value) =>
+                value === "" ||
+                (value.startsWith("http://") || value.startsWith("https://")),
+            "Cover image must be an http or https URL."
+        )
         .optional()
-        .or(z.literal(""))
         .default(""),
     read_time: z
         .string()

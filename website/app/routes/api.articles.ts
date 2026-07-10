@@ -29,7 +29,7 @@ export async function action({ request }: { request: Request }) {
         );
     }
 
-    const { user, headers } = await requireRequestUser(request);
+    const { user, responseHeaders } = await requireRequestUser(request);
     await requireUserRole(user.id, ["admin", "editor"]);
 
     let json: unknown;
@@ -46,7 +46,7 @@ export async function action({ request }: { request: Request }) {
                 status: 400,
                 headers: {
                     "Content-Type": "application/json",
-                    ...Object.fromEntries(headers.entries()),
+                    ...Object.fromEntries(responseHeaders.entries()),
                 },
             }
         );

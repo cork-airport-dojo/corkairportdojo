@@ -11,6 +11,8 @@ import {
     createArticleRequest,
     updateArticleRequest,
 } from "~/lib/api/article-create";
+import { uploadArticleCoverImage } from "~/lib/api/storage";
+import { dataUrlToFile } from "~/lib/image";
 import { useAuthStore } from "~/store/use-auth-store";
 import { usePostEditorStore } from "~/store/use-post-editor-store";
 import { useEditorShortcuts } from "~/hooks/use-editor-shortcuts";
@@ -19,6 +21,7 @@ import { PostEditorCard } from "../PostEditorCard/PostEditorCard";
 import { PostEditorSidebar } from "../PostEditorSidebar/PostEditorSidebar";
 import { CommandPalette } from "../CommandPalette/CommandPalette";
 import styles from "./WritePostPage.module.scss";
+
 
 function htmlToParagraphs(content: string) {
     return content
@@ -32,7 +35,7 @@ export function WritePostPage() {
     const titleInputRef = useRef<HTMLInputElement>(null);
     const editorAnchorRef = useRef<HTMLDivElement>(null);
 
-    const { userName } = useAuthStore();
+    const { user, userName } = useAuthStore();
 
     const {
         articleId,
@@ -117,6 +120,17 @@ export function WritePostPage() {
                 throw new Error("Please add article content before saving.");
             }
 
+            let resolvedCoverImage = coverImage.trim();
+
+            if (resolvedCoverImage.startsWith("data:image/")) {
+                if (!user?.id) {
+                    throw new Error("You must be signed in to upload an image.");
+                }
+
+                const file = dataUrlToFile(resolvedCoverImage, "article-cover.png");
+                const upload = await uploadArticleCoverImage(file, user.id);
+                resolvedCoverImage = upload.publicUrl;
+            }
             const payload = {
                 slug: generatedSlug,
                 title: title.trim(),
@@ -124,7 +138,7 @@ export function WritePostPage() {
                 body: paragraphs,
                 category: category.trim() || "General",
                 author_name: userName || "CorkAirportDojo",
-                cover_image: coverImage.trim(),
+                cover_image: resolvedCoverImage,
                 read_time: `${readingTime} min read`,
                 featured: false,
                 published,
