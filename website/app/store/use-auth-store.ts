@@ -18,6 +18,14 @@ interface AuthState {
     setRole: (role: UserRole | null) => void;
 }
 
+interface MeResponse {
+    user?: {
+        id: string;
+        email?: string | null;
+        role?: UserRole | null;
+    };
+}
+
 function getUserName(user: User | null) {
     if (!user) return "";
 
@@ -40,6 +48,24 @@ function getAvatarUrl(user: User | null) {
     return metadata.avatar_url || "";
 }
 
+async function fetchCurrentUserRole(): Promise<UserRole | null> {
+    const response = await fetch("/api/me", {
+        method: "GET",
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            return null;
+        }
+
+        throw new Error("Failed to load current user role.");
+    }
+
+    const payload = (await response.json()) as MeResponse;
+    return payload.user?.role ?? null;
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
     isAuthenticated: false,
     isLoading: true,
@@ -50,19 +76,60 @@ export const useAuthStore = create<AuthState>((set) => ({
     isAdmin: false,
 
     hydrate: async () => {
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
+        try {
+            const {
+                data: { user },
+                error,
+            } = await supabase.auth.getUser();
 
-        set({
-            isAuthenticated: Boolean(user),
-            isLoading: false,
-            user: user ?? null,
-            userName: getUserName(user ?? null),
-            avatarUrl: getAvatarUrl(user ?? null),
-            role: null,
-            isAdmin: false,
-        });
+            if (error) {
+                set({
+                    isAuthenticated: false,
+                    isLoading: false,
+                    user: null,
+                    userName: "",
+                    avatarUrl: "",
+                    role: null,
+                    isAdmin: false,
+                });
+                return;
+            }
+
+            if (!user) {
+                set({
+                    isAuthenticated: false,
+                    isLoading: false,
+                    user: null,
+                    userName: "",
+                    avatarUrl: "",
+                    role: null,
+                    isAdmin: false,
+                });
+                return;
+            }
+
+            const role = await fetchCurrentUserRole();
+
+            set({
+                isAuthenticated: true,
+                isLoading: false,
+                user,
+                userName: getUserName(user),
+                avatarUrl: getAvatarUrl(user),
+                role,
+                isAdmin: role === "admin",
+            });
+        } catch (error) {
+            set({
+                isAuthenticated: false,
+                isLoading: false,
+                user: null,
+                userName: "",
+                avatarUrl: "",
+                role: null,
+                isAdmin: false,
+            });
+        }
     },
 
     signInWithGitHub: async (redirectTo = "/profile") => {
@@ -77,7 +144,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
 
         if (error) {
-            console.error("GitHub sign-in failed:", error);
             throw error;
         }
     },
@@ -86,7 +152,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         const { error } = await supabase.auth.signOut();
 
         if (error) {
-            console.error("GitHub sign-out failed:", error);
             throw error;
         }
 

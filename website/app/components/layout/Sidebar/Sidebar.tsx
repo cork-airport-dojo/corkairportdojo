@@ -31,8 +31,8 @@ const publicNavItems = [
     { to: "/", label: "Home", icon: Home, end: true },
     { to: "/modules", label: "Modules", icon: Layers3 },
     { to: "/blog", label: "Articles", icon: BookOpen },
-    { to: "/categories", label: "Categories", icon: FolderKanban },
-    { to: "/tags", label: "Tags", icon: Hash },
+    /*{ to: "/categories", label: "Categories", icon: FolderKanban },*/
+    /*{ to: "/tags", label: "Tags", icon: Hash },*/
     { to: "/resources", label: "Resources", icon: Bookmark },
     { to: "/about", label: "About", icon: Info },
 ];

@@ -13,7 +13,9 @@ export default [
     route("resources", "routes/resources.tsx"),
     route("api/articles", "routes/api.articles.ts"),
     route("api/modules/featured", "routes/api.modules.featured.ts"),
+    route("api/modules", "routes/api.modules.ts"),
     route("api/weather", "routes/api.weather.ts"),
     route("api/articles/:slug", "routes/api.articles.$slug.ts"),
-    route("auth/callback", "routes/auth.callback.tsx")
+    route("auth/callback", "routes/auth.callback.tsx"),
+    route("api/me", "routes/api.me.ts"),
 ] satisfies RouteConfig;

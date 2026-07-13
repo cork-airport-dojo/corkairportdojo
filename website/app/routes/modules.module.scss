@@ -4,3 +4,13 @@
   gap: 24px;
   padding-bottom: 100px;
 }
+
+.createRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.createButton {
+  flex-shrink: 0;
+}
