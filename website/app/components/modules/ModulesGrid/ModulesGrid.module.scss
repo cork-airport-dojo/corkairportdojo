@@ -1,15 +1,115 @@
-@use "../../../styles/abstracts/breakpoints" as *;
+.stateCard {
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+  border-radius: 0 !important;
+}
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+.stateHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 0 !important;
 
-  @include respond-down(xl) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  h2 {
+    margin: 0 0 6px;
+    color: var(--color-text);
+    font-size: 1.05rem;
+    font-weight: 700;
   }
 
-  @include respond-down(sm) {
-    grid-template-columns: 1fr;
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+}
+
+.stateBody {
+  padding-top: 18px !important;
+}
+
+.stateIconWrap {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.retryButton {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--transition-base), color var(--transition-base);
+
+  &:hover {
+    border-color: var(--color-brand-purple);
+    color: var(--color-brand-purple);
+  }
+}
+
+.skeletonCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px !important;
+}
+
+.skeletonBadge,
+.skeletonTitle,
+.skeletonText,
+.skeletonTextShort,
+.skeletonFooter {
+  background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.04) 0%,
+          rgba(255, 255, 255, 0.08) 50%,
+          rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+.skeletonBadge {
+  width: 92px;
+  height: 24px;
+}
+
+.skeletonTitle {
+  width: 80%;
+  height: 28px;
+}
+
+.skeletonText {
+  width: 100%;
+  height: 18px;
+}
+
+.skeletonTextShort {
+  width: 72%;
+  height: 18px;
+}
+
+.skeletonFooter {
+  width: 120px;
+  height: 18px;
+  margin-top: 12px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
   }
 }

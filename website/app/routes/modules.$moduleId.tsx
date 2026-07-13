@@ -1,21 +1,44 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { AppShell } from "~/components/layout/AppShell/AppShell";
 import { ModulePage } from "~/components/modules/ModulePage/ModulePage";
-import { useCustomModulesStore } from "~/store/use-custom-modules-store";
-import { getAllModules } from "~/lib/get-all-modules";
+import { fetchModuleBySlug, type PublicModule } from "~/lib/api/modules";
+import { moduleIconMap } from "~/lib/modules";
 
 export default function ModuleRoute() {
     const { moduleId } = useParams();
-    const { modules: customModules, hydrate } = useCustomModulesStore();
+    const [moduleItem, setModuleItem] = useState<PublicModule | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        hydrate();
-    }, [hydrate]);
+        if (!moduleId) return;
 
-    const allModules = useMemo(() => getAllModules(customModules), [customModules]);
+        const loadModule = async () => {
+            setLoading(true);
 
-    const moduleItem = allModules.find((item) => item.id === moduleId);
+            try {
+                const module = await fetchModuleBySlug(moduleId);
+                setModuleItem(module);
+            } catch (error) {
+                console.error("Failed to load module:", error);
+                setModuleItem(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        void loadModule();
+    }, [moduleId]);
+
+    if (loading) {
+        return (
+            <AppShell>
+                <div style={{ paddingBottom: "100px" }}>
+                    <h1>Loading module...</h1>
+                </div>
+            </AppShell>
+        );
+    }
 
     if (!moduleItem) {
         return (
@@ -28,9 +51,24 @@ export default function ModuleRoute() {
         );
     }
 
+    const icon =  moduleIconMap.react;
+
     return (
         <AppShell>
-            <ModulePage module={moduleItem} />
+            <ModulePage
+                module={{
+                    id: moduleItem.slug,
+                    title: moduleItem.title,
+                    description: moduleItem.description ?? "",
+                    lessons: moduleItem.lessons,
+                    difficulty: moduleItem.difficulty ?? "Beginner",
+                    topic: moduleItem.topic ?? "",
+                    icon,
+                    featured: moduleItem.featured,
+                    views: moduleItem.views,
+                    overview: moduleItem.overview ?? [],
+                }}
+            />
         </AppShell>
     );
 }

@@ -66,7 +66,7 @@ export async function action({ request }: { request: Request }) {
                     status: 400,
                     headers: {
                         "Content-Type": "application/json",
-                        ...Object.fromEntries(headers.entries()),
+                        ...Object.fromEntries(responseHeaders.entries()),
                     },
                 }
             );
@@ -78,7 +78,7 @@ export async function action({ request }: { request: Request }) {
             status: 201,
             headers: {
                 "Content-Type": "application/json",
-                ...Object.fromEntries(headers.entries()),
+                ...Object.fromEntries(responseHeaders.entries()),
             },
         });
     }
@@ -96,7 +96,7 @@ export async function action({ request }: { request: Request }) {
                 status: 400,
                 headers: {
                     "Content-Type": "application/json",
-                    ...Object.fromEntries(headers.entries()),
+                    ...Object.fromEntries(responseHeaders.entries()),
                 },
             }
         );
@@ -108,7 +108,7 @@ export async function action({ request }: { request: Request }) {
         status: 200,
         headers: {
             "Content-Type": "application/json",
-            ...Object.fromEntries(headers.entries()),
+            ...Object.fromEntries(responseHeaders.entries()),
         },
     });
 }

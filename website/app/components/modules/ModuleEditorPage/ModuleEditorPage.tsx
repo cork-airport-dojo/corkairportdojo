@@ -4,11 +4,8 @@ import { Layers3, Save, SendHorizontal } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { moduleIconMap, type ModuleIconKey } from "~/lib/modules";
 import type { ModuleDifficulty } from "~/lib/constants/modules";
 import styles from "./ModuleEditorPage.module.scss";
-
-const iconOptions = Object.keys(moduleIconMap) as ModuleIconKey[];
 
 type ModuleStatus = "draft" | "published";
 
@@ -20,7 +17,6 @@ interface ModuleApiRecord {
     topic: string | null;
     difficulty: ModuleDifficulty;
     lessons: number;
-    icon_key: string | null;
     featured: boolean;
     published: boolean;
     overview: string[];
@@ -42,7 +38,6 @@ async function createModule(payload: {
     topic: string;
     lessons: number;
     difficulty: ModuleDifficulty;
-    iconKey: ModuleIconKey;
     featured: boolean;
     published: boolean;
     overview: string[];
@@ -97,7 +92,6 @@ async function updateModule(
         topic: string;
         lessons: number;
         difficulty: ModuleDifficulty;
-        iconKey: ModuleIconKey;
         featured: boolean;
         published: boolean;
         overview: string[];
@@ -136,7 +130,6 @@ export function ModuleEditorPage() {
     const [topic, setTopic] = useState("");
     const [lessons, setLessons] = useState("8");
     const [difficulty, setDifficulty] = useState<ModuleDifficulty>("Beginner");
-    const [iconKey, setIconKey] = useState<ModuleIconKey>("react");
     const [featured, setFeatured] = useState(false);
     const [status, setStatus] = useState<ModuleStatus>("draft");
     const [overviewText, setOverviewText] = useState("");
@@ -171,12 +164,12 @@ export function ModuleEditorPage() {
                 setTopic(module.topic ?? "");
                 setLessons(String(module.lessons));
                 setDifficulty(module.difficulty);
-                setIconKey((module.icon_key as ModuleIconKey | null) ?? "react");
                 setFeatured(module.featured);
                 setStatus(module.published ? "published" : "draft");
                 setOverviewText((module.overview ?? []).join("\n\n"));
             } catch (error) {
                 console.error("Failed to hydrate module editor:", error);
+
                 if (!cancelled) {
                     setSubmitMessage(
                         error instanceof Error
@@ -221,7 +214,6 @@ export function ModuleEditorPage() {
                 topic: topic.trim(),
                 lessons: Number(lessons),
                 difficulty,
-                iconKey,
                 featured,
                 published: nextStatus === "published",
                 overview: overviewParagraphs,
@@ -375,24 +367,6 @@ export function ModuleEditorPage() {
                                             <option value="Beginner">Beginner</option>
                                             <option value="Intermediate">Intermediate</option>
                                             <option value="Advanced">Advanced</option>
-                                        </select>
-                                    </div>
-
-                                    <div className={styles.field}>
-                                        <label htmlFor="module-icon">Icon</label>
-                                        <select
-                                            id="module-icon"
-                                            className={styles.select}
-                                            value={iconKey}
-                                            onChange={(event) =>
-                                                setIconKey(event.target.value as ModuleIconKey)
-                                            }
-                                        >
-                                            {iconOptions.map((option) => (
-                                                <option key={option} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
                                         </select>
                                     </div>
                                 </div>

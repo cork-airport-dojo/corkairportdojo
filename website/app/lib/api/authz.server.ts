@@ -16,12 +16,7 @@ export async function getUserRole(userId: string): Promise<AppUserRole | null> {
         return null;
     }
 
-    const role = (data?.role as AppUserRole | undefined) ?? null;
-
-    console.log("getUserRole userId:", userId);
-    console.log("getUserRole resolved role:", role);
-
-    return role;
+    return (data?.role as AppUserRole | undefined) ?? null;
 }
 
 export async function requireUserRole(

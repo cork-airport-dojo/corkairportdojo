@@ -11,7 +11,6 @@ interface UpdateModulePayload {
     topic?: string | null;
     lessons?: number;
     difficulty?: ModuleDifficulty;
-    iconKey?: string | null;
     featured?: boolean;
     published?: boolean;
     overview?: string[];
@@ -38,7 +37,7 @@ async function getExistingModule(moduleId: string) {
     const { data, error } = await supabase
         .from("modules")
         .select(
-            "id, slug, title, description, topic, difficulty, lessons, icon_key, featured, published, overview, created_by, created_at, updated_at"
+            "id, slug, title, description, topic, difficulty, lessons, featured, published, views, overview, created_by, created_at, updated_at"
         )
         .eq("id", moduleId)
         .maybeSingle();
@@ -250,7 +249,6 @@ export async function action({
         const topic = payload.topic?.trim() || null;
         const lessons = Number(payload.lessons ?? 0);
         const difficulty = payload.difficulty ?? "Beginner";
-        const iconKey = payload.iconKey?.trim() || null;
         const featured = Boolean(payload.featured);
         const published = Boolean(payload.published);
         const overview = Array.isArray(payload.overview)
@@ -301,14 +299,13 @@ export async function action({
                 topic,
                 lessons,
                 difficulty,
-                icon_key: iconKey,
                 featured,
                 published,
                 overview,
             })
             .eq("id", moduleId)
             .select(
-                "id, slug, title, description, topic, difficulty, lessons, icon_key, featured, published, overview, created_by, created_at, updated_at"
+                "id, slug, title, description, topic, difficulty, lessons, featured, published, views, overview, created_by, created_at, updated_at"
             )
             .single();
 

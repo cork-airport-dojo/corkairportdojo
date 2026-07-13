@@ -1,24 +1,144 @@
 import { useEffect, useRef, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { SectionHeader } from "../../common/SectionHeader/SectionHeader";
-import { useCustomModulesStore } from "~/store/use-custom-modules-store";
-import { getAllModules } from "~/lib/get-all-modules";
+import { fetchModules, type PublicModule } from "~/lib/api/modules";
+import { moduleIconMap } from "~/lib/modules";
 import { ModuleCard } from "../../modules/ModuleCard/ModuleCard";
+import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import styles from "./FeaturedModulesSection.module.scss";
+
+function FeaturedModulesLoadingState() {
+    return (
+        <section className={styles.section}>
+            <div className={styles.topRow}>
+                <SectionHeader
+                    title="Featured Modules"
+                    actionLabel="View all"
+                    actionHref="/modules"
+                />
+
+                <div className={styles.controls}>
+                    <button type="button" className={styles.controlButton} disabled>
+                        <ChevronLeft size={18} />
+                    </button>
+                    <button type="button" className={styles.controlButton} disabled>
+                        <ChevronRight size={18} />
+                    </button>
+                </div>
+            </div>
+
+            <div className={styles.trackWrap}>
+                <div className={styles.track}>
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <div key={index} className={styles.slide}>
+                            <Card className={styles.stateCard}>
+                                <CardContent className={styles.skeletonCardBody}>
+                                    <div className={styles.skeletonBadge} />
+                                    <div className={styles.skeletonTitle} />
+                                    <div className={styles.skeletonText} />
+                                    <div className={styles.skeletonTextShort} />
+                                    <div className={styles.skeletonFooter} />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function FeaturedModulesEmptyState() {
+    return (
+        <section className={styles.section}>
+            <div className={styles.topRow}>
+                <SectionHeader
+                    title="Featured Modules"
+                    actionLabel="View all"
+                    actionHref="/modules"
+                />
+            </div>
+
+            <Card className={styles.stateCard}>
+                <CardHeader className={styles.stateHeader}>
+                    <div className={styles.stateIconWrap}>
+                        <BookOpen size={18} />
+                    </div>
+                    <div>
+                        <h2>No featured modules yet</h2>
+                        <p>Featured published modules will appear here once they are added.</p>
+                    </div>
+                </CardHeader>
+            </Card>
+        </section>
+    );
+}
+
+function FeaturedModulesErrorState({ onRetry }: { onRetry: () => void }) {
+    return (
+        <section className={styles.section}>
+            <div className={styles.topRow}>
+                <SectionHeader
+                    title="Featured Modules"
+                    actionLabel="View all"
+                    actionHref="/modules"
+                />
+            </div>
+
+            <Card className={styles.stateCard}>
+                <CardHeader className={styles.stateHeader}>
+                    <div className={styles.stateIconWrap}>
+                        <RefreshCw size={18} />
+                    </div>
+                    <div>
+                        <h2>Unable to load featured modules</h2>
+                        <p>There was a problem loading featured modules right now.</p>
+                    </div>
+                </CardHeader>
+
+                <CardContent className={styles.stateBody}>
+                    <button
+                        type="button"
+                        className={styles.retryButton}
+                        onClick={onRetry}
+                    >
+                        Try Again
+                    </button>
+                </CardContent>
+            </Card>
+        </section>
+    );
+}
 
 export function FeaturedModulesSection() {
     const trackRef = useRef<HTMLDivElement>(null);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [modules, setModules] = useState<PublicModule[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
-    const { modules: customModules, hydrate } = useCustomModulesStore();
+    const loadModules = async () => {
+        setLoading(true);
+        setError(false);
+
+        try {
+            const data = await fetchModules();
+            setModules(data);
+        } catch (err) {
+            console.error("Failed to load featured modules:", err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        hydrate();
-    }, [hydrate]);
+        void loadModules();
+    }, []);
 
     const featuredModules = useMemo(() => {
-        return getAllModules(customModules).filter((module) => module.featured);
-    }, [customModules]);
+        return modules.filter((module) => module.featured);
+    }, [modules]);
 
     const scrollByAmount = (direction: "left" | "right") => {
         if (!trackRef.current) return;
@@ -75,7 +195,19 @@ export function FeaturedModulesSection() {
         return () => {
             track.removeEventListener("scroll", handleScroll);
         };
-    }, []);
+    }, [featuredModules.length]);
+
+    if (loading) {
+        return <FeaturedModulesLoadingState />;
+    }
+
+    if (error) {
+        return <FeaturedModulesErrorState onRetry={() => void loadModules()} />;
+    }
+
+    if (featuredModules.length === 0) {
+        return <FeaturedModulesEmptyState />;
+    }
 
     return (
         <section className={styles.section}>
@@ -109,26 +241,29 @@ export function FeaturedModulesSection() {
 
             <div className={styles.trackWrap}>
                 <div className={styles.track} ref={trackRef}>
-                    {featuredModules.map((module) => (
-                        <div key={module.title} className={styles.slide}>
-                            <ModuleCard
-                                key={module.id}
-                                id={module.id}
-                                title={module.title}
-                                description={module.description}
-                                lessons={module.lessons}
-                                difficulty={module.difficulty}
-                                icon={module.icon}
-                            />
-                        </div>
-                    ))}
+                    {featuredModules.map((module) => {
+                        const icon = moduleIconMap.react;
+
+                        return (
+                            <div key={module.id} className={styles.slide}>
+                                <ModuleCard
+                                    id={module.slug}
+                                    title={module.title}
+                                    description={module.description ?? ""}
+                                    lessons={module.lessons}
+                                    difficulty={module.difficulty ?? "Beginner"}
+                                    icon={icon}
+                                />
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
             <div className={styles.dots}>
                 {featuredModules.map((module, index) => (
                     <button
-                        key={module.title}
+                        key={module.id}
                         type="button"
                         className={`${styles.dot} ${
                             activeIndex === index ? styles.dotActive : ""

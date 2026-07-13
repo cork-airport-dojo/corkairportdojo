@@ -41,8 +41,6 @@ export async function getRequestUser(
         error,
     } = await supabase.auth.getUser();
 
-    console.log("SSR authenticated user id:", user?.id);
-    console.log("SSR authenticated user email:", user?.email);
 
     if (error) {
         console.error("Failed to get request user from cookie session:", error);

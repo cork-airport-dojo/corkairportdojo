@@ -16,6 +16,8 @@ export default [
     route("resources", "routes/resources.tsx"),
     route("api/articles", "routes/api.articles.ts"),
     route("api/modules/featured", "routes/api.modules.featured.ts"),
+    route("api/modules/published", "routes/api.modules.published.ts"),
+    route("api/modules/published/:slug", "routes/api.modules.published.$slug.ts"),
     route("api/profile/articles", "routes/api.profile.articles.ts"),
     route("api/profile/articles/:id", "routes/api.profile.articles.$id.ts"),
     route("api/profile/modules", "routes/api.profile.modules.ts"),
