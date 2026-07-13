@@ -85,7 +85,7 @@ export function ArticleManager() {
                                 <div className={styles.articleActions}>
                                     <Button asChild type="button" variant="outline" size="icon">
                                         <Link
-                                            to={`/write?edit=${article.id}`}
+                                            to={`/blog/${article.id}/edit`}
                                             aria-label="Edit article"
                                         >
                                             <Pencil size={16} />

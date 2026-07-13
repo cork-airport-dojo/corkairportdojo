@@ -19,7 +19,9 @@ function formatPublishedDate(value: string) {
     }
 }
 
-function mapArticleToPagePost(article: Awaited<ReturnType<typeof fetchArticleBySlug>>): ArticlePagePost | null {
+function mapArticleToPagePost(
+    article: Awaited<ReturnType<typeof fetchArticleBySlug>>
+): ArticlePagePost | null {
     if (!article) return null;
 
     return {
@@ -28,6 +30,7 @@ function mapArticleToPagePost(article: Awaited<ReturnType<typeof fetchArticleByS
         category: article.category ?? "General",
         excerpt: article.excerpt ?? "",
         author: article.author_name ?? "CorkAirportDojo",
+        authorAvatarUrl: article.author_avatar_url ?? null,
         date: formatPublishedDate(article.created_at),
         readTime: article.read_time ?? "Article",
         image: article.cover_image ?? "/logo.png",
@@ -42,10 +45,14 @@ function LoadingState() {
         <div className={styles.stateWrap}>
             <Card className={styles.stateCard}>
                 <CardContent className={styles.stateBody}>
+                    <div className={styles.skeletonCategory} />
+                    <div className={styles.skeletonTitle} />
+                    <div className={styles.skeletonExcerpt} />
+                    <div className={styles.skeletonMeta} />
                     <div className={styles.skeletonHero} />
                     <div className={styles.skeletonText} />
-                    <div className={styles.skeletonTextShort} />
                     <div className={styles.skeletonText} />
+                    <div className={styles.skeletonTextShort} />
                 </CardContent>
             </Card>
         </div>

@@ -8,10 +8,12 @@ interface CreateArticlePayload {
     excerpt?: string | null;
     category?: string | null;
     author_name?: string | null;
+    author_avatar_url?: string | null;
+    cover_image?: string | null;
     read_time?: string | null;
     featured?: boolean;
     published?: boolean;
-    content?: string | null;
+    body?: string[] | null;
 }
 
 function jsonResponse(
@@ -37,7 +39,7 @@ export async function loader({ request }: { request: Request }) {
     let query = supabase
         .from("articles")
         .select(
-            "id, slug, title, excerpt, category, author_name, read_time, featured, published, content, created_by, created_at, updated_at"
+            "id, slug, title, excerpt, category, author_name, author_avatar_url, cover_image, read_time, featured, published, body, created_by, created_at, updated_at"
         )
         .order("updated_at", { ascending: false });
 
@@ -48,7 +50,12 @@ export async function loader({ request }: { request: Request }) {
     const { data, error } = await query;
 
     if (error) {
-        console.error("Failed to load profile articles:", error);
+        console.error("Failed to load profile articles:", {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code,
+        });
 
         return jsonResponse(
             {
@@ -116,10 +123,14 @@ export async function action({ request }: { request: Request }) {
     const excerpt = payload.excerpt?.trim() || null;
     const category = payload.category?.trim() || null;
     const author_name = payload.author_name?.trim() || null;
+    const author_avatar_url = payload.author_avatar_url?.trim() || null;
+    const cover_image = payload.cover_image?.trim() || null;
     const read_time = payload.read_time?.trim() || null;
     const featured = Boolean(payload.featured);
     const published = Boolean(payload.published);
-    const content = payload.content ?? "";
+    const body = Array.isArray(payload.body)
+        ? payload.body.map((item) => item.trim()).filter(Boolean)
+        : [];
 
     if (!title) {
         return jsonResponse(
@@ -153,19 +164,26 @@ export async function action({ request }: { request: Request }) {
             excerpt,
             category,
             author_name,
+            author_avatar_url,
+            cover_image,
             read_time,
             featured,
             published,
-            content,
+            body,
             created_by: user.id,
         })
         .select(
-            "id, slug, title, excerpt, category, author_name, read_time, featured, published, content, created_by, created_at, updated_at"
+            "id, slug, title, excerpt, category, author_name, author_avatar_url, cover_image, read_time, featured, published, body, created_by, created_at, updated_at"
         )
         .single();
 
     if (error) {
-        console.error("Failed to create article:", error);
+        console.error("Failed to create article:", {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code,
+        });
 
         return jsonResponse(
             {

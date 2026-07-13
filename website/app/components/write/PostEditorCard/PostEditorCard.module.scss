@@ -1,8 +1,8 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 24px;
+  gap: 20px;
+  padding: 20px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   box-shadow: none;
@@ -11,7 +11,7 @@
 .titleArea {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .fieldBlock,
@@ -22,36 +22,36 @@
 .categoryBlock {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .fieldLabel,
 .label {
   color: var(--color-text);
-  font-size: 0.92rem;
-  font-weight: 700;
-  min-height: 24px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  min-height: 22px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
 
   span {
     color: var(--color-text-secondary);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 400;
   }
 }
 
 .titleInput {
-  min-height: 72px;
+  min-height: 60px;
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
   color: var(--color-text) !important;
-  font-size: clamp(2.25rem, 3vw, 3rem) !important;
-  font-weight: 700 !important;
-  line-height: 1.02 !important;
-  letter-spacing: -0.03em;
+  font-size: clamp(1.55rem, 2.2vw, 2.3rem) !important;
+  font-weight: 650 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.02em;
   box-shadow: none !important;
 }
 
@@ -60,25 +60,25 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 16px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--color-border);
 
   span {
     color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.84rem;
     font-weight: 600;
   }
 
   code {
     color: var(--color-brand-purple-hover);
-    font-size: 0.9rem;
+    font-size: 0.84rem;
   }
 }
 
 .metaRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px;
   align-items: start;
 }
 
@@ -86,12 +86,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  min-height: 40px;
+  min-height: 36px;
 }
 
 .tagChip {
-  min-height: 32px;
-  padding: 0 12px;
+  min-height: 30px;
+  padding: 0 10px;
   border: 1px solid var(--color-border);
   border-radius: 999px;
   background: #1a1f2a;
@@ -99,7 +99,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-weight: 600;
 
   button {
@@ -131,12 +131,12 @@
 
 .metaInput,
 .select {
-  min-height: 44px;
+  min-height: 42px;
 }
 
 .metaButton {
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 42px;
+  padding: 0 16px;
   border-color: var(--color-border);
   border-radius: 0 !important;
   background: var(--color-panel);
@@ -150,11 +150,11 @@
 }
 
 .descriptionInput {
-  min-height: 96px;
+  min-height: 88px;
   padding: 14px 16px;
   resize: vertical;
   font: inherit;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 .hiddenInput {
@@ -162,7 +162,7 @@
 }
 
 .coverUpload {
-  min-height: 56px;
+  min-height: 50px;
   border: 1px dashed #3a4253;
   border-radius: 0;
   background: var(--color-panel);
@@ -183,37 +183,37 @@
 
   img {
     width: 100%;
-    height: 260px;
+    height: 180px;
     object-fit: cover;
     display: block;
   }
 }
 
 .coverEmpty {
-  min-height: 180px;
+  min-height: 140px;
   display: grid;
   place-items: center;
   color: var(--color-text-muted);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
 .editorSectionHeader {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 18px;
+  gap: 16px;
 
   h2 {
     margin: 0;
     color: var(--color-text);
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 650;
   }
 
   p {
     margin: 6px 0 0;
     color: var(--color-text-secondary);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -225,8 +225,8 @@
   background: var(--color-panel);
 
   button {
-    min-width: 102px;
-    height: 40px;
+    min-width: 96px;
+    height: 38px;
     border: none;
     border-radius: 0;
     background: transparent;
@@ -247,7 +247,7 @@
   justify-content: space-between;
   gap: 12px;
   color: var(--color-text-muted);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
 }
 
 @media (max-width: 1000px) {
@@ -258,7 +258,7 @@
 
 @media (max-width: 720px) {
   .card {
-    padding: 20px;
+    padding: 18px;
   }
 
   .editorSectionHeader,

@@ -11,6 +11,7 @@ export interface ArticlePagePost {
     category: string;
     excerpt: string;
     author: string;
+    authorAvatarUrl?: string | null;
     date: string;
     readTime: string;
     image: string;
@@ -49,7 +50,14 @@ export function ArticlePage({ post }: ArticlePageProps) {
 
                     <div className={styles.metaRow}>
                         <div className={styles.authorRow}>
-                            <img src="/avatar.jpg" alt={post.author} className={styles.avatar} />
+                            <img
+                                src={post.authorAvatarUrl || "/logo.png"}
+                                alt={post.author}
+                                className={styles.avatar}
+                                onError={(event) => {
+                                    event.currentTarget.src = "/logo.png";
+                                }}
+                            />
                             <div className={styles.authorMeta}>
                                 <strong>{post.author}</strong>
                                 <span>{post.date}</span>

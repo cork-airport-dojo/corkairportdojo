@@ -3,19 +3,21 @@ import type {
     CreateArticleInput,
     UpdateArticleInput,
 } from "~/lib/api/article-schema.server";
+import { getUserRole } from "~/lib/api/authz.server";
 
 export interface ArticleRecord {
     id: string;
     slug: string;
     title: string;
     excerpt: string | null;
+    body: string[];
     category: string | null;
     author_name: string | null;
+    author_avatar_url: string | null;
     cover_image: string | null;
     read_time: string | null;
     featured: boolean;
     published: boolean;
-    body: string[];
     created_at: string;
     updated_at: string;
 }
@@ -26,7 +28,7 @@ export async function getPublishedArticles(): Promise<ArticleRecord[]> {
     const { data, error } = await supabase
         .from("articles")
         .select(
-            "id, slug, title, excerpt, category, author_name, cover_image, read_time, featured, published, body, created_at, updated_at"
+            "id, slug, title, excerpt, body, category, author_name, author_avatar_url, cover_image, read_time, featured, published, created_at, updated_at"
         )
         .eq("published", true)
         .order("created_at", { ascending: false });
@@ -47,7 +49,7 @@ export async function getPublishedArticleBySlug(
     const { data, error } = await supabase
         .from("articles")
         .select(
-            "id, slug, title, excerpt, category, author_name, cover_image, read_time, featured, published, body, created_at, updated_at"
+            "id, slug, title, excerpt, category, author_name, author_avatar_url, cover_image, read_time, featured, published, body, created_at, updated_at"
         )
         .eq("published", true)
         .eq("slug", slug)
@@ -62,7 +64,7 @@ export async function getPublishedArticleBySlug(
 }
 
 export async function createArticle(
-    input: CreateArticleInput,
+    input: CreateArticleInput & { author_avatar_url?: string | null },
     createdBy: string
 ): Promise<ArticleRecord> {
     const supabase = getSupabaseAdminClient();
@@ -76,6 +78,7 @@ export async function createArticle(
             body: input.body,
             category: input.category || "General",
             author_name: input.author_name || null,
+            author_avatar_url: input.author_avatar_url || null,
             cover_image: input.cover_image || null,
             read_time: input.read_time || null,
             featured: input.featured ?? false,
@@ -83,7 +86,7 @@ export async function createArticle(
             created_by: createdBy,
         })
         .select(
-            "id, slug, title, excerpt, category, author_name, cover_image, read_time, featured, published, body, created_at, updated_at"
+            "id, slug, title, excerpt, body, category, author_name, author_avatar_url, cover_image, read_time, featured, published, created_at, updated_at"
         )
         .single();
 
@@ -110,10 +113,11 @@ export async function createArticle(
 }
 
 export async function updateArticle(
-    input: UpdateArticleInput,
+    input: UpdateArticleInput & { author_avatar_url?: string | null },
     userId: string
 ): Promise<ArticleRecord> {
     const supabase = getSupabaseAdminClient();
+    const role = await getUserRole(userId);
 
     const { data: existing, error: existingError } = await supabase
         .from("articles")
@@ -136,7 +140,7 @@ export async function updateArticle(
         );
     }
 
-    if (existing.created_by !== userId && !["admin", "editor"].includes(role)) {
+    if (existing.created_by !== userId && !["admin", "editor"].includes(role ?? "")) {
         throw new Response(
             JSON.stringify({
                 error: "Forbidden",
@@ -160,6 +164,7 @@ export async function updateArticle(
             body: input.body,
             category: input.category || "General",
             author_name: input.author_name || null,
+            author_avatar_url: input.author_avatar_url || null,
             cover_image: input.cover_image || null,
             read_time: input.read_time || null,
             featured: input.featured ?? false,
@@ -167,12 +172,12 @@ export async function updateArticle(
         })
         .eq("id", input.id)
         .select(
-            "id, slug, title, excerpt, category, author_name, cover_image, read_time, featured, published, body, created_at, updated_at"
+            "id, slug, title, excerpt, body, category, author_name, author_avatar_url, cover_image, read_time, featured, published, created_at, updated_at"
         )
         .single();
 
     if (error) {
-        console.error("Failed to update article:", error);
+        console.error(`Failed to update article "${input.id}":`, error);
         throw new Response(
             JSON.stringify({
                 error: "ArticleUpdateFailed",

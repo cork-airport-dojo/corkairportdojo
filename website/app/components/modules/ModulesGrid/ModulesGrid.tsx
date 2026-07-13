@@ -3,7 +3,7 @@ import { BookOpen, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { ModuleCard } from "../ModuleCard/ModuleCard";
 import { fetchModules, type PublicModule } from "~/lib/api/modules";
-import { moduleIconMap, type ModuleIconKey } from "~/lib/modules";
+import { moduleIconMap} from "~/lib/modules";
 import styles from "./ModulesGrid.module.scss";
 
 function ModulesLoadingState() {

@@ -31,7 +31,7 @@
 .title {
   margin: 0;
   color: var(--color-text);
-  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  font-size: clamp(2rem, 4vw, 3.2rem);
   line-height: 1.05;
   font-weight: 700;
 }
@@ -40,7 +40,7 @@
   max-width: 860px;
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1.75;
 }
 
@@ -55,15 +55,17 @@
 .authorRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   object-fit: cover;
   border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
 }
 
 .authorMeta {
@@ -100,7 +102,7 @@
 
 .coverImage {
   width: 100%;
-  max-height: 520px;
+  max-height: 320px;
   object-fit: cover;
   display: block;
 }

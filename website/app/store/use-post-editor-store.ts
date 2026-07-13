@@ -9,6 +9,19 @@ interface StoredDraftPayload extends PostEditorFormData {
     articleSlug: string | null;
 }
 
+interface HydrateArticleInput {
+    articleId: string;
+    articleSlug: string;
+    title: string;
+    description: string;
+    category: string;
+    tags?: string[];
+    coverImage: string;
+    content: string;
+    markdownMode?: boolean;
+    status: "draft" | "review" | "published";
+}
+
 interface PostEditorState extends PostEditorFormData {
     articleId: string | null;
     articleSlug: string | null;
@@ -26,9 +39,11 @@ interface PostEditorState extends PostEditorFormData {
     setStatus: (value: "draft" | "review" | "published") => void;
     setCommandPaletteOpen: (value: boolean) => void;
     setArticleIdentity: (input: { articleId: string; articleSlug: string }) => void;
+    hydrateFromArticle: (input: HydrateArticleInput) => void;
     saveDraft: () => void;
     loadDraft: () => void;
     clearDraft: () => void;
+    resetEditor: () => void;
 }
 
 const initialState: PostEditorFormData = {
@@ -42,12 +57,16 @@ const initialState: PostEditorFormData = {
     status: "draft",
 };
 
-export const usePostEditorStore = create<PostEditorState>((set, get) => ({
+const resetState = {
     ...initialState,
     articleId: null,
     articleSlug: null,
     commandPaletteOpen: false,
     lastSavedAt: null,
+};
+
+export const usePostEditorStore = create<PostEditorState>((set, get) => ({
+    ...resetState,
 
     setTitle: (value) => set({ title: value }),
     setDescription: (value) => set({ description: value }),
@@ -76,6 +95,21 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
         set({
             articleId,
             articleSlug,
+        }),
+
+    hydrateFromArticle: (input) =>
+        set({
+            articleId: input.articleId,
+            articleSlug: input.articleSlug,
+            title: input.title,
+            description: input.description,
+            category: input.category,
+            tags: input.tags ?? [],
+            coverImage: input.coverImage,
+            content: input.content,
+            markdownMode: input.markdownMode ?? false,
+            status: input.status,
+            lastSavedAt: null,
         }),
 
     saveDraft: () => {
@@ -124,10 +158,13 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
     clearDraft: () => {
         localStorage.removeItem(POST_EDITOR_STORAGE_KEY);
         set({
-            ...initialState,
-            articleId: null,
-            articleSlug: null,
-            lastSavedAt: null,
+            ...resetState,
+        });
+    },
+
+    resetEditor: () => {
+        set({
+            ...resetState,
         });
     },
 }));

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import {
     calculateReadingTime,
     calculateSeoScore,
@@ -22,6 +22,20 @@ import { PostEditorSidebar } from "../PostEditorSidebar/PostEditorSidebar";
 import { CommandPalette } from "../CommandPalette/CommandPalette";
 import styles from "./WritePostPage.module.scss";
 
+interface ArticleApiRecord {
+    id: string;
+    slug: string;
+    title: string;
+    excerpt: string | null;
+    category: string | null;
+    author_name: string | null;
+    author_avatar_url: string | null;
+    cover_image: string | null;
+    read_time: string | null;
+    featured: boolean;
+    published: boolean;
+    body: string[];
+}
 
 function htmlToParagraphs(content: string) {
     return content
@@ -30,12 +44,42 @@ function htmlToParagraphs(content: string) {
         .filter(Boolean);
 }
 
+function paragraphsToEditorContent(paragraphs: string[]) {
+    return paragraphs.join("\n\n");
+}
+
+async function fetchArticleById(id: string) {
+    const response = await fetch(`/api/profile/articles/${id}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            Accept: "application/json",
+        },
+    });
+
+    const result = (await response.json().catch(() => null)) as
+        | { message?: string; article?: ArticleApiRecord }
+        | null;
+
+    if (!response.ok) {
+        throw new Error(result?.message || "Failed to load article.");
+    }
+
+    return result?.article ?? null;
+}
+
 export function WritePostPage() {
     const navigate = useNavigate();
+    const params = useParams();
+    const articleIdFromRoute = params.id;
+    const isEditMode = Boolean(articleIdFromRoute);
+
     const titleInputRef = useRef<HTMLInputElement>(null);
     const editorAnchorRef = useRef<HTMLDivElement>(null);
 
-    const { user, userName } = useAuthStore();
+    const { user, userName, avatarUrl } = useAuthStore();
+    const [isHydrating, setIsHydrating] = useState(isEditMode);
+    const [pageError, setPageError] = useState<string | null>(null);
 
     const {
         articleId,
@@ -59,23 +103,80 @@ export function WritePostPage() {
         setMarkdownMode,
         setStatus,
         saveDraft,
-        loadDraft,
         clearDraft,
+        resetEditor,
+        hydrateFromArticle,
         setCommandPaletteOpen,
         setArticleIdentity,
     } = usePostEditorStore();
 
     useEffect(() => {
-        loadDraft();
-    }, [loadDraft]);
+        let cancelled = false;
+
+        const hydrateEditor = async () => {
+            if (!articleIdFromRoute) {
+                resetEditor();
+                setIsHydrating(false);
+                setPageError(null);
+                return;
+            }
+
+            try {
+                setIsHydrating(true);
+                setPageError(null);
+
+                const article = await fetchArticleById(articleIdFromRoute);
+
+                if (!article || cancelled) return;
+
+                hydrateFromArticle({
+                    articleId: article.id,
+                    articleSlug: article.slug,
+                    title: article.title,
+                    description: article.excerpt ?? "",
+                    category: article.category ?? "General",
+                    tags: [],
+                    coverImage: article.cover_image ?? "",
+                    content: paragraphsToEditorContent(
+                        Array.isArray(article.body) ? article.body : []
+                    ),
+                    markdownMode: false,
+                    status: article.published ? "published" : "draft",
+                });
+            } catch (error) {
+                console.error("Failed to hydrate article editor:", error);
+
+                if (!cancelled) {
+                    setPageError(
+                        error instanceof Error
+                            ? error.message
+                            : "Failed to load article."
+                    );
+                }
+            } finally {
+                if (!cancelled) {
+                    setIsHydrating(false);
+                }
+            }
+        };
+
+        void hydrateEditor();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [articleIdFromRoute, hydrateFromArticle, resetEditor]);
 
     useEffect(() => {
+        if (isHydrating) return;
+
         const timeout = window.setTimeout(() => {
             saveDraft();
         }, 1200);
 
         return () => window.clearTimeout(timeout);
     }, [
+        isHydrating,
         articleId,
         title,
         description,
@@ -131,6 +232,7 @@ export function WritePostPage() {
                 const upload = await uploadArticleCoverImage(file, user.id);
                 resolvedCoverImage = upload.publicUrl;
             }
+
             const payload = {
                 slug: generatedSlug,
                 title: title.trim(),
@@ -138,15 +240,16 @@ export function WritePostPage() {
                 body: paragraphs,
                 category: category.trim() || "General",
                 author_name: userName || "CorkAirportDojo",
+                author_avatar_url: avatarUrl || "",
                 cover_image: resolvedCoverImage,
                 read_time: `${readingTime} min read`,
                 featured: false,
                 published,
             };
 
-            if (articleId) {
+            if (articleIdFromRoute) {
                 return updateArticleRequest({
-                    id: articleId,
+                    id: articleIdFromRoute,
                     ...payload,
                 });
             }
@@ -164,6 +267,11 @@ export function WritePostPage() {
 
             if (published) {
                 navigate(`/blog/${article.slug}`);
+                return;
+            }
+
+            if (!articleIdFromRoute) {
+                navigate(`/blog/${article.id}/edit`, { replace: true });
             }
         },
     });
@@ -219,45 +327,55 @@ export function WritePostPage() {
             />
 
             <div className={styles.page}>
-                <PostEditorHeader />
+                <PostEditorHeader isEditMode={isEditMode} />
 
-                <div className={styles.layout}>
-                    <div ref={editorAnchorRef} className={styles.main}>
-                        <PostEditorCard
-                            title={title}
-                            description={description}
-                            category={category}
-                            tags={tags}
-                            coverImage={coverImage}
-                            content={content}
-                            markdownMode={markdownMode}
-                            onTitleChange={setTitle}
-                            onDescriptionChange={setDescription}
-                            onCategoryChange={setCategory}
-                            onAddTag={addTag}
-                            onRemoveTag={removeTag}
-                            onCoverImageChange={setCoverImage}
-                            onContentChange={setContent}
-                            onToggleMarkdownMode={setMarkdownMode}
-                            titleInputRef={titleInputRef}
-                        />
+                {isHydrating ? (
+                    <div style={{ color: "var(--color-text-secondary)" }}>
+                        Loading article editor...
                     </div>
+                ) : pageError ? (
+                    <div style={{ color: "var(--color-danger, #ef4444)" }}>
+                        {pageError}
+                    </div>
+                ) : (
+                    <div className={styles.layout}>
+                        <div ref={editorAnchorRef} className={styles.main}>
+                            <PostEditorCard
+                                title={title}
+                                description={description}
+                                category={category}
+                                tags={tags}
+                                coverImage={coverImage}
+                                content={content}
+                                markdownMode={markdownMode}
+                                onTitleChange={setTitle}
+                                onDescriptionChange={setDescription}
+                                onCategoryChange={setCategory}
+                                onAddTag={addTag}
+                                onRemoveTag={removeTag}
+                                onCoverImageChange={setCoverImage}
+                                onContentChange={setContent}
+                                onToggleMarkdownMode={setMarkdownMode}
+                                titleInputRef={titleInputRef}
+                            />
+                        </div>
 
-                    <div className={styles.sidebar}>
-                        <PostEditorSidebar
-                            wordCount={wordCount}
-                            readingTime={readingTime}
-                            seoScore={seoScore}
-                            status={status}
-                            lastSavedAt={lastSavedAt}
-                            markdownMode={markdownMode}
-                            onSaveDraft={handleSaveDraft}
-                            onPreview={handlePreview}
-                            onPublish={handlePublish}
-                            isSaving={saveMutation.isPending}
-                        />
+                        <div className={styles.sidebar}>
+                            <PostEditorSidebar
+                                wordCount={wordCount}
+                                readingTime={readingTime}
+                                seoScore={seoScore}
+                                status={status}
+                                lastSavedAt={lastSavedAt}
+                                markdownMode={markdownMode}
+                                onSaveDraft={handleSaveDraft}
+                                onPreview={handlePreview}
+                                onPublish={handlePublish}
+                                isSaving={saveMutation.isPending}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {saveMutation.isError && (
                     <div style={{ color: "var(--color-danger, #ef4444)" }}>

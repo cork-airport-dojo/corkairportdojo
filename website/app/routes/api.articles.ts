@@ -72,7 +72,10 @@ export async function action({ request }: { request: Request }) {
             );
         }
 
-        const article = await createArticle(parsed.data, user.id);
+        const article = await createArticle(
+            parsed.data as typeof parsed.data & { author_avatar_url?: string | null },
+            user.id
+        );
 
         return new Response(JSON.stringify({ article }), {
             status: 201,
@@ -102,7 +105,10 @@ export async function action({ request }: { request: Request }) {
         );
     }
 
-    const article = await updateArticle(parsed.data, user.id);
+    const article = await updateArticle(
+        parsed.data as typeof parsed.data & { author_avatar_url?: string | null },
+        user.id
+    );
 
     return new Response(JSON.stringify({ article }), {
         status: 200,
