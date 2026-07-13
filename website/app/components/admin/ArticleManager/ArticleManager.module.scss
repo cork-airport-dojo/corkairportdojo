@@ -45,13 +45,13 @@
   padding-top: 16px !important;
 }
 
-.moduleList {
+.articleList {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.moduleItem {
+.articleItem {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -61,7 +61,7 @@
   background: var(--color-surface);
 }
 
-.moduleText {
+.articleText {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -79,7 +79,7 @@
   }
 }
 
-.moduleMetaRow {
+.articleMetaRow {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -107,7 +107,7 @@
   flex-wrap: wrap;
 }
 
-.moduleActions {
+.articleActions {
   display: flex;
   align-items: center;
   gap: 8px;

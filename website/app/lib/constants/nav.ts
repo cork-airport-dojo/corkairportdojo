@@ -11,7 +11,7 @@ import {
 export const mobileNavItems = [
     { path: "/", label: "Home", icon: Home },
     { path: "/modules", label: "Modules", icon: Layers3 },
-    { path: "/blog", label: "Blog", icon: BookOpen },
+    { path: "/blog", label: "Articles", icon: BookOpen },
     { path: "/resources", label: "Resources", icon: FolderOpen },
     { path: "/categories", label: "Categories", icon: FolderKanban },
     { path: "/profile", label: "Profile", icon: User },

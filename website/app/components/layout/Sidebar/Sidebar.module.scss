@@ -1,11 +1,9 @@
-@use "../../../styles/abstracts/breakpoints" as *;
-
 .sidebar {
   position: sticky;
   top: 0;
-  width: 260px;
+  width: 240px;
   height: 100vh;
-  padding: 24px 16px 16px;
+  padding: 16px;
   border-right: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   display: flex;
@@ -18,47 +16,55 @@
 }
 
 .sidebarCollapsed {
-  width: 88px;
-  padding-left: 12px;
-  padding-right: 12px;
+  width: 72px;
+  padding: 12px 8px;
 
   .brand {
     justify-content: center;
   }
 
-  .navItem {
+  .navItem,
+  .quickActionItem {
     justify-content: center;
     padding-left: 0;
     padding-right: 0;
   }
 
-  .writeCta,
-  .loginCta,
-  .collapseButton {
-    padding-left: 0;
-    padding-right: 0;
+  .navItemAccent {
+    left: 0;
   }
 
-  .navItemAccent {
-    display: none;
+  .settingsSection {
+    gap: 8px;
+  }
+
+  .connectRow {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .connectButton {
+    width: 44px;
   }
 }
 
-.top {
+.logoArea {
+  min-height: 72px;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 16px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 52px;
+  min-height: 40px;
 
   img {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     object-fit: contain;
     flex-shrink: 0;
   }
@@ -67,39 +73,48 @@
 .brandTitle {
   display: block;
   color: var(--color-text);
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
 .brandSubtitle {
   display: block;
   margin-top: 4px;
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
 }
 
-.nav {
+.mainSections {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 0;
+}
+
+.navSection {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  gap: 4px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .navItem {
   position: relative;
   min-height: 44px;
   padding: 0 14px;
-  border: 1px solid transparent;
-  background: transparent;
   color: var(--color-text-secondary);
-  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid transparent;
   transition:
-          border-color var(--transition-base),
           background-color var(--transition-base),
+          border-color var(--transition-base),
           color var(--transition-base);
 
   &:hover {
@@ -107,16 +122,10 @@
     color: var(--color-text);
   }
 
-  svg {
-    flex-shrink: 0;
-  }
-
   span:last-child {
-    flex: 1;
-    min-width: 0;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
   }
 }
 
@@ -125,13 +134,13 @@
   left: -16px;
   top: 8px;
   bottom: 8px;
-  width: 2px;
+  width: 3px;
   background: transparent;
 }
 
 .navItemActive {
-  border-color: var(--color-border);
   background: var(--color-surface);
+  border-color: var(--color-border);
   color: var(--color-text);
 
   .navItemAccent {
@@ -139,56 +148,104 @@
   }
 }
 
-.footer {
+.sectionLabel {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.quickActionsSection {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: auto;
-  padding-top: 8px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.writeCta,
-.loginCta {
+.quickActionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quickActionItem {
   min-height: 44px;
-  width: 100%;
-  justify-content: center;
-  gap: 10px;
-  border-radius: 0 !important;
-}
-
-.writeCta {
-  background: var(--color-brand-purple);
-  color: white;
-  border: none;
+  padding: 0 14px;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition:
+          background-color var(--transition-base),
+          border-color var(--transition-base),
+          color var(--transition-base);
 
   &:hover {
-    background: var(--color-brand-purple-hover);
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  svg {
+    color: var(--color-brand-purple);
+    flex-shrink: 0;
+  }
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
-.loginCta {
-  min-height: 48px;
-  width: 100%;
+.connectSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.connectRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.connectButton {
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  font: inherit;
+  text-decoration: none;
+  transition:
+          border-color var(--transition-base),
+          background-color var(--transition-base),
+          color var(--transition-base);
+
+  &:hover {
+    border-color: var(--color-brand-purple);
+    background: #171b24;
+    color: var(--color-text);
+  }
 }
 
-.loginCtaCollapsed {
-  width: 48px;
-  min-width: 48px;
-  padding: 0;
+.bottomSections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
 }
 
 .profileCard {
   min-height: 72px;
-  max-height: 72px;
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--color-border);
@@ -199,12 +256,8 @@
   gap: 12px;
   justify-content: flex-start;
   text-align: left;
-  cursor: pointer;
   overflow: hidden;
   border-radius: 0 !important;
-  transition:
-          border-color var(--transition-base),
-          background-color var(--transition-base);
 
   &:hover {
     border-color: var(--color-border-hover);
@@ -242,11 +295,15 @@
 
   span {
     color: var(--color-text-secondary);
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  }
+
+  em {
+    color: var(--color-brand-purple);
+    font-size: 0.82rem;
+    font-style: normal;
+    line-height: 1.2;
   }
 }
 
@@ -256,6 +313,23 @@
   flex-shrink: 0;
 }
 
+.collapsedProfileButton {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+
+  img {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    object-fit: cover;
+  }
+}
+
 .sidebarProfileMenu {
   min-width: 190px;
   border-radius: 0 !important;
@@ -263,42 +337,77 @@
   border: 1px solid var(--color-border) !important;
 }
 
-.socialRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.socialButton {
-  border-color: var(--color-border);
+.loginCta {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
-  color: var(--color-text-secondary);
+  color: var(--color-text);
   border-radius: 0 !important;
-  transition:
-          border-color var(--transition-base),
-          background-color var(--transition-base),
-          color var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 0 14px;
 
   &:hover {
     border-color: var(--color-border-hover);
     background: #171b24;
     color: var(--color-text);
   }
-
-  svg {
-    display: block;
-  }
 }
 
+.loginCtaCollapsed {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.settingsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settingsButton,
 .collapseButton {
   min-height: 44px;
   width: 100%;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
   border-color: var(--color-border);
   background: var(--color-surface);
   color: var(--color-text-secondary);
   border-radius: 0 !important;
+
+  &:hover {
+    border-color: var(--color-border-hover);
+    background: #171b24;
+    color: var(--color-text);
+  }
+}
+
+.settingsIconButton {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border-radius: 0 !important;
+
+  &:hover {
+    border-color: var(--color-border-hover);
+    background: #171b24;
+    color: var(--color-text);
+  }
+}
+
+.collapseButton {
+  justify-content: flex-start;
 }
 
 .chevronCollapsed {

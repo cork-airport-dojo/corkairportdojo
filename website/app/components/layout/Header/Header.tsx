@@ -52,10 +52,12 @@ export function Header({
     return (
         <header className={styles.header}>
             <div className={styles.leftZone}>
-                <MobileSidebar
-                    collapsed={sidebarCollapsed}
-                    onToggleCollapse={onToggleSidebarCollapse}
-                />
+                <div className={styles.mobileTriggerWrap}>
+                    <MobileSidebar
+                        collapsed={sidebarCollapsed}
+                        onToggleCollapse={onToggleSidebarCollapse}
+                    />
+                </div>
 
                 <div className={styles.searchWrap}>
                     <Search size={18} className={styles.searchIcon} />
@@ -75,6 +77,7 @@ export function Header({
                     size="icon"
                     className={styles.iconButton}
                     aria-label="Toggle theme"
+                    title="Toggle theme"
                 >
                     <Moon size={18} />
                 </Button>
@@ -85,6 +88,7 @@ export function Header({
                     size="icon"
                     className={styles.iconButton}
                     aria-label="Notifications"
+                    title="Notifications"
                 >
                     <Bell size={18} />
                     <span className={styles.badge}>2</span>
@@ -95,14 +99,23 @@ export function Header({
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className={styles.profileButton}>
                                 {avatarUrl ? (
-                                    <img src={avatarUrl} alt={userName} className={styles.avatar} />
+                                    <img
+                                        src={avatarUrl}
+                                        alt={userName}
+                                        className={styles.avatar}
+                                    />
                                 ) : (
                                     <div className={styles.avatarFallback}>
                                         {userName.slice(0, 1).toUpperCase() || "U"}
                                     </div>
                                 )}
-                                <span className={styles.profileName}>{userName}</span>
-                                <ChevronDown size={16} />
+
+                                <div className={styles.profileMeta}>
+                                    <span className={styles.profileEyebrow}>Signed in</span>
+                                    <span className={styles.profileName}>{userName}</span>
+                                </div>
+
+                                <ChevronDown size={16} className={styles.profileChevron} />
                             </Button>
                         </DropdownMenuTrigger>
 

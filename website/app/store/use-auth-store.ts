@@ -4,6 +4,14 @@ import { supabase } from "~/lib/supabase/browser";
 
 export type UserRole = "admin" | "editor" | "viewer";
 
+interface MeResponse {
+    user?: {
+        id: string;
+        email?: string | null;
+        role?: UserRole | null;
+    };
+}
+
 interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
@@ -12,18 +20,11 @@ interface AuthState {
     avatarUrl: string;
     role: UserRole | null;
     isAdmin: boolean;
+    canManageContent: boolean;
     hydrate: () => Promise<void>;
     signInWithGitHub: (redirectTo?: string) => Promise<void>;
     signOut: () => Promise<void>;
     setRole: (role: UserRole | null) => void;
-}
-
-interface MeResponse {
-    user?: {
-        id: string;
-        email?: string | null;
-        role?: UserRole | null;
-    };
 }
 
 function getUserName(user: User | null) {
@@ -45,25 +46,41 @@ function getAvatarUrl(user: User | null) {
     if (!user) return "";
 
     const metadata = user.user_metadata ?? {};
-    return metadata.avatar_url || "";
+
+    return (
+        metadata.avatar_url ||
+        metadata.picture ||
+        ""
+    );
 }
 
 async function fetchCurrentUserRole(): Promise<UserRole | null> {
     const response = await fetch("/api/me", {
         method: "GET",
         credentials: "include",
+        headers: {
+            Accept: "application/json",
+        },
     });
 
-    if (!response.ok) {
-        if (response.status === 401) {
-            return null;
-        }
+    if (response.status === 401) {
+        return null;
+    }
 
+    if (!response.ok) {
         throw new Error("Failed to load current user role.");
     }
 
     const payload = (await response.json()) as MeResponse;
     return payload.user?.role ?? null;
+}
+
+function mapRoleState(role: UserRole | null) {
+    return {
+        role,
+        isAdmin: role === "admin",
+        canManageContent: role === "admin" || role === "editor",
+    };
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -74,6 +91,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     avatarUrl: "",
     role: null,
     isAdmin: false,
+    canManageContent: false,
 
     hydrate: async () => {
         try {
@@ -83,14 +101,14 @@ export const useAuthStore = create<AuthState>((set) => ({
             } = await supabase.auth.getUser();
 
             if (error) {
+                console.error("Failed to hydrate auth user:", error);
                 set({
                     isAuthenticated: false,
                     isLoading: false,
                     user: null,
                     userName: "",
                     avatarUrl: "",
-                    role: null,
-                    isAdmin: false,
+                    ...mapRoleState(null),
                 });
                 return;
             }
@@ -102,32 +120,43 @@ export const useAuthStore = create<AuthState>((set) => ({
                     user: null,
                     userName: "",
                     avatarUrl: "",
-                    role: null,
-                    isAdmin: false,
+                    ...mapRoleState(null),
                 });
                 return;
             }
 
-            const role = await fetchCurrentUserRole();
-
-            set({
+            const baseState = {
                 isAuthenticated: true,
                 isLoading: false,
                 user,
                 userName: getUserName(user),
                 avatarUrl: getAvatarUrl(user),
-                role,
-                isAdmin: role === "admin",
-            });
+            };
+
+            try {
+                const role = await fetchCurrentUserRole();
+
+                set({
+                    ...baseState,
+                    ...mapRoleState(role),
+                });
+            } catch (roleError) {
+                console.error("Failed to hydrate user role:", roleError);
+
+                set({
+                    ...baseState,
+                    ...mapRoleState(null),
+                });
+            }
         } catch (error) {
+            console.error("Auth hydrate failed:", error);
             set({
                 isAuthenticated: false,
                 isLoading: false,
                 user: null,
                 userName: "",
                 avatarUrl: "",
-                role: null,
-                isAdmin: false,
+                ...mapRoleState(null),
             });
         }
     },
@@ -144,6 +173,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         });
 
         if (error) {
+            console.error("GitHub sign-in failed:", error);
             throw error;
         }
     },
@@ -152,6 +182,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         const { error } = await supabase.auth.signOut();
 
         if (error) {
+            console.error("GitHub sign-out failed:", error);
             throw error;
         }
 
@@ -161,8 +192,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             user: null,
             userName: "",
             avatarUrl: "",
-            role: null,
-            isAdmin: false,
+            ...mapRoleState(null),
         });
 
         window.location.assign("/logout");
@@ -170,8 +200,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     setRole: (role) => {
         set({
-            role,
-            isAdmin: role === "admin",
+            ...mapRoleState(role),
         });
     },
 }));

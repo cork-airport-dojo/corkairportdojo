@@ -30,7 +30,7 @@ export function GitHubLoginButton({
             title={title}
             aria-label={title || label}
         >
-            <FiGithub size={16} />
+            <FiGithub size={18} />
             {!iconOnly && <span>{label}</span>}
         </button>
     );

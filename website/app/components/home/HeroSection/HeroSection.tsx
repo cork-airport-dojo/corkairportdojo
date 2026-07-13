@@ -2,7 +2,6 @@ import { useEffect, useMemo } from "react";
 import { BookOpen, Users, PenTool, Boxes } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
-import { GitHubLoginButton } from "~/components/auth/GitHubLoginButton/GitHubLoginButton";
 import { useHeroCTAStore } from "~/store/use-hero-cta-store";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./HeroSection.module.scss";

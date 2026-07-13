@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, FileText, Plus, RefreshCw } from "lucide-react";
+import { ArrowRight, FileText, PenSquare, RefreshCw } from "lucide-react";
 import { Link } from "react-router";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
-import { Button } from "~/components/ui/button";
 import { fetchArticles, type PublicArticle } from "~/lib/api/articles";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./ArticlesPage.module.scss";
@@ -69,9 +68,7 @@ export function ArticlesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
-    const { isAuthenticated, role } = useAuthStore();
-    const canManageContent =
-        isAuthenticated && (role === "admin" || role === "editor");
+    const { canManageContent } = useAuthStore();
 
     const loadArticles = async () => {
         setLoading(true);
@@ -106,16 +103,14 @@ export function ArticlesPage() {
                     </div>
 
                     {canManageContent && (
-                        <Button
-                            asChild
-                            type="button"
-                            size="icon"
-                            className={styles.createButton}
+                        <Link
+                            to="/write"
+                            className={styles.headerAction}
+                            aria-label="Create article"
                         >
-                            <Link to="/write" aria-label="Create article" title="Create article">
-                                <Plus size={18} />
-                            </Link>
-                        </Button>
+                            <PenSquare size={16} />
+                            <span>New Article</span>
+                        </Link>
                     )}
                 </div>
             </section>

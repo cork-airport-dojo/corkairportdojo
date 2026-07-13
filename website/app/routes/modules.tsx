@@ -1,6 +1,5 @@
 import { useLoaderData, Link } from "react-router";
-import { Plus } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Layers3 } from "lucide-react";
 import { useAuthStore } from "~/store/use-auth-store";
 import { AppShell } from "~/components/layout/AppShell/AppShell";
 import { ModulesHero } from "~/components/modules/ModulesHero/ModulesHero";
@@ -13,40 +12,29 @@ export async function loader() {
     return loadWeatherAlertData();
 }
 
-export function shouldRevalidate() {
-    return false;
-}
-
 export default function ModulesRoute() {
     const { weatherAlert, closureNotice } = useLoaderData<typeof loader>();
-    const { isAuthenticated, role } = useAuthStore();
-
-    const canManageContent =
-        isAuthenticated && (role === "admin" || role === "editor");
+    const { canManageContent } = useAuthStore();
 
     return (
         <AppShell weatherAlert={weatherAlert} closureNotice={closureNotice}>
             <div className={styles.page}>
-                <ModulesHero />
+                <div className={styles.heroWrap}>
+                    <ModulesHero />
 
-                {canManageContent && (
-                    <div className={styles.createRow}>
-                        <Button
-                            asChild
-                            type="button"
-                            size="icon"
-                            className={styles.createButton}
-                        >
+                    {canManageContent && (
+                        <div className={styles.heroActionRow}>
                             <Link
-                                to="/profile"
+                                to="/modules/new"
+                                className={styles.headerAction}
                                 aria-label="Create module"
-                                title="Create module"
                             >
-                                <Plus size={18} />
+                                <Layers3 size={16} />
+                                <span>New Module</span>
                             </Link>
-                        </Button>
-                    </div>
-                )}
+                        </div>
+                    )}
+                </div>
 
                 <ModulesToolbar />
                 <ModulesGrid />

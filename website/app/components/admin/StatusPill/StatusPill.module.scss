@@ -1,0 +1,24 @@
+.pill {
+  min-height: 24px;
+  padding: 0 10px;
+  border: 1px solid;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.published {
+  border-color: rgba(72, 199, 116, 0.35);
+  background: rgba(72, 199, 116, 0.12);
+  color: #67e19a;
+}
+
+.draft {
+  border-color: rgba(255, 184, 77, 0.35);
+  background: rgba(255, 184, 77, 0.12);
+  color: #ffcb78;
+}

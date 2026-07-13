@@ -27,6 +27,7 @@
 .sidebarColumn {
   min-width: 0;
   min-height: 100vh;
+  border-right: 1px solid var(--color-border);
 
   @include respond-down(xl) {
     display: none;
@@ -44,23 +45,35 @@
   flex-direction: column;
 }
 
+.headerShell {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: linear-gradient(
+          180deg,
+          rgba(10, 14, 22, 0.98) 0%,
+          rgba(10, 14, 22, 0.96) 100%
+  );
+  backdrop-filter: blur(10px);
+}
+
 .mainInner {
   flex: 1;
   min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--layout-right-rail-width);
   gap: 24px;
-  padding: 0 24px 24px;
+  padding: 20px 24px 24px;
   align-items: start;
 
   @include respond-down(xl) {
     grid-template-columns: 1fr;
-    padding: 0 20px 20px;
+    padding: 16px 20px 20px;
   }
 
   @include respond-down(md) {
     gap: 20px;
-    padding: 0 16px 16px;
+    padding: 12px 16px 16px;
   }
 }
 
@@ -78,6 +91,9 @@
 
 .aside {
   min-width: 0;
+  position: sticky;
+  top: 108px;
+  align-self: start;
 
   @include respond-down(xl) {
     display: none;

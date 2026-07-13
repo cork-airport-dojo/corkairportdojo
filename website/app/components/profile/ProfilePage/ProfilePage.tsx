@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { FiGithub } from "react-icons/fi";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { ArticleManager } from "~/components/admin/ArticleManager/ArticleManager";
 import { NoticeManager } from "~/components/admin/NoticeManager/NoticeManager";
 import { ModuleManager } from "~/components/admin/ModuleManager/ModuleManager";
 import { HeroCTAButtonManager } from "~/components/admin/HeroCTAButtonManager/HeroCTAButtonManager";
@@ -30,6 +31,8 @@ function formatJoinedDate(value?: string) {
 
 export function ProfilePage() {
     const { hydrate, isAdmin, user, userName, avatarUrl } = useAuthStore();
+    const { isAuthenticated, role, canManageContent } = useAuthStore();
+    const canManageSiteSettings = isAuthenticated && role === "admin";
 
     useEffect(() => {
         void hydrate();
@@ -101,9 +104,10 @@ export function ProfilePage() {
                 </div>
             </section>
 
-            {isAdmin && <NoticeManager />}
-            {isAdmin && <ModuleManager />}
-            {isAdmin && <HeroCTAButtonManager />}
+            {canManageContent && <ArticleManager />}
+            {canManageContent && <NoticeManager />}
+            {canManageSiteSettings && <ModuleManager />}
+            {canManageSiteSettings && <HeroCTAButtonManager />}
 
             <section className={styles.statsGrid}>
                 {stats.map((stat) => (

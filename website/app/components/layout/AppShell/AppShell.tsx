@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import { RightSidebar } from "../RightSidebar/RightSidebar";
@@ -13,6 +13,8 @@ interface AppShellProps {
     closureNotice?: DojoClosureNotice | null;
 }
 
+const SIDEBAR_STORAGE_KEY = "corkairportdojo.sidebar.collapsed";
+
 export function AppShell({
                              children,
                              hideDefaultRightSidebar = false,
@@ -20,6 +22,32 @@ export function AppShell({
                              closureNotice = null,
                          }: AppShellProps) {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [hasLoadedSidebarPreference, setHasLoadedSidebarPreference] = useState(false);
+
+    useEffect(() => {
+        const storedValue = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
+
+        if (storedValue === "true") {
+            setSidebarCollapsed(true);
+        } else if (storedValue === "false") {
+            setSidebarCollapsed(false);
+        }
+
+        setHasLoadedSidebarPreference(true);
+    }, []);
+
+    useEffect(() => {
+        if (!hasLoadedSidebarPreference) return;
+
+        window.localStorage.setItem(
+            SIDEBAR_STORAGE_KEY,
+            String(sidebarCollapsed)
+        );
+    }, [hasLoadedSidebarPreference, sidebarCollapsed]);
+
+    const toggleSidebarCollapsed = () => {
+        setSidebarCollapsed((value) => !value);
+    };
 
     return (
         <div className={styles.wrapper}>
@@ -35,22 +63,23 @@ export function AppShell({
                 >
                     <Sidebar
                         collapsed={sidebarCollapsed}
-                        onToggleCollapse={() => setSidebarCollapsed((value) => !value)}
+                        onToggleCollapse={toggleSidebarCollapsed}
                     />
                 </div>
 
                 <div className={styles.mainColumn}>
-                    <Header
-                        sidebarCollapsed={sidebarCollapsed}
-                        onToggleSidebarCollapse={() =>
-                            setSidebarCollapsed((value) => !value)
-                        }
-                    />
+                    <div className={styles.headerShell}>
+                        <Header
+                            sidebarCollapsed={sidebarCollapsed}
+                            onToggleSidebarCollapse={toggleSidebarCollapsed}
+                        />
+                    </div>
 
-                    <div className={`${styles.mainInner} ${
-                        hideDefaultRightSidebar ? styles.mainInnerExpanded : ""
-                    }`}>
-
+                    <div
+                        className={`${styles.mainInner} ${
+                            hideDefaultRightSidebar ? styles.mainInnerExpanded : ""
+                        }`}
+                    >
                         <main className={styles.content}>
                             <DojoClosureBanner notice={closureNotice} />
                             {children}
