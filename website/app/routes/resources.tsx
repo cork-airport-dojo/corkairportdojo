@@ -3,7 +3,7 @@ import { ResourcesPage } from "~/components/resources/ResourcesPage/ResourcesPag
 
 export default function ResourcesRoute() {
     return (
-        <AppShell>
+        <AppShell hideDefaultRightSidebar>
             <ResourcesPage />
         </AppShell>
     );

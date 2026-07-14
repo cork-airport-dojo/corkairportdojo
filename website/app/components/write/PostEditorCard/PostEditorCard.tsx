@@ -152,6 +152,11 @@ export function PostEditorCard({
 
             <div className={styles.coverBlock}>
                 <label className={styles.label}>Cover Image</label>
+                <p className={styles.helpText}>
+                    Best results: use a wide banner-style image. Avoid screenshots with small text,
+                    dashboards, or dense UI captures, as they can look blurry and oversized on the
+                    article page.
+                </p>
 
                 <input
                     ref={fileInputRef}

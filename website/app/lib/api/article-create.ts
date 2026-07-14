@@ -5,6 +5,7 @@ export interface CreateArticleRequest {
     body: string[];
     category: string;
     author_name: string;
+    author_avatar_url?: string;
     cover_image: string;
     read_time: string;
     featured?: boolean;
@@ -23,6 +24,7 @@ export interface ArticleMutationResponse {
         excerpt: string | null;
         category: string | null;
         author_name: string | null;
+        author_avatar_url: string | null;
         cover_image: string | null;
         read_time: string | null;
         featured: boolean;

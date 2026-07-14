@@ -33,6 +33,18 @@ export const createArticleSchema = z.object({
         .max(120, "Author name must be 120 characters or fewer.")
         .optional()
         .default(""),
+    author_avatar_url: z
+        .string()
+        .trim()
+        .refine(
+            (value) =>
+                value === "" ||
+                value.startsWith("http://") ||
+                value.startsWith("https://"),
+            "Author avatar URL must be an http or https URL."
+        )
+        .optional()
+        .default(""),
     cover_image: z
         .string()
         .trim()

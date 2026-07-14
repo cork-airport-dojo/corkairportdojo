@@ -8,10 +8,12 @@ interface UpdateArticlePayload {
     excerpt?: string | null;
     category?: string | null;
     author_name?: string | null;
+    author_avatar_url?: string | null;
+    cover_image?: string | null;
     read_time?: string | null;
     featured?: boolean;
     published?: boolean;
-    content?: string | null;
+    body?: string[] | null;
 }
 
 function jsonResponse(
@@ -35,7 +37,7 @@ async function getExistingArticle(articleId: string) {
     const { data, error } = await supabase
         .from("articles")
         .select(
-            "id, slug, title, excerpt, category, author_name, read_time, featured, published, content, created_by, created_at, updated_at"
+            "id, slug, title, excerpt, category, author_name, author_avatar_url, cover_image, read_time, featured, published, body, created_by, created_at, updated_at"
         )
         .eq("id", articleId)
         .maybeSingle();
@@ -68,6 +70,8 @@ export async function loader({
     const { data: existing, error } = await getExistingArticle(articleId);
 
     if (error || !existing) {
+        console.error(`Failed to load article "${articleId}" for profile access:`, error);
+
         return jsonResponse(
             {
                 error: "ArticleNotFound",
@@ -79,9 +83,10 @@ export async function loader({
     }
 
     const isAdmin = role === "admin";
+    const isEditor = role === "editor";
     const isOwner = existing.created_by === user.id;
 
-    if (!isAdmin && !isOwner) {
+    if (!isAdmin && !isEditor && !isOwner) {
         return jsonResponse(
             {
                 error: "Forbidden",
@@ -128,6 +133,8 @@ export async function action({
         const { data: existing, error: existingError } = await getExistingArticle(articleId);
 
         if (existingError || !existing) {
+            console.error(`Failed to find article "${articleId}" for delete:`, existingError);
+
             return jsonResponse(
                 {
                     error: "ArticleNotFound",
@@ -139,9 +146,10 @@ export async function action({
         }
 
         const isAdmin = role === "admin";
+        const isEditor = role === "editor";
         const isOwner = existing.created_by === user.id;
 
-        if (!isAdmin && !isOwner) {
+        if (!isAdmin && !isEditor && !isOwner) {
             return jsonResponse(
                 {
                     error: "Forbidden",
@@ -188,6 +196,8 @@ export async function action({
         const { data: existing, error: existingError } = await getExistingArticle(articleId);
 
         if (existingError || !existing) {
+            console.error(`Failed to find article "${articleId}" for update:`, existingError);
+
             return jsonResponse(
                 {
                     error: "ArticleNotFound",
@@ -233,10 +243,14 @@ export async function action({
         const excerpt = payload.excerpt?.trim() || null;
         const category = payload.category?.trim() || null;
         const author_name = payload.author_name?.trim() || null;
+        const author_avatar_url = payload.author_avatar_url?.trim() || null;
+        const cover_image = payload.cover_image?.trim() || null;
         const read_time = payload.read_time?.trim() || null;
         const featured = Boolean(payload.featured);
         const published = Boolean(payload.published);
-        const content = payload.content ?? "";
+        const body = Array.isArray(payload.body)
+            ? payload.body.map((item) => item.trim()).filter(Boolean)
+            : [];
 
         if (!title) {
             return jsonResponse(
@@ -270,14 +284,16 @@ export async function action({
                 excerpt,
                 category,
                 author_name,
+                author_avatar_url,
+                cover_image,
                 read_time,
                 featured,
                 published,
-                content,
+                body,
             })
             .eq("id", articleId)
             .select(
-                "id, slug, title, excerpt, category, author_name, read_time, featured, published, content, created_by, created_at, updated_at"
+                "id, slug, title, excerpt, category, author_name, author_avatar_url, cover_image, read_time, featured, published, body, created_by, created_at, updated_at"
             )
             .single();
 

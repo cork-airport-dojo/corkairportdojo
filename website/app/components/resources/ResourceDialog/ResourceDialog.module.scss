@@ -1,0 +1,84 @@
+.dialog {
+  border-radius: 0 !important;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.select {
+  min-height: 40px;
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+  color: var(--color-text);
+  padding: 0 12px 0 40px;
+  width: 100%;
+}
+
+.providerSelectWrap {
+  position: relative;
+}
+
+.providerIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  span {
+    color: var(--color-text);
+  }
+
+  em {
+    color: var(--color-text-muted);
+    font-style: normal;
+  }
+}
+
+.requiredMark {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.helpText {
+  margin: -2px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.errorText {
+  margin: 0;
+  color: #f87171;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.invalidInput {
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.15);
+}

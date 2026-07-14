@@ -56,7 +56,9 @@ export function ArticleCard({
                     </div>
 
                     <h3 className={styles.title}>{title}</h3>
-                    <p className={styles.excerpt}>{excerpt}</p>
+                    <p className={styles.excerpt}>
+                        {excerpt || "No description provided yet."}
+                    </p>
 
                     <div className={styles.meta}>
                         <div className={styles.authorRow}>
