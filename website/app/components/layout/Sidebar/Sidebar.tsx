@@ -8,7 +8,6 @@ import {
     Layers3,
     PenSquare,
     User,
-    Settings,
     LogOut,
     FolderOpen,
     CalendarPlus,
@@ -212,10 +211,10 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                                         <span>Profile</span>
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                {/*<DropdownMenuItem>
                                     <Settings size={16} />
                                     <span>Settings</span>
-                                </DropdownMenuItem>
+                                </DropdownMenuItem>*/}
                                 <DropdownMenuItem onClick={() => void handleLogout()}>
                                     <LogOut size={16} />
                                     <span>Sign out</span>
@@ -249,7 +248,7 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                 )}
 
                 <div className={styles.settingsSection}>
-                    {!collapsed ? (
+                    {/*{!collapsed ? (
                         <Button type="button" variant="outline" className={styles.settingsButton}>
                             <Settings size={18} />
                             <span>Settings</span>
@@ -265,7 +264,7 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                         >
                             <Settings size={18} />
                         </Button>
-                    )}
+                    )}*/}
 
                     <Button
                         type="button"
