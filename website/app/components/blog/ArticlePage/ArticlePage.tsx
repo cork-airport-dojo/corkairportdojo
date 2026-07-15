@@ -1,9 +1,18 @@
 import { useEffect } from "react";
 import { Clock3, FolderOpen } from "lucide-react";
-import { resources } from "~/lib/constants/resources";
 import { ArticleResourcesAside } from "~/components/resources/ArticleResourcesAside/ArticleResourcesAside";
 import { useRecentArticlesStore } from "~/store/use-recent-articles-store";
 import styles from "./ArticlePage.module.scss";
+
+export interface ArticleLinkedResource {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    image: string;
+    provider: "Google Drive" | "OneDrive" | "GitHub" | "External";
+    href: string;
+}
 
 export interface ArticlePagePost {
     id: string;
@@ -16,7 +25,7 @@ export interface ArticlePagePost {
     readTime: string;
     image: string;
     featured?: boolean;
-    resourceIds?: string[];
+    resources?: ArticleLinkedResource[];
     body: string[];
 }
 
@@ -25,10 +34,7 @@ interface ArticlePageProps {
 }
 
 export function ArticlePage({ post }: ArticlePageProps) {
-    const linkedResources = resources.filter((resource) =>
-        post.resourceIds?.includes(resource.id)
-    );
-
+    const linkedResources = post.resources ?? [];
     const { addArticle } = useRecentArticlesStore();
 
     useEffect(() => {
@@ -64,29 +70,20 @@ export function ArticlePage({ post }: ArticlePageProps) {
                             </div>
                         </div>
 
-                        <div className={styles.readMeta}>
-                            <Clock3 size={15} />
-                            <span>{post.readTime}</span>
-                        </div>
+                        <div className={styles.metaGroup}>
+                            <div className={styles.readMeta}>
+                                <Clock3 size={15} />
+                                <span>{post.readTime}</span>
+                            </div>
 
-                        <div className={styles.resourceMeta}>
-                            <FolderOpen size={15} />
-                            <span>{linkedResources.length} resources</span>
+                            <div className={styles.resourceMeta}>
+                                <FolderOpen size={15} />
+                                <span>{linkedResources.length} resources</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
-
-            <div className={styles.coverWrap}>
-                <img
-                    src={post.image}
-                    alt={post.title}
-                    className={styles.coverImage}
-                    onError={(event) => {
-                        event.currentTarget.src = "/logo.png";
-                    }}
-                />
-            </div>
 
             <div className={styles.layout}>
                 <main className={styles.main}>
@@ -98,6 +95,17 @@ export function ArticlePage({ post }: ArticlePageProps) {
                 </main>
 
                 <aside className={styles.aside}>
+                    <div className={styles.coverCard}>
+                        <img
+                            src={post.image}
+                            alt={post.title}
+                            className={styles.coverImage}
+                            onError={(event) => {
+                                event.currentTarget.src = "/logo.png";
+                            }}
+                        />
+                    </div>
+
                     <ArticleResourcesAside resources={linkedResources} />
                 </aside>
             </div>

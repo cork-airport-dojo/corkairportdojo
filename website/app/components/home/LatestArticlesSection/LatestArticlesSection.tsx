@@ -143,7 +143,10 @@ export function LatestArticlesSection() {
                     year: "numeric",
                 }),
                 readTime: article.read_time ?? "Article",
-                resourceCount: 0,
+                resourceCount:
+                    article.resources?.length ??
+                    article.resource_ids?.length ??
+                    0,
             })),
         [articles]
     );

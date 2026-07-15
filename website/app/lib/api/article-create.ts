@@ -8,6 +8,7 @@ export interface CreateArticleRequest {
     author_avatar_url?: string;
     cover_image: string;
     read_time: string;
+    resource_ids?: string[];
     featured?: boolean;
     published: boolean;
 }

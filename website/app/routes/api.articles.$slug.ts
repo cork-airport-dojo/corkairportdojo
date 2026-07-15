@@ -2,12 +2,12 @@ import { data } from "react-router";
 import { getPublishedArticleBySlug } from "~/lib/api/articles.server";
 
 export async function loader({ params }: { params: { slug?: string } }) {
-    const slug = params.slug;
+    const slug = params.slug?.trim();
 
     if (!slug) {
         return data(
             {
-                error: "ValidationFailed",
+                error: "InvalidSlug",
                 message: "Article slug is required.",
             },
             { status: 400 }
@@ -20,7 +20,7 @@ export async function loader({ params }: { params: { slug?: string } }) {
         return data(
             {
                 error: "ArticleNotFound",
-                message: "Article could not be found.",
+                message: "Article not found.",
             },
             { status: 404 }
         );

@@ -1,47 +1,91 @@
 import { ExternalLink, FolderOpen } from "lucide-react";
-import type {ResourceItem} from "~/lib/constants/resources";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { Link } from "react-router";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
 import styles from "./ArticleResourcesAside.module.scss";
 
-interface ArticleResourcesAsideProps {
-    resources: ResourceItem[];
+interface ArticleResourceItem {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    image: string;
+    provider: "Google Drive" | "OneDrive" | "GitHub" | "External";
+    href: string;
 }
 
-export function ArticleResourcesAside({ resources }: ArticleResourcesAsideProps) {
-    if (!resources.length) return null;
+interface ArticleResourcesAsideProps {
+    resources: ArticleResourceItem[];
+}
 
-    return (
-        <aside className={styles.aside}>
+export function ArticleResourcesAside({
+                                          resources,
+                                      }: ArticleResourcesAsideProps) {
+    if (!resources.length) {
+        return (
             <Card className={styles.card}>
                 <CardHeader className={styles.header}>
-                    <div className={styles.titleRow}>
-                        <div className={styles.iconWrap}>
-                            <FolderOpen size={16} />
-                        </div>
-                        <h2>Resources</h2>
-                    </div>
+                    <CardTitle>Resources</CardTitle>
+                    <CardDescription>
+                        No linked resources have been added to this article yet.
+                    </CardDescription>
                 </CardHeader>
-
-                <CardContent className={styles.body}>
-                    <div className={styles.list}>
-                        {resources.map((resource) => (
-                            <a
-                                key={resource.id}
-                                href={resource.href}
-                                target="_blank"
-                                rel="noreferrer"
-                                className={styles.item}
-                            >
-                                <div className={styles.itemText}>
-                                    <strong>{resource.title}</strong>
-                                    <span>{resource.provider}</span>
-                                </div>
-                                <ExternalLink size={14} />
-                            </a>
-                        ))}
-                    </div>
-                </CardContent>
             </Card>
-        </aside>
+        );
+    }
+
+    return (
+        <Card className={styles.card}>
+            <CardHeader className={styles.header}>
+                <CardTitle>Resources for this article</CardTitle>
+                <CardDescription>
+                    Continue learning with the linked references below.
+                </CardDescription>
+            </CardHeader>
+
+            <CardContent className={styles.body}>
+                <div className={styles.list}>
+                    {resources.map((resource) => (
+                        <a
+                            key={resource.id}
+                            href={resource.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={styles.resourceLink}
+                        >
+                            <div className={styles.resourceImageWrap}>
+                                <img
+                                    src={resource.image || "/logo.png"}
+                                    alt={resource.title}
+                                    className={styles.resourceImage}
+                                    onError={(event) => {
+                                        event.currentTarget.src = "/logo.png";
+                                    }}
+                                />
+                            </div>
+
+                            <div className={styles.resourceContent}>
+                                <div className={styles.resourceTop}>
+                                    <Badge variant="outline">{resource.provider}</Badge>
+                                    <span className={styles.category}>{resource.category}</span>
+                                </div>
+
+                                <strong className={styles.resourceTitle}>
+                                    {resource.title}
+                                </strong>
+
+                                <p className={styles.resourceDescription}>
+                                    {resource.description}
+                                </p>
+
+                                <span className={styles.resourceAction}>
+                                    Open Resource <ExternalLink size={14} />
+                                </span>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
     );
 }

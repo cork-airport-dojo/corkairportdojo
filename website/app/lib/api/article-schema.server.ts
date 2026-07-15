@@ -6,7 +6,10 @@ export const createArticleSchema = z.object({
         .trim()
         .min(3, "Slug must be at least 3 characters.")
         .max(120, "Slug must be 120 characters or fewer.")
-        .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers and hyphens."),
+        .regex(
+            /^[a-z0-9-]+$/,
+            "Slug must contain only lowercase letters, numbers and hyphens."
+        ),
     title: z
         .string()
         .trim()
@@ -51,7 +54,8 @@ export const createArticleSchema = z.object({
         .refine(
             (value) =>
                 value === "" ||
-                (value.startsWith("http://") || value.startsWith("https://")),
+                value.startsWith("http://") ||
+                value.startsWith("https://"),
             "Cover image must be an http or https URL."
         )
         .optional()
@@ -62,6 +66,7 @@ export const createArticleSchema = z.object({
         .max(40, "Read time must be 40 characters or fewer.")
         .optional()
         .default(""),
+    resource_ids: z.array(z.string().uuid()).optional().default([]),
     featured: z.boolean().optional().default(false),
     published: z.boolean().optional().default(false),
 });

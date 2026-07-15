@@ -11,6 +11,7 @@ interface UpdateArticlePayload {
     author_avatar_url?: string | null;
     cover_image?: string | null;
     read_time?: string | null;
+    resource_ids?: string[];
     featured?: boolean;
     published?: boolean;
     body?: string[] | null;
@@ -34,15 +35,59 @@ function jsonResponse(
 async function getExistingArticle(articleId: string) {
     const supabase = getSupabaseAdminClient();
 
-    const { data, error } = await supabase
+    return supabase
         .from("articles")
         .select(
             "id, slug, title, excerpt, category, author_name, author_avatar_url, cover_image, read_time, featured, published, body, created_by, created_at, updated_at"
         )
         .eq("id", articleId)
         .maybeSingle();
+}
 
-    return { data, error };
+async function getArticleResourceIds(articleId: string) {
+    const supabase = getSupabaseAdminClient();
+
+    const { data, error } = await supabase
+        .from("article_resources")
+        .select("resource_id")
+        .eq("article_id", articleId);
+
+    if (error) {
+        console.error(`Failed to load article resources for "${articleId}":`, error);
+        return [];
+    }
+
+    return (data ?? [])
+        .map((row) => row.resource_id)
+        .filter(Boolean) as string[];
+}
+
+async function syncArticleResourceIds(articleId: string, resourceIds: string[]) {
+    const supabase = getSupabaseAdminClient();
+
+    const { error: deleteLinksError } = await supabase
+        .from("article_resources")
+        .delete()
+        .eq("article_id", articleId);
+
+    if (deleteLinksError) {
+        throw deleteLinksError;
+    }
+
+    if (!resourceIds.length) return;
+
+    const { error: insertLinksError } = await supabase
+        .from("article_resources")
+        .insert(
+            resourceIds.map((resourceId) => ({
+                article_id: articleId,
+                resource_id: resourceId,
+            }))
+        );
+
+    if (insertLinksError) {
+        throw insertLinksError;
+    }
 }
 
 export async function loader({
@@ -52,12 +97,12 @@ export async function loader({
     request: Request;
     params: { id?: string };
 }) {
-    const articleId = params.id;
+    const articleId = params.id?.trim();
 
     if (!articleId) {
         return jsonResponse(
             {
-                error: "ValidationFailed",
+                error: "InvalidArticleId",
                 message: "Article id is required.",
             },
             { status: 400 }
@@ -67,11 +112,9 @@ export async function loader({
     const { user, responseHeaders } = await requireRequestUser(request);
     const role = await getUserRole(user.id);
 
-    const { data: existing, error } = await getExistingArticle(articleId);
+    const { data: article, error } = await getExistingArticle(articleId);
 
-    if (error || !existing) {
-        console.error(`Failed to load article "${articleId}" for profile access:`, error);
-
+    if (error || !article) {
         return jsonResponse(
             {
                 error: "ArticleNotFound",
@@ -84,7 +127,7 @@ export async function loader({
 
     const isAdmin = role === "admin";
     const isEditor = role === "editor";
-    const isOwner = existing.created_by === user.id;
+    const isOwner = article.created_by === user.id;
 
     if (!isAdmin && !isEditor && !isOwner) {
         return jsonResponse(
@@ -97,9 +140,14 @@ export async function loader({
         );
     }
 
+    const resource_ids = await getArticleResourceIds(articleId);
+
     return jsonResponse(
         {
-            article: existing,
+            article: {
+                ...article,
+                resource_ids,
+            },
         },
         { status: 200 },
         responseHeaders
@@ -113,18 +161,19 @@ export async function action({
     request: Request;
     params: { id?: string };
 }) {
-    const method = request.method.toUpperCase();
-    const articleId = params.id;
+    const articleId = params.id?.trim();
 
     if (!articleId) {
         return jsonResponse(
             {
-                error: "ValidationFailed",
+                error: "InvalidArticleId",
                 message: "Article id is required.",
             },
             { status: 400 }
         );
     }
+
+    const method = request.method.toUpperCase();
 
     if (method === "DELETE") {
         const { user, responseHeaders } = await requireRequestUser(request);
@@ -133,8 +182,6 @@ export async function action({
         const { data: existing, error: existingError } = await getExistingArticle(articleId);
 
         if (existingError || !existing) {
-            console.error(`Failed to find article "${articleId}" for delete:`, existingError);
-
             return jsonResponse(
                 {
                     error: "ArticleNotFound",
@@ -251,6 +298,9 @@ export async function action({
         const body = Array.isArray(payload.body)
             ? payload.body.map((item) => item.trim()).filter(Boolean)
             : [];
+        const resource_ids = Array.isArray(payload.resource_ids)
+            ? payload.resource_ids.map((id) => id.trim()).filter(Boolean)
+            : [];
 
         if (!title) {
             return jsonResponse(
@@ -313,9 +363,30 @@ export async function action({
             );
         }
 
+        try {
+            await syncArticleResourceIds(articleId, resource_ids);
+        } catch (resourceError) {
+            console.error(
+                `Failed to sync article resources for "${articleId}":`,
+                resourceError
+            );
+
+            return jsonResponse(
+                {
+                    error: "ArticleResourcesUpdateFailed",
+                    message: "Unable to update linked resources.",
+                },
+                { status: 500 },
+                responseHeaders
+            );
+        }
+
         return jsonResponse(
             {
-                article: data,
+                article: {
+                    ...data,
+                    resource_ids,
+                },
             },
             { status: 200 },
             responseHeaders
@@ -325,7 +396,7 @@ export async function action({
     return jsonResponse(
         {
             error: "MethodNotAllowed",
-            message: "Only GET, PATCH, and DELETE are allowed for this endpoint.",
+            message: "Only GET, PATCH and DELETE are allowed for this endpoint.",
         },
         { status: 405 }
     );

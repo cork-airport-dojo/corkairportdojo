@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, FileText, PenSquare, RefreshCw } from "lucide-react";
 import { Link } from "react-router";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
 import { fetchArticles, type PublicArticle } from "~/lib/api/articles";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./ArticlesPage.module.scss";
@@ -9,7 +9,7 @@ import styles from "./ArticlesPage.module.scss";
 function ArticlesLoadingState() {
     return (
         <div className={styles.grid}>
-            {Array.from({ length: 6 }).map((_, index) => (
+            {Array.from({ length: 8 }).map((_, index) => (
                 <Card key={index} className={styles.card}>
                     <CardContent className={styles.cardBody}>
                         <div className={styles.skeletonCategory} />
@@ -91,29 +91,33 @@ export function ArticlesPage() {
 
     return (
         <div className={styles.page}>
-            <section className={styles.hero}>
-                <div className={styles.heroInner}>
-                    <div className={styles.heroContent}>
-                        <span className={styles.eyebrow}>Knowledge Base</span>
-                        <h1 className={styles.title}>Articles</h1>
-                        <p className={styles.description}>
-                            Explore published articles, engineering notes and practical guides
-                            from CorkAirportDojo.
-                        </p>
-                    </div>
+            <div className={styles.topLayout}>
+                <div className={styles.headerColumn}>
+                    <Card className={styles.heroCard}>
+                        <CardHeader className={styles.heroHeader}>
+                            <div className={styles.eyebrow}>Knowledge Base</div>
+                            <CardTitle className={styles.title}>Articles</CardTitle>
+                            <CardDescription className={styles.description}>
+                                Explore published articles, engineering notes and practical guides
+                                from CorkAirportDojo.
+                            </CardDescription>
+                        </CardHeader>
 
-                    {canManageContent && (
-                        <Link
-                            to="/write"
-                            className={styles.headerAction}
-                            aria-label="Create article"
-                        >
-                            <PenSquare size={16} />
-                            <span>New Article</span>
-                        </Link>
-                    )}
+                        {canManageContent && (
+                            <CardContent className={styles.heroActions}>
+                                <Link
+                                    to="/write"
+                                    className={styles.headerAction}
+                                    aria-label="Create article"
+                                >
+                                    <PenSquare size={16} />
+                                    <span>New Article</span>
+                                </Link>
+                            </CardContent>
+                        )}
+                    </Card>
                 </div>
-            </section>
+            </div>
 
             {loading && <ArticlesLoadingState />}
 
@@ -146,6 +150,9 @@ export function ArticlesPage() {
                                         <div className={styles.meta}>
                                             <span>{article.author_name ?? "CorkAirportDojo"}</span>
                                             <span>{article.read_time ?? "Article"}</span>
+                                            <span>
+                                            {(article.resources?.length ?? article?.resource_ids?.length ?? 0)} resources
+                                            </span>
                                         </div>
 
                                         <span className={styles.readMore}>

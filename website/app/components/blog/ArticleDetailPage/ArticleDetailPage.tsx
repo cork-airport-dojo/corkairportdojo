@@ -34,7 +34,7 @@ function mapArticleToPagePost(
         date: formatPublishedDate(article.created_at),
         readTime: article.read_time ?? "Article",
         image: article.cover_image ?? "/logo.png",
-        resourceIds: [],
+        resources: article.resources ?? [],
         body: Array.isArray(article.body) ? article.body : [],
         featured: article.featured,
     };

@@ -5,7 +5,6 @@ import {
     LogOut,
     Moon,
     Search,
-    Settings,
     User,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
@@ -126,10 +125,10 @@ export function Header({
                                     <span>Profile</span>
                                 </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            {/*<DropdownMenuItem>
                                 <Settings size={16} />
                                 <span>Settings</span>
-                            </DropdownMenuItem>
+                            </DropdownMenuItem>*/}
                             <DropdownMenuItem onClick={() => void handleLogout()}>
                                 <LogOut size={16} />
                                 <span>Sign out</span>

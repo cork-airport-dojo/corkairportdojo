@@ -1,3 +1,13 @@
+export interface PublicArticleResource {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    image: string;
+    provider: "Google Drive" | "OneDrive" | "GitHub" | "External";
+    href: string;
+}
+
 export interface PublicArticle {
     id: string;
     slug: string;
@@ -13,6 +23,7 @@ export interface PublicArticle {
     published: boolean;
     created_at: string;
     updated_at: string;
+    resources?: PublicArticleResource[];
 }
 
 export async function fetchArticles(): Promise<PublicArticle[]> {

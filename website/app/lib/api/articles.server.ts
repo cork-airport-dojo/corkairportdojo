@@ -5,6 +5,16 @@ import type {
 } from "~/lib/api/article-schema.server";
 import { getUserRole } from "~/lib/api/authz.server";
 
+export interface ArticleResourceRecord {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    image: string;
+    provider: "Google Drive" | "OneDrive" | "GitHub" | "External";
+    href: string;
+}
+
 export interface ArticleRecord {
     id: string;
     slug: string;
@@ -20,6 +30,107 @@ export interface ArticleRecord {
     published: boolean;
     created_at: string;
     updated_at: string;
+    resources?: ArticleResourceRecord[];
+    resource_ids?: string[];
+}
+
+async function getArticleResources(articleId: string): Promise<{
+    resources: ArticleResourceRecord[];
+    resource_ids: string[];
+}> {
+    const supabase = getSupabaseServerClient();
+
+    const { data, error } = await supabase
+        .from("article_resources")
+        .select(
+            `
+            resource_id,
+            resources (
+                id,
+                title,
+                description,
+                category,
+                image,
+                provider,
+                href
+            )
+            `
+        )
+        .eq("article_id", articleId);
+
+    if (error) {
+        console.error(`Failed to load linked resources for article "${articleId}":`, error);
+        return {
+            resources: [],
+            resource_ids: [],
+        };
+    }
+
+    const rows = data ?? [];
+
+    const resources = rows
+        .map((row) => row.resources)
+        .filter(Boolean) as ArticleResourceRecord[];
+
+    const resource_ids = rows
+        .map((row) => row.resource_id)
+        .filter(Boolean) as string[];
+
+    return {
+        resources,
+        resource_ids,
+    };
+}
+
+async function syncArticleResources(
+    articleId: string,
+    resourceIds: string[]
+) {
+    const supabase = getSupabaseAdminClient();
+
+    const { error: deleteError } = await supabase
+        .from("article_resources")
+        .delete()
+        .eq("article_id", articleId);
+
+    if (deleteError) {
+        console.error(`Failed to clear article resources for "${articleId}":`, deleteError);
+        throw new Response(
+            JSON.stringify({
+                error: "ArticleResourcesSyncFailed",
+                message: "Unable to update linked resources.",
+            }),
+            {
+                status: 500,
+                headers: { "Content-Type": "application/json" },
+            }
+        );
+    }
+
+    if (!resourceIds.length) return;
+
+    const rows = resourceIds.map((resourceId) => ({
+        article_id: articleId,
+        resource_id: resourceId,
+    }));
+
+    const { error: insertError } = await supabase
+        .from("article_resources")
+        .insert(rows);
+
+    if (insertError) {
+        console.error(`Failed to insert article resources for "${articleId}":`, insertError);
+        throw new Response(
+            JSON.stringify({
+                error: "ArticleResourcesSyncFailed",
+                message: "Unable to update linked resources.",
+            }),
+            {
+                status: 500,
+                headers: { "Content-Type": "application/json" },
+            }
+        );
+    }
 }
 
 export async function getPublishedArticles(): Promise<ArticleRecord[]> {
@@ -38,7 +149,19 @@ export async function getPublishedArticles(): Promise<ArticleRecord[]> {
         return [];
     }
 
-    return (data ?? []) as ArticleRecord[];
+    const articles = (data ?? []) as ArticleRecord[];
+
+    return Promise.all(
+        articles.map(async (article) => {
+            const linked = await getArticleResources(article.id);
+
+            return {
+                ...article,
+                resources: linked.resources,
+                resource_ids: linked.resource_ids,
+            };
+        })
+    );
 }
 
 export async function getPublishedArticleBySlug(
@@ -60,7 +183,16 @@ export async function getPublishedArticleBySlug(
         return null;
     }
 
-    return (data ?? null) as ArticleRecord | null;
+    if (!data) return null;
+
+    const article = data as ArticleRecord;
+    const linked = await getArticleResources(article.id);
+
+    return {
+        ...article,
+        resources: linked.resources,
+        resource_ids: linked.resource_ids,
+    };
 }
 
 export async function createArticle(
@@ -109,7 +241,14 @@ export async function createArticle(
         );
     }
 
-    return data as ArticleRecord;
+    await syncArticleResources(data.id, input.resource_ids ?? []);
+    const linked = await getArticleResources(data.id);
+
+    return {
+        ...(data as ArticleRecord),
+        resources: linked.resources,
+        resource_ids: linked.resource_ids,
+    };
 }
 
 export async function updateArticle(
@@ -195,5 +334,12 @@ export async function updateArticle(
         );
     }
 
-    return data as ArticleRecord;
+    await syncArticleResources(input.id, input.resource_ids ?? []);
+    const linked = await getArticleResources(input.id);
+
+    return {
+        ...(data as ArticleRecord),
+        resources: linked.resources,
+        resource_ids: linked.resource_ids,
+    };
 }
