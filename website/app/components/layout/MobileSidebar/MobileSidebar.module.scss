@@ -3,7 +3,7 @@
 .mobileOnly {
   display: none;
 
-  @include respond-down(lg) {
+  @include respond-down(xl) {
     display: inline-flex;
   }
 }
