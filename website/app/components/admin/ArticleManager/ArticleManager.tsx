@@ -57,10 +57,6 @@ export function ArticleManager() {
                             <div key={article.id} className={styles.articleItem}>
                                 <div className={styles.articleText}>
                                     <div className={styles.articleMetaRow}>
-                                        <span className={styles.badge}>
-                                            {article.category ?? "General"}
-                                        </span>
-
                                         {article.featured && (
                                             <span className={styles.badge}>Featured</span>
                                         )}
@@ -85,7 +81,7 @@ export function ArticleManager() {
                                 <div className={styles.articleActions}>
                                     <Button asChild type="button" variant="outline" size="icon">
                                         <Link
-                                            to={`/blog/${article.id}/edit`}
+                                            to={`/blog/${article.slug}/edit`}
                                             aria-label="Edit article"
                                         >
                                             <Pencil size={16} />

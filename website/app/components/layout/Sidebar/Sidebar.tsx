@@ -75,11 +75,10 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
 
     return (
         <aside
-            className={`${styles.sidebar} ${
-                collapsed ? styles.sidebarCollapsed : ""
-            }`}
+            className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""
+                }`}
         >
-            <div className={styles.logoArea}>
+            <Link to="/" className={styles.logoArea}>
                 <div className={styles.brand}>
                     <img src="/logo-mark.svg" alt="CorkAirportDojo" />
                     {!collapsed && (
@@ -89,10 +88,11 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                         </div>
                     )}
                 </div>
-            </div>
+            </Link>
 
             <div className={styles.mainSections}>
                 <nav className={styles.navSection}>
+                    <section>
                     {navItems.map((item) => {
                         const Icon = item.icon;
 
@@ -112,33 +112,35 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                             </NavLink>
                         );
                     })}
+                    </section>
+
+                    {canManageContent && (
+                        <section className={styles.quickActionsSection}>
+                            {!collapsed && <span className={styles.sectionLabel}>Quick Actions</span>}
+
+                            <div className={styles.quickActionsList}>
+                                {contentQuickActions.map((item) => {
+                                    const Icon = item.icon;
+
+                                    return (
+                                        <Link
+                                            key={item.label}
+                                            to={item.to}
+                                            className={styles.quickActionItem}
+                                            title={collapsed ? item.label : undefined}
+                                        >
+                                            <Icon size={18} />
+                                            {!collapsed && <span>{item.label}</span>}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    )}
                 </nav>
 
-                {canManageContent && (
-                    <section className={styles.quickActionsSection}>
-                        {!collapsed && <span className={styles.sectionLabel}>Quick Actions</span>}
 
-                        <div className={styles.quickActionsList}>
-                            {contentQuickActions.map((item) => {
-                                const Icon = item.icon;
-
-                                return (
-                                    <Link
-                                        key={item.label}
-                                        to={item.to}
-                                        className={styles.quickActionItem}
-                                        title={collapsed ? item.label : undefined}
-                                    >
-                                        <Icon size={18} />
-                                        {!collapsed && <span>{item.label}</span>}
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    </section>
-                )}
-
-                <section className={styles.connectSection}>
+                {/* <section className={styles.connectSection}>
                     {!collapsed && <span className={styles.sectionLabel}>Connect</span>}
 
                     <div className={styles.connectRow}>
@@ -173,115 +175,9 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
                             <Mail size={20} />
                         </a>
                     </div>
-                </section>
+                </section> */}
             </div>
 
-            <div className={styles.bottomSections}>
-                {isAuthenticated ? (
-                    !collapsed ? (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className={styles.profileCard}>
-                                    {avatarUrl ? (
-                                        <img src={avatarUrl} alt={userName} />
-                                    ) : (
-                                        <div className={styles.avatarFallback}>
-                                            {userName.slice(0, 1).toUpperCase() || "U"}
-                                        </div>
-                                    )}
-
-                                    <div className={styles.profileInfo}>
-                                        <strong>{userName}</strong>
-                                        <span>Signed in</span>
-                                        <em>View Profile</em>
-                                    </div>
-
-                                    <ChevronDown size={16} className={styles.profileChevron} />
-                                </Button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent
-                                align="end"
-                                side="top"
-                                className={styles.sidebarProfileMenu}
-                            >
-                                <DropdownMenuItem asChild>
-                                    <Link to="/profile">
-                                        <User size={16} />
-                                        <span>Profile</span>
-                                    </Link>
-                                </DropdownMenuItem>
-                                {/*<DropdownMenuItem>
-                                    <Settings size={16} />
-                                    <span>Settings</span>
-                                </DropdownMenuItem>*/}
-                                <DropdownMenuItem onClick={() => void handleLogout()}>
-                                    <LogOut size={16} />
-                                    <span>Sign out</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    ) : (
-                        <Link
-                            to="/profile"
-                            className={styles.collapsedProfileButton}
-                            aria-label="Profile"
-                            title={userName || "Profile"}
-                        >
-                            {avatarUrl ? (
-                                <img src={avatarUrl} alt={userName} />
-                            ) : (
-                                <div className={styles.avatarFallback}>
-                                    {userName.slice(0, 1).toUpperCase() || "U"}
-                                </div>
-                            )}
-                        </Link>
-                    )
-                ) : (
-                    <GitHubLoginButton
-                        redirectTo="/profile"
-                        className={`${styles.loginCta} ${collapsed ? styles.loginCtaCollapsed : ""}`}
-                        label="Sign in with GitHub"
-                        iconOnly={collapsed}
-                        title="Sign in with GitHub"
-                    />
-                )}
-
-                <div className={styles.settingsSection}>
-                    {/*{!collapsed ? (
-                        <Button type="button" variant="outline" className={styles.settingsButton}>
-                            <Settings size={18} />
-                            <span>Settings</span>
-                        </Button>
-                    ) : (
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className={styles.settingsIconButton}
-                            aria-label="Settings"
-                            title="Settings"
-                        >
-                            <Settings size={18} />
-                        </Button>
-                    )}*/}
-
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className={styles.collapseButton}
-                        onClick={onToggleCollapse}
-                        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                        title={collapsed ? "Expand sidebar" : undefined}
-                    >
-                        <ChevronLeft
-                            size={16}
-                            className={collapsed ? styles.chevronCollapsed : ""}
-                        />
-                        {!collapsed && <span>Collapse Sidebar</span>}
-                    </Button>
-                </div>
-            </div>
         </aside>
     );
 }

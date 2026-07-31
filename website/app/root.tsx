@@ -42,6 +42,7 @@ export default function App() {
             <link rel="icon" href="/favicon.ico" />
             <Meta />
             <Links />
+            <link rel="stylesheet" href="/github-markdown-dark.css" />
         </head>
         <body>
         <QueryProvider>

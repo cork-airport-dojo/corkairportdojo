@@ -1,6 +1,6 @@
+import type { LucideIcon } from "lucide-react";
 import { create } from "zustand";
-
-const NOTICES_STORAGE_KEY = "corkairportdojo-notices";
+import { supabase } from "~/lib/supabase/browser";
 
 export type NoticeSeverity = "info" | "warning" | "closure";
 
@@ -18,14 +18,14 @@ export interface ImportantNotice {
 interface NoticesState {
     notices: ImportantNotice[];
     editingNoticeId: string | null;
-    hydrate: () => void;
+    hydrate: () => Promise<void>;
     addNotice: (input: {
         message: string;
         severity: NoticeSeverity;
         pinned: boolean;
         startAt: string;
         expiresAt: string;
-    }) => void;
+    }) => Promise<void>;
     updateNotice: (
         id: string,
         input: {
@@ -35,17 +35,12 @@ interface NoticesState {
             startAt: string;
             expiresAt: string;
         }
-    ) => void;
-    removeNotice: (id: string) => void;
-    togglePinned: (id: string) => void;
+    ) => Promise<void>;
+    removeNotice: (id: string) => Promise<void>;
+    togglePinned: (id: string) => Promise<void>;
     setEditingNoticeId: (id: string | null) => void;
-    clearInactiveNotices: () => void;
+    clearInactiveNotices: () => Promise<void>;
     getVisibleNotices: () => ImportantNotice[];
-}
-
-function isValidDate(value: string) {
-    const time = new Date(value).getTime();
-    return Number.isFinite(time);
 }
 
 function normalizeSeverity(value: unknown): NoticeSeverity {
@@ -53,51 +48,18 @@ function normalizeSeverity(value: unknown): NoticeSeverity {
     return "info";
 }
 
-function normalizeNotice(raw: unknown): ImportantNotice | null {
-    if (!raw || typeof raw !== "object") return null;
-
-    const notice = raw as Partial<ImportantNotice>;
-
-    if (!notice.id || !notice.message) return null;
-    if (!notice.startAt || !notice.expiresAt) return null;
-    if (!isValidDate(notice.startAt) || !isValidDate(notice.expiresAt)) return null;
-
+// Map snake_case DB row → camelCase ImportantNotice
+function rowToNotice(row: Record<string, unknown>): ImportantNotice {
     return {
-        id: String(notice.id),
-        message: String(notice.message),
-        severity: normalizeSeverity(notice.severity),
-        pinned: Boolean(notice.pinned),
-        startAt: String(notice.startAt),
-        expiresAt: String(notice.expiresAt),
-        createdAt:
-            notice.createdAt && isValidDate(notice.createdAt)
-                ? String(notice.createdAt)
-                : new Date().toISOString(),
-        updatedAt:
-            notice.updatedAt && isValidDate(notice.updatedAt)
-                ? String(notice.updatedAt)
-                : new Date().toISOString(),
+        id: String(row.id),
+        message: String(row.message),
+        severity: normalizeSeverity(row.severity),
+        pinned: Boolean(row.pinned),
+        startAt: String(row.start_at),
+        expiresAt: String(row.expires_at),
+        createdAt: String(row.created_at),
+        updatedAt: String(row.updated_at),
     };
-}
-
-function readStoredNotices(): ImportantNotice[] {
-    const raw = localStorage.getItem(NOTICES_STORAGE_KEY);
-    if (!raw) return [];
-
-    try {
-        const parsed = JSON.parse(raw) as unknown;
-        if (!Array.isArray(parsed)) return [];
-
-        return parsed
-            .map((item) => normalizeNotice(item))
-            .filter((item): item is ImportantNotice => item !== null);
-    } catch {
-        return [];
-    }
-}
-
-function writeStoredNotices(notices: ImportantNotice[]) {
-    localStorage.setItem(NOTICES_STORAGE_KEY, JSON.stringify(notices));
 }
 
 function severityRank(severity: NoticeSeverity) {
@@ -106,102 +68,112 @@ function severityRank(severity: NoticeSeverity) {
     return 1;
 }
 
-function isNoticeVisible(notice: ImportantNotice) {
+function isNoticeVisible(notice: ImportantNotice): boolean {
     const now = Date.now();
-    const startAt = new Date(notice.startAt).getTime();
-    const expiresAt = new Date(notice.expiresAt).getTime();
-
-    return Number.isFinite(startAt) && Number.isFinite(expiresAt) && startAt <= now && expiresAt > now;
+    const start = notice.startAt ? new Date(notice.startAt).getTime() : 0;
+    const expires = notice.expiresAt ? new Date(notice.expiresAt).getTime() : Infinity;
+    return start <= now && now < expires;
 }
 
 export const useNoticesStore = create<NoticesState>((set, get) => ({
     notices: [],
     editingNoticeId: null,
 
-    hydrate: () => {
-        const stored = readStoredNotices();
-        writeStoredNotices(stored);
-        set({ notices: stored });
+    hydrate: async () => {
+        const { data, error } = await supabase
+            .from("notices")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Failed to load notices:", error.message);
+            return;
+        }
+
+        set({ notices: (data ?? []).map(rowToNotice) });
     },
 
-    addNotice: ({ message, severity, pinned, startAt, expiresAt }) => {
-        const trimmed = message.trim();
-        if (!trimmed || !isValidDate(startAt) || !isValidDate(expiresAt)) return;
+    addNotice: async ({ message, severity, pinned, startAt, expiresAt }) => {
+        const { data, error } = await supabase
+            .from("notices")
+            .insert({
+                message: message.trim(),
+                severity,
+                pinned,
+                start_at: new Date(startAt).toISOString(),
+                expires_at: new Date(expiresAt).toISOString(),
+            })
+            .select()
+            .single();
 
-        const nextNotice: ImportantNotice = {
-            id: crypto.randomUUID(),
-            message: trimmed,
-            severity,
-            pinned,
-            startAt: new Date(startAt).toISOString(),
-            expiresAt: new Date(expiresAt).toISOString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
+        if (error) throw new Error(error.message);
 
-        const next = [...get().notices, nextNotice];
-        writeStoredNotices(next);
-        set({ notices: next });
+        set((state) => ({ notices: [rowToNotice(data), ...state.notices] }));
     },
 
-    updateNotice: (id, { message, severity, pinned, startAt, expiresAt }) => {
-        const trimmed = message.trim();
-        if (!trimmed || !isValidDate(startAt) || !isValidDate(expiresAt)) return;
+    updateNotice: async (id, { message, severity, pinned, startAt, expiresAt }) => {
+        const { data, error } = await supabase
+            .from("notices")
+            .update({
+                message: message.trim(),
+                severity,
+                pinned,
+                start_at: new Date(startAt).toISOString(),
+                expires_at: new Date(expiresAt).toISOString(),
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", id)
+            .select()
+            .single();
 
-        const next = get().notices.map((notice) =>
-            notice.id === id
-                ? {
-                    ...notice,
-                    message: trimmed,
-                    severity,
-                    pinned,
-                    startAt: new Date(startAt).toISOString(),
-                    expiresAt: new Date(expiresAt).toISOString(),
-                    updatedAt: new Date().toISOString(),
-                }
-                : notice
-        );
+        if (error) throw new Error(error.message);
 
-        writeStoredNotices(next);
-        set({
-            notices: next,
+        set((state) => ({
+            notices: state.notices.map((n) => (n.id === id ? rowToNotice(data) : n)),
             editingNoticeId: null,
-        });
+        }));
     },
 
-    removeNotice: (id) => {
-        const next = get().notices.filter((notice) => notice.id !== id);
-        writeStoredNotices(next);
-        set({ notices: next });
+    removeNotice: async (id) => {
+        const { error } = await supabase.from("notices").delete().eq("id", id);
+        if (error) throw new Error(error.message);
+        set((state) => ({ notices: state.notices.filter((n) => n.id !== id) }));
     },
 
-    togglePinned: (id) => {
-        const next = get().notices.map((notice) =>
-            notice.id === id
-                ? {
-                    ...notice,
-                    pinned: !notice.pinned,
-                    updatedAt: new Date().toISOString(),
-                }
-                : notice
-        );
+    togglePinned: async (id) => {
+        const notice = get().notices.find((n) => n.id === id);
+        if (!notice) return;
 
-        writeStoredNotices(next);
-        set({ notices: next });
+        const { data, error } = await supabase
+            .from("notices")
+            .update({ pinned: !notice.pinned, updated_at: new Date().toISOString() })
+            .eq("id", id)
+            .select()
+            .single();
+
+        if (error) throw new Error(error.message);
+
+        set((state) => ({
+            notices: state.notices.map((n) => (n.id === id ? rowToNotice(data) : n)),
+        }));
     },
 
     setEditingNoticeId: (id) => set({ editingNoticeId: id }),
 
-    clearInactiveNotices: () => {
-        const now = Date.now();
+    clearInactiveNotices: async () => {
+        const now = new Date().toISOString();
+        const { error } = await supabase
+            .from("notices")
+            .delete()
+            .lt("expires_at", now);
 
-        const next = get().notices.filter((notice) => {
-            const expiresAt = new Date(notice.expiresAt).getTime();
-            return Number.isFinite(expiresAt) && expiresAt > now;
-        });
+        if (error) throw new Error(error.message);
 
-        writeStoredNotices(next);
-        set({ notices: next });
+        set((state) => ({
+            notices: state.notices.filter(
+                (n) => new Date(n.expiresAt).getTime() > Date.now()
+            ),
+        }));
     },
 
     getVisibleNotices: () => {
@@ -209,13 +181,9 @@ export const useNoticesStore = create<NoticesState>((set, get) => ({
             .filter(isNoticeVisible)
             .sort((a, b) => {
                 if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
-
                 const severityDiff = severityRank(b.severity) - severityRank(a.severity);
                 if (severityDiff !== 0) return severityDiff;
-
-                return (
-                    new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-                );
+                return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
             });
     },
 }));

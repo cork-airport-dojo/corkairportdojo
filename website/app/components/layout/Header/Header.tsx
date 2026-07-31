@@ -70,28 +70,6 @@ export function Header({
             </div>
 
             <div className={styles.actions}>
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className={styles.iconButton}
-                    aria-label="Toggle theme"
-                    title="Toggle theme"
-                >
-                    <Moon size={18} />
-                </Button>
-
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className={styles.iconButton}
-                    aria-label="Notifications"
-                    title="Notifications"
-                >
-                    <Bell size={18} />
-                    <span className={styles.badge}>2</span>
-                </Button>
 
                 {isAuthenticated ? (
                     <DropdownMenu>

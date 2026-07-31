@@ -8,7 +8,6 @@ interface ArticleCardProps {
     id: string;
     title: string;
     excerpt: string;
-    category: string;
     image: string;
     author: string;
     authorAvatarUrl?: string | null;
@@ -18,21 +17,20 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({
-                                id,
-                                title,
-                                excerpt,
-                                category,
-                                image,
-                                author,
-                                authorAvatarUrl,
-                                date,
-                                readTime,
-                                resourceCount = 0,
-                            }: ArticleCardProps) {
+    id,
+    title,
+    excerpt,
+    image,
+    author,
+    authorAvatarUrl,
+    date,
+    readTime,
+    resourceCount = 0,
+}: ArticleCardProps) {
     return (
         <Card className={styles.card}>
             <Link to={`/blog/${id}`} className={styles.cardLink}>
-                <div className={styles.imageWrap}>
+                {image ? <div className={styles.imageWrap}>
                     <img
                         src={image}
                         alt={title}
@@ -41,20 +39,9 @@ export function ArticleCard({
                             event.currentTarget.src = "/logo.png";
                         }}
                     />
-                </div>
+                </div> : <></>}
 
                 <CardContent className={styles.content}>
-                    <div className={styles.topRow}>
-                        <Badge variant="outline" className={styles.categoryBadge}>
-                            {category}
-                        </Badge>
-
-                        <div className={styles.resourceCount}>
-                            <FolderOpen size={14} />
-                            <span>{resourceCount}</span>
-                        </div>
-                    </div>
-
                     <h3 className={styles.title}>{title}</h3>
                     <p className={styles.excerpt}>
                         {excerpt || "No description provided yet."}

@@ -147,3 +147,12 @@
   align-items: center;
   cursor: pointer;
 }
+
+.moduleSelect {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+  color: var(--color-text);
+  padding: 0 12px;
+}

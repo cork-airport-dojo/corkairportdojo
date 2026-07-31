@@ -24,12 +24,6 @@ export const createArticleSchema = z.object({
     body: z
         .array(z.string().trim().min(1))
         .min(1, "Article body must contain at least one paragraph."),
-    category: z
-        .string()
-        .trim()
-        .max(80, "Category must be 80 characters or fewer.")
-        .optional()
-        .default("General"),
     author_name: z
         .string()
         .trim()

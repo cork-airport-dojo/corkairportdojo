@@ -11,10 +11,8 @@ export const createModuleSchema = z.object({
     description: z.string().trim().max(500).optional().default(""),
     topic: z.string().trim().max(120).optional().default(""),
     difficulty: z.string().trim().max(80).optional().default(""),
-    lessons: z.number().int().min(0).optional().default(0),
     featured: z.boolean().optional().default(false),
     published: z.boolean().optional().default(false),
-    views: z.number().int().min(0).optional().default(0),
     overview: z.array(z.string().trim()).optional().default([]),
 });
 

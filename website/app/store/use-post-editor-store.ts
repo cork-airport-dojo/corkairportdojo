@@ -14,7 +14,6 @@ interface HydrateArticleInput {
     articleSlug: string;
     title: string;
     description: string;
-    category: string;
     tags?: string[];
     coverImage: string;
     content: string;
@@ -29,7 +28,6 @@ interface PostEditorState extends PostEditorFormData {
     lastSavedAt: string | null;
     setTitle: (value: string) => void;
     setDescription: (value: string) => void;
-    setCategory: (value: string) => void;
     setTags: (value: string[]) => void;
     addTag: (value: string) => void;
     removeTag: (value: string) => void;
@@ -49,7 +47,6 @@ interface PostEditorState extends PostEditorFormData {
 const initialState: PostEditorFormData = {
     title: "",
     description: "",
-    category: "Web Development",
     tags: ["Next.js", "React", "TypeScript"],
     coverImage: "",
     content: "",
@@ -70,7 +67,6 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
 
     setTitle: (value) => set({ title: value }),
     setDescription: (value) => set({ description: value }),
-    setCategory: (value) => set({ category: value }),
     setTags: (value) => set({ tags: value }),
 
     addTag: (value) =>
@@ -103,7 +99,6 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
             articleSlug: input.articleSlug,
             title: input.title,
             description: input.description,
-            category: input.category,
             tags: input.tags ?? [],
             coverImage: input.coverImage,
             content: input.content,
@@ -118,7 +113,6 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
         const payload: StoredDraftPayload = {
             title: state.title,
             description: state.description,
-            category: state.category,
             tags: state.tags,
             coverImage: state.coverImage,
             content: state.content,
@@ -141,7 +135,6 @@ export const usePostEditorStore = create<PostEditorState>((set, get) => ({
             set({
                 title: parsed.title ?? "",
                 description: parsed.description ?? "",
-                category: parsed.category ?? "Web Development",
                 tags: parsed.tags ?? [],
                 coverImage: parsed.coverImage ?? "",
                 content: parsed.content ?? "",

@@ -12,7 +12,7 @@ function LatestArticlesLoadingState() {
                 <SectionHeader
                     title="Latest Articles"
                     actionLabel="View all"
-                    actionHref="/articles"
+                    actionHref="/blog" 
                 />
 
                 <div className={styles.controls}>
@@ -53,7 +53,7 @@ function LatestArticlesEmptyState() {
                 <SectionHeader
                     title="Latest Articles"
                     actionLabel="View all"
-                    actionHref="/articles"
+                    actionHref="/blog" 
                 />
             </div>
 
@@ -77,7 +77,7 @@ function LatestArticlesErrorState({ onRetry }: { onRetry: () => void }) {
                 <SectionHeader
                     title="Latest Articles"
                     actionLabel="View all"
-                    actionHref="/articles"
+                    actionHref="/blog" 
                 />
             </div>
 
@@ -133,7 +133,6 @@ export function LatestArticlesSection() {
                 id: article.slug,
                 title: article.title,
                 excerpt: article.excerpt ?? "",
-                category: article.category ?? "General",
                 image: article.cover_image ?? "/logo.png",
                 author: article.author_name ?? "CorkAirportDojo",
                 authorAvatarUrl: article.author_avatar_url ?? null,
@@ -226,7 +225,7 @@ export function LatestArticlesSection() {
                 <SectionHeader
                     title="Latest Articles"
                     actionLabel="View all"
-                    actionHref="/articles"
+                    actionHref="/blog"
                 />
 
                 <div className={styles.controls}>

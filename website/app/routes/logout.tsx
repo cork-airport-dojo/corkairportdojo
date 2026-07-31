@@ -1,16 +1,11 @@
-import { redirect } from "react-router";
-import { createRequestSupabaseServerClient } from "~/lib/supabase/auth.server";
-
-export async function loader({ request }: { request: Request }) {
-    const { supabase, responseHeaders } = createRequestSupabaseServerClient(request);
-
-    await supabase.auth.signOut();
-
-    return redirect("/", {
-        headers: responseHeaders,
-    });
-}
+import { useEffect } from "react";
+import { supabase } from "~/lib/supabase/browser";
 
 export default function LogoutRoute() {
-    return null;
+  useEffect(() => {
+    supabase.auth.signOut().then(() => {
+      window.location.assign("/");
+    });
+  }, []);
+  return null;
 }

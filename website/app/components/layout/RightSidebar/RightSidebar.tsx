@@ -28,7 +28,6 @@ import {
     getWeatherAlertIconKey,
 } from "~/lib/constants/weather-warnings";
 import { useNoticesStore, type ImportantNotice } from "~/store/use-notices-store";
-import { useModuleViewsStore } from "~/store/use-module-views-store";
 import { useCustomModulesStore } from "~/store/use-custom-modules-store";
 import { useRecentArticlesStore } from "~/store/use-recent-articles-store";
 import { getAllModules } from "~/lib/get-all-modules";
@@ -45,7 +44,7 @@ function getNoticeAccent(notice: ImportantNotice) {
             text: "#fca5a5",
             background: "rgba(239, 68, 68, 0.08)",
             border: "rgba(239, 68, 68, 0.3)",
-            icon: AlertTriangle,
+            icon: AlertTriangle as LucideIcon,
         };
     }
 
@@ -55,7 +54,7 @@ function getNoticeAccent(notice: ImportantNotice) {
             text: "#fcd34d",
             background: "rgba(245, 158, 11, 0.08)",
             border: "rgba(245, 158, 11, 0.3)",
-            icon: TriangleAlert,
+            icon: TriangleAlert as LucideIcon,
         };
     }
 
@@ -64,7 +63,7 @@ function getNoticeAccent(notice: ImportantNotice) {
         text: "#93c5fd",
         background: "rgba(59, 130, 246, 0.08)",
         border: "rgba(59, 130, 246, 0.3)",
-        icon: Info,
+        icon: Info as LucideIcon,
     };
 }
 
@@ -106,7 +105,6 @@ function formatRecentReadTime(value: string) {
 
 export function RightSidebar({ weatherAlert }: RightSidebarProps) {
     const { notices, hydrate, clearInactiveNotices, getVisibleNotices } = useNoticesStore();
-    const { views, hydrate: hydrateModuleViews, getViews } = useModuleViewsStore();
     const { modules: customModules, hydrate: hydrateCustomModules } = useCustomModulesStore();
     const {
         articles: recentArticlesState,
@@ -120,10 +118,9 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
     }, [hydrate, clearInactiveNotices]);
 
     useEffect(() => {
-        hydrateModuleViews();
         hydrateCustomModules();
         hydrateRecentArticles();
-    }, [hydrateModuleViews, hydrateCustomModules, hydrateRecentArticles]);
+    }, [hydrateCustomModules, hydrateRecentArticles]);
 
     const visibleNotices = useMemo(() => getVisibleNotices(), [notices, getVisibleNotices]);
 
@@ -131,16 +128,6 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
         () => getRecentArticles(),
         [recentArticlesState, getRecentArticles]
     );
-
-    const popularModules = useMemo(() => {
-        return getAllModules(customModules)
-            .map((module) => ({
-                ...module,
-                totalViews: getViews(module.id, module.views),
-            }))
-            .sort((a, b) => b.totalViews - a.totalViews)
-            .slice(0, 3);
-    }, [customModules, views, getViews]);
 
     const showWeatherCard = weatherAlert?.hasAlert;
     const alertAccent = getWeatherAlertAccent(weatherAlert?.level ?? null);
@@ -246,7 +233,7 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
                                             className={styles.noticeSeverityIcon}
                                             style={{ color: accent.text }}
                                         >
-                                            <NoticeIcon size={15} />
+                                            <NoticeIcon  size={15} />
                                         </div>
 
                                         <div className={styles.noticeBody}>
@@ -290,7 +277,6 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
                                 >
                                     <strong>{article.title}</strong>
                                     <div className={styles.recentMeta}>
-                                        <span>{article.category}</span>
                                         <span>{formatRecentReadTime(article.readAt)}</span>
                                     </div>
                                 </Link>
@@ -299,29 +285,6 @@ export function RightSidebar({ weatherAlert }: RightSidebarProps) {
                     </CardContent>
                 </Card>
             )}
-
-            <Card className={styles.sidebarCard}>
-                <CardHeader className={styles.cardHeader}>
-                    <RailCardHeader
-                        title="Popular Modules"
-                        action={<span className={styles.viewAll}>View all</span>}
-                    />
-                </CardHeader>
-
-                <CardContent className={styles.cardBody}>
-                    <div className={styles.moduleList}>
-                        {popularModules.map((module) => (
-                            <div key={module.id} className={styles.moduleItem}>
-                                <div className={styles.moduleIcon} />
-                                <div className={styles.moduleContent}>
-                                    <strong>{module.title}</strong>
-                                    <span>{module.totalViews} views</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     );
 }

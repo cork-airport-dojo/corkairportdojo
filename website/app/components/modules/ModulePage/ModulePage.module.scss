@@ -87,6 +87,9 @@
 .mainColumn,
 .rail {
   min-width: 0;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel {
@@ -168,5 +171,29 @@
   span {
     color: var(--color-text-secondary);
     font-size: 0.92rem;
+  }
+}
+
+// .articleGrid {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 16px;
+// }
+.articleGrid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+
+  @include respond-down(xl) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include respond-down(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include respond-down(md) {
+    grid-template-columns: 1fr;
   }
 }

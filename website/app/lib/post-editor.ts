@@ -1,7 +1,6 @@
 export interface PostEditorFormData {
     title: string;
     description: string;
-    category: string;
     tags: string[];
     coverImage: string;
     content: string;
@@ -16,11 +15,15 @@ export function stripHtml(html: string) {
 }
 
 export function calculateWordCount(input: string) {
-    const clean = stripHtml(input);
+    if (input === null) return 0
+    // const clean = stripHtml(input);
+    const clean = input;
     return clean ? clean.split(" ").length : 0;
 }
 
 export function calculateReadingTime(words: number) {
+    if (words === null) return 0
+    
     return Math.max(1, Math.ceil(words / 200));
 }
 
@@ -29,8 +32,7 @@ export function calculateSeoScore(data: PostEditorFormData) {
 
     if (data.title.trim().length >= 20) score += 20;
     if (data.description.trim().length >= 80) score += 20;
-    if (data.category.trim().length > 0) score += 15;
-    if (data.tags.length >= 3) score += 15;
+    if (data.tags.length >= 3) score += 30;
     if (data.coverImage.trim().length > 0) score += 10;
     if (calculateWordCount(data.content) >= 300) score += 20;
 

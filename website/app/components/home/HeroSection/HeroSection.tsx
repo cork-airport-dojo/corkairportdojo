@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { BookOpen, Users, PenTool, Boxes } from "lucide-react";
+import { BookOpen, Users, PenTool, Boxes, Hammer, BanknoteX } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { useHeroCTAStore } from "~/store/use-hero-cta-store";
@@ -7,25 +7,25 @@ import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./HeroSection.module.scss";
 
 const highlights = [
+    // {
+    //     icon: PenTool,
+    //     title: "Expert Writers",
+    //     description: "Industry-focused insights",
+    // },
     {
-        icon: PenTool,
-        title: "Expert Writers",
-        description: "Industry-focused insights",
+        icon: BanknoteX,
+        title: "Free service",
+        description: "There will never be a requirement for fees",
     },
     {
-        icon: Boxes,
+        icon: Hammer,
         title: "Practical Examples",
-        description: "Real-world technical learning",
-    },
-    {
-        icon: BookOpen,
-        title: "Regular Updates",
-        description: "Fresh content every week",
+        description: "Classes are taught by professionals",
     },
     {
         icon: Users,
         title: "Community Driven",
-        description: "Learn and build together",
+        description: "This is a volunteer-led initiative",
     },
 ];
 

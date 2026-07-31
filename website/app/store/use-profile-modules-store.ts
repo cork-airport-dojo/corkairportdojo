@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { supabase } from "~/lib/supabase/browser";
 
 export interface ProfileModuleRecord {
     id: string;
@@ -7,7 +8,6 @@ export interface ProfileModuleRecord {
     description: string | null;
     topic: string | null;
     difficulty: string;
-    lessons: number;
     icon_key: string | null;
     featured: boolean;
     published: boolean;
@@ -15,10 +15,6 @@ export interface ProfileModuleRecord {
     created_by: string | null;
     created_at: string;
     updated_at: string;
-}
-
-interface ProfileModulesResponse {
-    modules?: ProfileModuleRecord[];
 }
 
 interface ProfileModulesState {
@@ -32,42 +28,22 @@ interface ProfileModulesState {
 }
 
 async function fetchProfileModules(): Promise<ProfileModuleRecord[]> {
-    const response = await fetch("/api/profile/modules", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-            Accept: "application/json",
-        },
-    });
+    const { data, error } = await supabase
+        .from("modules")
+        .select("id, slug, title, description, topic, difficulty, icon_key, featured, published, overview, created_by, created_at, updated_at")
+        .order("created_at", { ascending: false });
 
-    if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as
-            | { message?: string }
-            | null;
-
-        throw new Error(payload?.message || "Failed to load profile modules.");
-    }
-
-    const payload = (await response.json()) as ProfileModulesResponse;
-    return payload.modules ?? [];
+    if (error) throw new Error(error.message);
+    return data ?? [];
 }
 
 async function deleteProfileModule(id: string): Promise<void> {
-    const response = await fetch(`/api/profile/modules/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-            Accept: "application/json",
-        },
-    });
+    const { error } = await supabase
+        .from("modules")
+        .delete()
+        .eq("id", id);
 
-    if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as
-            | { message?: string }
-            | null;
-
-        throw new Error(payload?.message || "Failed to delete module.");
-    }
+    if (error) throw new Error(error.message);
 }
 
 export const useProfileModulesStore = create<ProfileModulesState>((set) => ({
@@ -76,29 +52,16 @@ export const useProfileModulesStore = create<ProfileModulesState>((set) => ({
     error: null,
 
     hydrate: async () => {
-        set({
-            isLoading: true,
-            error: null,
-        });
-
+        set({ isLoading: true, error: null });
         try {
             const modules = await fetchProfileModules();
-
-            set({
-                modules,
-                isLoading: false,
-                error: null,
-            });
+            set({ modules, isLoading: false, error: null });
         } catch (error) {
             console.error("Failed to hydrate profile modules:", error);
-
             set({
                 modules: [],
                 isLoading: false,
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to load modules.",
+                error: error instanceof Error ? error.message : "Failed to load modules.",
             });
         }
     },
@@ -106,34 +69,14 @@ export const useProfileModulesStore = create<ProfileModulesState>((set) => ({
     removeModule: async (id: string) => {
         try {
             await deleteProfileModule(id);
-
-            set((state) => ({
-                modules: state.modules.filter((module) => module.id !== id),
-                error: null,
-            }));
+            set((state) => ({ modules: state.modules.filter((m) => m.id !== id), error: null }));
         } catch (error) {
             console.error(`Failed to delete module "${id}":`, error);
-
-            set({
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to delete module.",
-            });
-
+            set({ error: error instanceof Error ? error.message : "Failed to delete module." });
             throw error;
         }
     },
 
-    setModules: (modules) => {
-        set({
-            modules,
-        });
-    },
-
-    clearError: () => {
-        set({
-            error: null,
-        });
-    },
+    setModules: (modules) => set({ modules }),
+    clearError: () => set({ error: null }),
 }));

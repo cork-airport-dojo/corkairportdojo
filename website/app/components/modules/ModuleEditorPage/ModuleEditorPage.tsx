@@ -5,7 +5,9 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import type { ModuleDifficulty } from "~/lib/constants/modules";
+import { supabase } from "~/lib/supabase/browser";
 import styles from "./ModuleEditorPage.module.scss";
+import { fetchModuleBySlug } from "~/lib/api/modules";
 
 type ModuleStatus = "draft" | "published";
 
@@ -15,8 +17,8 @@ interface ModuleApiRecord {
     title: string;
     description: string | null;
     topic: string | null;
+    icon_key: string | null;
     difficulty: ModuleDifficulty;
-    lessons: number;
     featured: boolean;
     published: boolean;
     overview: string[];
@@ -36,99 +38,70 @@ async function createModule(payload: {
     slug: string;
     description: string;
     topic: string;
-    lessons: number;
+    icon_key: string;
     difficulty: ModuleDifficulty;
     featured: boolean;
     published: boolean;
     overview: string[];
 }) {
-    const response = await fetch("/api/profile/modules", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-    });
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
 
-    const result = (await response.json().catch(() => null)) as
-        | { message?: string; module?: ModuleApiRecord }
-        | null;
+    const { data, error } = await supabase
+        .from("modules")
+        .insert({ ...payload, created_by: user.id })
+        .select()
+        .single();
 
-    if (!response.ok) {
-        throw new Error(result?.message || "Failed to create module.");
-    }
-
-    return result?.module ?? null;
+    if (error) throw new Error(error.message);
+    return data as ModuleApiRecord;
 }
 
 async function fetchModule(id: string) {
-    const response = await fetch(`/api/profile/modules/${id}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-            Accept: "application/json",
-        },
-    });
+    const { data, error } = await supabase
+        .from("modules")
+        .select("id, slug, title, description, topic, icon_key, difficulty, featured, published, overview")
+        .eq("id", id)
+        .single();
 
-    const result = (await response.json().catch(() => null)) as
-        | { message?: string; module?: ModuleApiRecord }
-        | null;
-
-    if (!response.ok) {
-        throw new Error(result?.message || "Failed to load module.");
-    }
-
-    return result?.module ?? null;
+    if (error) throw new Error(error.message);
+    return data as ModuleApiRecord;
 }
 
-async function updateModule(
-    id: string,
-    payload: {
-        title: string;
-        slug: string;
-        description: string;
-        topic: string;
-        lessons: number;
-        difficulty: ModuleDifficulty;
-        featured: boolean;
-        published: boolean;
-        overview: string[];
-    }
-) {
-    const response = await fetch(`/api/profile/modules/${id}`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-    });
+async function updateModule(id: string, payload: {
+    title: string;
+    slug: string;
+    description: string;
+    topic: string;
+    icon_key: string;
+    difficulty: ModuleDifficulty;
+    featured: boolean;
+    published: boolean;
+    overview: string[];
+}) {
+    const { data, error } = await supabase
+        .from("modules")
+        .update(payload)
+        .eq("id", id)
+        .select()
+        .single();
 
-    const result = (await response.json().catch(() => null)) as
-        | { message?: string; module?: ModuleApiRecord }
-        | null;
-
-    if (!response.ok) {
-        throw new Error(result?.message || "Failed to update module.");
-    }
-
-    return result?.module ?? null;
+    if (error) throw new Error(error.message);
+    return data as ModuleApiRecord;
 }
 
 export function ModuleEditorPage() {
     const navigate = useNavigate();
     const params = useParams();
-    const moduleId = params.id;
-    const isEditMode = Boolean(moduleId);
+    const moduleSlug = params.slug;
+    const isEditMode = Boolean(moduleSlug);
 
+    const [id, setId] = useState("");
     const [title, setTitle] = useState("");
     const [slug, setSlug] = useState("");
     const [description, setDescription] = useState("");
     const [topic, setTopic] = useState("");
-    const [lessons, setLessons] = useState("8");
+    const [iconKey, setIconKey] = useState("");
     const [difficulty, setDifficulty] = useState<ModuleDifficulty>("Beginner");
     const [featured, setFeatured] = useState(false);
     const [status, setStatus] = useState<ModuleStatus>("draft");
@@ -145,7 +118,7 @@ export function ModuleEditorPage() {
     }, [overviewText]);
 
     useEffect(() => {
-        if (!moduleId) return;
+        if (!moduleSlug) return;
 
         let cancelled = false;
 
@@ -154,15 +127,17 @@ export function ModuleEditorPage() {
                 setIsHydrating(true);
                 setSubmitMessage(null);
 
-                const module = await fetchModule(moduleId);
+                const module = await fetchModuleBySlug(moduleSlug);
+                console.error(module)
 
                 if (!module || cancelled) return;
 
+                setId(module.id)
                 setTitle(module.title);
                 setSlug(module.slug);
                 setDescription(module.description ?? "");
                 setTopic(module.topic ?? "");
-                setLessons(String(module.lessons));
+                setIconKey(module.icon_key ?? "");
                 setDifficulty(module.difficulty);
                 setFeatured(module.featured);
                 setStatus(module.published ? "published" : "draft");
@@ -189,7 +164,7 @@ export function ModuleEditorPage() {
         return () => {
             cancelled = true;
         };
-    }, [moduleId]);
+    }, [moduleSlug]);
 
     const handleGenerateSlug = () => {
         setSlug(slugify(title));
@@ -212,15 +187,15 @@ export function ModuleEditorPage() {
                 slug: finalSlug,
                 description: description.trim(),
                 topic: topic.trim(),
-                lessons: Number(lessons),
+                icon_key: iconKey.trim(),
                 difficulty,
                 featured,
                 published: nextStatus === "published",
                 overview: overviewParagraphs,
             };
 
-            if (isEditMode && moduleId) {
-                await updateModule(moduleId, payload);
+            if (isEditMode && moduleSlug) {
+                await updateModule(id, payload);
             } else {
                 await createModule(payload);
             }
@@ -332,6 +307,22 @@ export function ModuleEditorPage() {
                                     />
                                 </div>
 
+                                <div className={styles.field}>
+                                    <label htmlFor="module-icon-key">Icon Key <span className={styles.optional}>(optional)</span></label>
+                                    <Input
+                                        id="module-icon-key"
+                                        value={iconKey}
+                                        onChange={(event) => setIconKey(event.target.value)}
+                                        placeholder="e.g. layers-3, cpu, graduation-cap"
+                                    />
+                                    <p className={styles.fieldHint}>
+                                        Find icon names at{" "}
+                                        <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer">
+                                            lucide.dev/icons
+                                        </a>
+                                    </p>
+                                </div>
+
                                 <div className={styles.grid}>
                                     <div className={styles.field}>
                                         <label htmlFor="module-topic">Topic</label>
@@ -340,17 +331,6 @@ export function ModuleEditorPage() {
                                             value={topic}
                                             onChange={(event) => setTopic(event.target.value)}
                                             placeholder="React, TypeScript, AI..."
-                                        />
-                                    </div>
-
-                                    <div className={styles.field}>
-                                        <label htmlFor="module-lessons">Lessons</label>
-                                        <Input
-                                            id="module-lessons"
-                                            type="number"
-                                            min="1"
-                                            value={lessons}
-                                            onChange={(event) => setLessons(event.target.value)}
                                         />
                                     </div>
 
@@ -479,11 +459,6 @@ export function ModuleEditorPage() {
                                     <div>
                                         <span className={styles.previewLabel}>Topic</span>
                                         <strong>{topic || "Not set"}</strong>
-                                    </div>
-
-                                    <div>
-                                        <span className={styles.previewLabel}>Lessons</span>
-                                        <strong>{lessons || "0"}</strong>
                                     </div>
 
                                     <div>

@@ -8,31 +8,28 @@ import {
     Server,
     ShieldCheck,
 } from "lucide-react";
+import { DynamicIcon } from 'lucide-react/dynamic'
 import type { ModuleItem } from "~/lib/constants/modules";
 
-export const moduleIconMap = {
-    react: Atom,
-    node: Server,
-    typescript: Boxes,
-    database: Database,
-    nextjs: Globe,
-    security: ShieldCheck,
-    ai: BrainCircuit,
-    cloud: Cloud,
-} as const;
-
-export type ModuleIconKey = keyof typeof moduleIconMap;
+// export const moduleIconMap = {
+//     react: Atom,
+//     node: Server,
+//     typescript: Boxes,
+//     database: Database,
+//     nextjs: Globe,
+//     security: ShieldCheck,
+//     ai: BrainCircuit,
+//     cloud: Cloud,
+// } as const;
 
 export interface StoredModuleItem {
     id: string;
     title: string;
     description: string;
-    lessons: number;
     difficulty: ModuleItem["difficulty"];
     topic: string;
-    iconKey: ModuleIconKey;
+    iconKey: string;
     featured: boolean;
-    views: number;
     overview: string[];
     createdAt: string;
     updatedAt: string;
@@ -43,12 +40,10 @@ export function materializeStoredModule(module: StoredModuleItem): ModuleItem {
         id: module.id,
         title: module.title,
         description: module.description,
-        lessons: module.lessons,
         difficulty: module.difficulty,
         topic: module.topic,
-        icon: moduleIconMap[module.iconKey],
+        icon_key: module.iconKey,
         featured: module.featured,
-        views: module.views,
         overview: module.overview,
     };
 }

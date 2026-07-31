@@ -132,9 +132,6 @@ export function ArticlesPage() {
                             <Link to={`/blog/${article.slug}`} className={styles.cardLink}>
                                 <CardContent className={styles.cardBody}>
                                     <div className={styles.cardTop}>
-                                        <span className={styles.category}>
-                                            {article.category ?? "General"}
-                                        </span>
                                         {article.featured && (
                                             <span className={styles.featuredBadge}>Featured</span>
                                         )}

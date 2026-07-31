@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { ArticlePage, type ArticlePagePost } from "~/components/blog/ArticlePage/ArticlePage";
 import { fetchArticleBySlug } from "~/lib/api/articles";
 import styles from "./ArticleDetailPage.module.scss";
+import { useProfileModulesStore } from "~/store/use-profile-modules-store";
 
 interface ArticleDetailPageProps {
     slug: string;
@@ -27,7 +28,6 @@ function mapArticleToPagePost(
     return {
         id: article.slug,
         title: article.title,
-        category: article.category ?? "General",
         excerpt: article.excerpt ?? "",
         author: article.author_name ?? "CorkAirportDojo",
         authorAvatarUrl: article.author_avatar_url ?? null,
@@ -35,8 +35,10 @@ function mapArticleToPagePost(
         readTime: article.read_time ?? "Article",
         image: article.cover_image ?? "/logo.png",
         resources: article.resources ?? [],
-        body: Array.isArray(article.body) ? article.body : [],
+        markdown: article.markdown ?? "",
         featured: article.featured,
+        moduleId: article.module ?? undefined,
+        slug: article.slug,
     };
 }
 

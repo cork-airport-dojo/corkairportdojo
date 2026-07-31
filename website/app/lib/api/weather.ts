@@ -1,12 +1,17 @@
-import type { CorkWeatherAlert } from "~/lib/constants/weather-warnings";
+import {
+    getCorkWeatherAlert,
+    getDojoClosureNotice,
+    type CorkWeatherAlert,
+    type DojoClosureNotice,
+} from "~/lib/constants/weather-warnings";
 
-export async function fetchWeather(): Promise<CorkWeatherAlert | null> {
-    const response = await fetch("/api/weather");
+export interface WeatherAlertData {
+    weatherAlert: CorkWeatherAlert | null;
+    closureNotice: DojoClosureNotice | null;
+}
 
-    if (!response.ok) {
-        throw new Error("Failed to fetch weather");
-    }
-
-    const payload = (await response.json()) as { weather?: CorkWeatherAlert | null };
-    return payload.weather ?? null;
+export async function fetchWeatherAlertData(): Promise<WeatherAlertData> {
+    const weatherAlert = await getCorkWeatherAlert();
+    const closureNotice = getDojoClosureNotice(weatherAlert);
+    return { weatherAlert, closureNotice };
 }

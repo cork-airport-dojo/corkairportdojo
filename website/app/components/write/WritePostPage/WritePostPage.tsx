@@ -13,8 +13,8 @@ import {
     updateArticleRequest,
 } from "~/lib/api/article-create";
 import { fetchResources, type ResourceRecord } from "~/lib/api/resources";
-import { uploadArticleCoverImage } from "~/lib/api/storage";
-import { dataUrlToFile } from "~/lib/image";
+import { fetchModules, type PublicModule } from "~/lib/api/modules";
+import { supabase } from "~/lib/supabase/browser";
 import { useAuthStore } from "~/store/use-auth-store";
 import { usePostEditorStore } from "~/store/use-post-editor-store";
 import { useEditorShortcuts } from "~/hooks/use-editor-shortcuts";
@@ -45,15 +45,15 @@ interface ArticleApiRecord {
     slug: string;
     title: string;
     excerpt: string | null;
-    category: string | null;
     author_name: string | null;
     author_avatar_url: string | null;
     cover_image: string | null;
     read_time: string | null;
     featured: boolean;
     published: boolean;
-    body: string[];
-    resource_ids?: string[];
+    markdown: string;
+    resources: { resource_id: string }[];
+    module: string | null;
 }
 
 function htmlToParagraphs(content: string) {
@@ -67,31 +67,22 @@ function paragraphsToEditorContent(paragraphs: string[]) {
     return paragraphs.join("\n\n");
 }
 
-async function fetchArticleById(id: string) {
-    const response = await fetch(`/api/profile/articles/${id}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-            Accept: "application/json",
-        },
-    });
+async function fetchArticleBySlugForEdit(slug: string) {
+    const { data, error } = await supabase
+        .from("articles")
+        .select("id, slug, title, excerpt, markdown, author_name, author_avatar_url, cover_image, read_time, featured, published, module, resources:article_resources(resource_id)")
+        .eq("slug", slug)
+        .maybeSingle();
 
-    const result = (await response.json().catch(() => null)) as
-        | { message?: string; article?: ArticleApiRecord }
-        | null;
-
-    if (!response.ok) {
-        throw new Error(result?.message || "Failed to load article.");
-    }
-
-    return result?.article ?? null;
+    if (error) throw new Error(error.message);
+    return data as ArticleApiRecord | null;
 }
 
 export function WritePostPage() {
     const navigate = useNavigate();
     const params = useParams();
-    const articleIdFromRoute = params.id;
-    const isEditMode = Boolean(articleIdFromRoute);
+    const articleSlugFromRoute = params.postId;
+    const isEditMode = Boolean(articleSlugFromRoute);
 
     const titleInputRef = useRef<HTMLInputElement>(null);
     const editorAnchorRef = useRef<HTMLDivElement>(null);
@@ -104,12 +95,13 @@ export function WritePostPage() {
     const [availableResources, setAvailableResources] = useState<ResourceRecord[]>([]);
     const [resourceSearch, setResourceSearch] = useState("");
     const [resourcePickerOpen, setResourcePickerOpen] = useState(false);
+    const [moduleId, setModuleId] = useState<string>("");
+    const [availableModules, setAvailableModules] = useState<PublicModule[]>([]);
 
     const {
         articleId,
         title,
         description,
-        category,
         tags,
         coverImage,
         content,
@@ -119,7 +111,6 @@ export function WritePostPage() {
         lastSavedAt,
         setTitle,
         setDescription,
-        setCategory,
         addTag,
         removeTag,
         setCoverImage,
@@ -140,16 +131,23 @@ export function WritePostPage() {
         const loadResources = async () => {
             try {
                 const resources = await fetchResources();
-
-                if (!cancelled) {
-                    setAvailableResources(resources.filter((resource) => resource.active));
-                }
+                if (!cancelled) setAvailableResources(resources.filter((r) => r.active));
             } catch (error) {
                 console.error("Failed to load resources for article editor:", error);
             }
         };
 
+        const loadModules = async () => {
+            try {
+                const modules = await fetchModules();
+                if (!cancelled) setAvailableModules(modules);
+            } catch (error) {
+                console.error("Failed to load modules for article editor:", error);
+            }
+        };
+
         void loadResources();
+        void loadModules();
 
         return () => {
             cancelled = true;
@@ -160,7 +158,7 @@ export function WritePostPage() {
         let cancelled = false;
 
         const hydrateEditor = async () => {
-            if (!articleIdFromRoute) {
+            if (!articleSlugFromRoute) {
                 resetEditor();
                 setSelectedResourceIds([]);
                 setIsHydrating(false);
@@ -172,7 +170,7 @@ export function WritePostPage() {
                 setIsHydrating(true);
                 setPageError(null);
 
-                const article = await fetchArticleById(articleIdFromRoute);
+                const article = await fetchArticleBySlugForEdit(articleSlugFromRoute);
 
                 if (!article || cancelled) return;
 
@@ -181,17 +179,15 @@ export function WritePostPage() {
                     articleSlug: article.slug,
                     title: article.title,
                     description: article.excerpt ?? "",
-                    category: article.category ?? "General",
                     tags: [],
                     coverImage: article.cover_image ?? "",
-                    content: paragraphsToEditorContent(
-                        Array.isArray(article.body) ? article.body : []
-                    ),
+                    content: article.markdown,
                     markdownMode: false,
                     status: article.published ? "published" : "draft",
                 });
 
-                setSelectedResourceIds(article.resource_ids ?? []);
+                setSelectedResourceIds((article.resources ?? []).map((r) => r.resource_id));
+                setModuleId(article.module ?? "");
             } catch (error) {
                 console.error("Failed to hydrate article editor:", error);
 
@@ -214,7 +210,7 @@ export function WritePostPage() {
         return () => {
             cancelled = true;
         };
-    }, [articleIdFromRoute, hydrateFromArticle, resetEditor]);
+    }, [articleSlugFromRoute, hydrateFromArticle, resetEditor]);
 
     useEffect(() => {
         if (isHydrating) return;
@@ -229,7 +225,6 @@ export function WritePostPage() {
         articleId,
         title,
         description,
-        category,
         tags,
         coverImage,
         content,
@@ -246,14 +241,13 @@ export function WritePostPage() {
             calculateSeoScore({
                 title,
                 description,
-                category,
                 tags,
                 coverImage,
                 content,
                 markdownMode,
                 status,
             }),
-        [title, description, category, tags, coverImage, content, markdownMode, status]
+        [title, description, tags, coverImage, content, markdownMode, status]
     );
 
     const filteredResources = useMemo(() => {
@@ -297,42 +291,32 @@ export function WritePostPage() {
                 throw new Error("Please enter a title before saving.");
             }
 
-            const paragraphs = htmlToParagraphs(content);
+            // const paragraphs = htmlToParagraphs(content);
 
-            if (!paragraphs.length) {
-                throw new Error("Please add article content before saving.");
-            }
+            // if (!paragraphs.length) {
+            //     throw new Error("Please add article content before saving.");
+            // }
 
-            let resolvedCoverImage = coverImage.trim();
-
-            if (resolvedCoverImage.startsWith("data:image/")) {
-                if (!user?.id) {
-                    throw new Error("You must be signed in to upload an image.");
-                }
-
-                const file = dataUrlToFile(resolvedCoverImage, "article-cover.png");
-                const upload = await uploadArticleCoverImage(file, user.id);
-                resolvedCoverImage = upload.publicUrl;
-            }
+            const resolvedCoverImage = coverImage.trim();
 
             const payload = {
                 slug: generatedSlug,
                 title: title.trim(),
                 excerpt: description.trim(),
-                body: paragraphs,
-                category: category.trim() || "General",
+                markdown: content,
                 author_name: userName || "CorkAirportDojo",
                 author_avatar_url: avatarUrl || "",
                 cover_image: resolvedCoverImage,
                 read_time: `${readingTime} min read`,
                 featured: false,
                 resource_ids: selectedResourceIds,
+                module: moduleId || null,
                 published,
             };
 
-            if (articleIdFromRoute) {
+            if (articleSlugFromRoute) {
                 return updateArticleRequest({
-                    id: articleIdFromRoute,
+                    id: articleId!,
                     ...payload,
                 });
             }
@@ -353,8 +337,8 @@ export function WritePostPage() {
                 return;
             }
 
-            if (!articleIdFromRoute) {
-                navigate(`/blog/${article.id}/edit`, { replace: true });
+            if (!articleSlugFromRoute) {
+                navigate(`/blog/${article.slug}/edit`, { replace: true });
             }
         },
     });
@@ -426,14 +410,12 @@ export function WritePostPage() {
                             <PostEditorCard
                                 title={title}
                                 description={description}
-                                category={category}
                                 tags={tags}
                                 coverImage={coverImage}
                                 content={content}
                                 markdownMode={markdownMode}
                                 onTitleChange={setTitle}
                                 onDescriptionChange={setDescription}
-                                onCategoryChange={setCategory}
                                 onAddTag={addTag}
                                 onRemoveTag={removeTag}
                                 onCoverImageChange={setCoverImage}
@@ -444,6 +426,29 @@ export function WritePostPage() {
                         </div>
 
                         <div className={styles.sidebar}>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Module</CardTitle>
+                                    <CardDescription>
+                                        Optionally scope this article to a module.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <select
+                                        className={styles.moduleSelect}
+                                        value={moduleId}
+                                        onChange={(e) => setModuleId(e.target.value)}
+                                    >
+                                        <option value="">None</option>
+                                        {availableModules.map((m) => (
+                                            <option key={m.id} value={m.id}>
+                                                {m.title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </CardContent>
+                            </Card>
+
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Linked Resources</CardTitle>

@@ -12,7 +12,6 @@ const CUSTOM_MODULES_STORAGE_KEY = "corkairportdojo-custom-modules";
 interface CreateModuleInput {
     title: string;
     description: string;
-    lessons: number;
     difficulty: ModuleItem["difficulty"];
     topic: string;
     iconKey: ModuleIconKey;
@@ -72,12 +71,10 @@ export const useCustomModulesStore = create<CustomModulesState>((set, get) => ({
             id: nextId,
             title,
             description,
-            lessons: Number(input.lessons) || 0,
             difficulty: input.difficulty,
             topic: input.topic.trim(),
             iconKey: input.iconKey,
             featured: input.featured,
-            views: 0,
             overview,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -101,7 +98,6 @@ export const useCustomModulesStore = create<CustomModulesState>((set, get) => ({
                     ...module,
                     title,
                     description,
-                    lessons: Number(input.lessons) || 0,
                     difficulty: input.difficulty,
                     topic: input.topic.trim(),
                     iconKey: input.iconKey,

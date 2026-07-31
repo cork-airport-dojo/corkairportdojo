@@ -52,7 +52,6 @@ export function ProfilePage() {
     const bio =
         metadata.bio ||
         "Signed in with GitHub. Your account information is now linked to CorkAirportDojo.";
-    const location = metadata.location || "Location not provided";
 
     const stats = useMemo(
         () => [
@@ -83,10 +82,6 @@ export function ProfilePage() {
                         <p className={styles.bio}>{bio}</p>
 
                         <div className={styles.metaRow}>
-                            <span>
-                                <MapPin size={14} />
-                                {location}
-                            </span>
                             <span>
                                 <Mail size={14} />
                                 {email}
@@ -156,24 +151,6 @@ export function ProfilePage() {
                             </div>
                         </CardContent>
                     </Card>
-
-                    <Card className={styles.panel}>
-                        <CardHeader className={styles.panelHeader}>
-                            <div className={styles.panelTitleRow}>
-                                <div className={styles.panelIcon}>
-                                    <FileText size={16} />
-                                </div>
-                                <h2>Profile Summary</h2>
-                            </div>
-                        </CardHeader>
-                        <CardContent className={styles.panelBody}>
-                            <p className={styles.summaryText}>
-                                Your CorkAirportDojo profile is now using live GitHub account
-                                information from your authenticated session instead of static
-                                placeholder data.
-                            </p>
-                        </CardContent>
-                    </Card>
                 </div>
 
                 <aside className={styles.rail}>
@@ -192,22 +169,6 @@ export function ProfilePage() {
                                 <span className={styles.badge}>GitHub OAuth</span>
                                 {isAdmin && <span className={styles.badge}>Admin</span>}
                             </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className={styles.panel}>
-                        <CardHeader className={styles.panelHeader}>
-                            <div className={styles.panelTitleRow}>
-                                <div className={styles.panelIcon}>
-                                    <Award size={16} />
-                                </div>
-                                <h2>Account Source</h2>
-                            </div>
-                        </CardHeader>
-                        <CardContent className={styles.panelBody}>
-                            <p className={styles.summaryText}>
-                                Profile identity is sourced from GitHub through Supabase Auth.
-                            </p>
                         </CardContent>
                     </Card>
                 </aside>
