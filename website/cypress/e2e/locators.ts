@@ -6,4 +6,19 @@ const navigation = {
   navOpen: 'button[aria-label="Open navigation"]', //smaller screen
 };
 
-export default { navigation };
+const homepage = {
+  heroTitle: "h1",
+  mainCta: 'a[href*="/modules"]',
+  articleViewAll: 'a[href*="/articles"]',
+  featureSection: "section.features",
+  featuredTitle: "section h2",
+  popularModulesCard: "div[data-slot=card]",
+  popularModulesTitle: "div[data-slot=card] h3",
+  popularModulesList: "div[data-slot=card-content] strong",
+};
+
+const modules = {
+  heroTitle: "span[class*='eyebrow']",
+};
+
+export default { navigation, homepage, modules };
