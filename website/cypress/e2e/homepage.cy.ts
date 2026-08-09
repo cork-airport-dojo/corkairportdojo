@@ -2,14 +2,11 @@ import locators from "./locators";
 
 describe("Homepage Tests", () => {
   beforeEach(() => {
-    // Clear localStorage before each test to prevent hydration mismatch (Project Standard)
     cy.clearLocalStorage();
-    // Visit the root page
     cy.visit("/");
   });
 
   it("should load the homepage successfully", () => {
-    // Use a small wait for initial rendering if needed
     cy.wait(100);
 
     cy.get("header").find("[data-slot='input']").should("be.visible");
