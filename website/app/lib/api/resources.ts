@@ -43,13 +43,30 @@ export async function fetchResources(): Promise<ResourceRecord[]> {
     return data ?? [];
 }
 
-export async function fetchResourcesForModule(module_id: string): Promise<ResourceRecord[]> {
-        const { data, error } = await supabase
+interface FetchResourcesOptions {
+    page?: number;
+    pageSize?: number;
+}
+
+export async function fetchResourcesForModule(
+    module_id: string,
+    options?: FetchResourcesOptions,
+): Promise<ResourceRecord[]> {
+    let query = supabase
         .from("resources")
         .select("*")
         .eq("active", true)
         .eq("module", module_id)
         .order("created_at", { ascending: false });
+
+    if (options?.pageSize) {
+        const page = options.page && options.page > 0 ? options.page : 1;
+        const from = (page - 1) * options.pageSize;
+        const to = from + options.pageSize - 1;
+        query = query.range(from, to);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw new Error(error.message);
     return data ?? [];

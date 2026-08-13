@@ -133,7 +133,7 @@ export function LatestArticlesSection() {
                 id: article.slug,
                 title: article.title,
                 excerpt: article.excerpt ?? "",
-                image: article.cover_image ?? "/logo.png",
+                image: article.cover_image ?? "/logo.webp",
                 author: article.author_name ?? "CorkAirportDojo",
                 authorAvatarUrl: article.author_avatar_url ?? null,
                 date: new Date(article.created_at).toLocaleDateString("en-IE", {

@@ -1,13 +1,3 @@
-import {
-    Atom,
-    Boxes,
-    BrainCircuit,
-    Cloud,
-    Database,
-    Globe,
-    Server,
-    ShieldCheck,
-} from "lucide-react";
 import type { IconName } from "lucide-react/dynamic";
 
 export type ModuleDifficulty = "Beginner" | "Intermediate" | "Advanced";

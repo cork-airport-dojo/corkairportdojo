@@ -1,7 +1,9 @@
+@use "../../../styles/abstracts/breakpoints" as *;
+
 .sidebar {
   position: sticky;
   top: 0;
-  width: 200px;
+  width: var(--layout-sidebar-width);
   min-height: 100vh;
   max-height: 100vh;
   padding: 8px;
@@ -431,4 +433,11 @@
   font-size: 0.9rem;
   font-weight: 700;
   flex-shrink: 0;
+}
+
+.mobileLogin {
+  display: none;
+  @include respond-down(lg) {
+    display: block;
+  }
 }

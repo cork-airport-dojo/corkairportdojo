@@ -1,0 +1,39 @@
+.main {
+  margin: auto;
+  max-width: 37em;
+  font-size: 18px;
+  line-height: 1.25;
+
+  text-align: justify;
+
+  & a {
+    color: lightskyblue;
+  }
+}
+
+.main h1 {
+  text-align: center;
+}
+
+.main img {
+  margin: auto;
+  max-height: 40dvh;
+}
+ 
+.imageWrapper {
+  position: relative;
+}
+
+.imageWrapper>img {
+  width: 150%;
+  left: 37.5%;
+  transform: translateX(-37.5%);
+ 
+  max-height: none;
+  position: absolute;
+}
+
+.teamImage {
+  background-color: #161616;
+  padding: 2%;
+}

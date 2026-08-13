@@ -1,31 +1,19 @@
 import { useEffect } from "react";
 import {
     BookOpen,
-    ChevronDown,
-    ChevronLeft,
     Home,
     Info,
     Layers3,
     PenSquare,
     User,
-    LogOut,
     FolderOpen,
     CalendarPlus,
     FolderPlus,
-    Mail,
 } from "lucide-react";
-import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { NavLink, Link, useNavigate } from "react-router";
-import { Button } from "~/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { GitHubLoginButton } from "~/components/auth/GitHubLoginButton/GitHubLoginButton";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./Sidebar.module.scss";
+import LoginDropdown from "~/components/LoginDropdown/LoginDropdown";
 
 const publicNavItems = [
     { to: "/", label: "Home", icon: Home, end: true },
@@ -46,10 +34,10 @@ const contentQuickActions = [
 
 interface SidebarProps {
     collapsed: boolean;
-    onToggleCollapse: () => void;
+    // onToggleCollapse: () => void;
 }
 
-export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
+export function Sidebar({ collapsed }: SidebarProps) {
     const navigate = useNavigate();
     const {
         isAuthenticated,
@@ -74,110 +62,80 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
     };
 
     return (
-        <aside
-            className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""
-                }`}
-        >
-            <Link to="/" className={styles.logoArea}>
-                <div className={styles.brand}>
-                    <img src="/logo-mark.svg" alt="CorkAirportDojo" />
-                    {!collapsed && (
-                        <div>
-                            <span className={styles.brandTitle}>CorkAirportDojo</span>
-                            <span className={styles.brandSubtitle}>Learn. Build. Grow.</span>
-                        </div>
-                    )}
+      <aside
+        className={`${styles.sidebar} ${
+          collapsed ? styles.sidebarCollapsed : ""
+        }`}
+      >
+        <Link to="/" className={styles.logoArea}>
+          <div className={styles.brand}>
+            <img src="/logo-mark.svg" alt="CorkAirportDojo" />
+            {!collapsed && (
+              <div>
+                <span className={styles.brandTitle}>CorkAirportDojo</span>
+                <span className={styles.brandSubtitle}>
+                  Learn. Build. Grow.
+                </span>
+              </div>
+            )}
+          </div>
+        </Link>
+
+        <div className={styles.mainSections}>
+          <nav className={styles.navSection}>
+            <section>
+              {navItems.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <NavLink
+                    key={item.label}
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) =>
+                      `${styles.navItem} ${isActive ? styles.navItemActive : ""}`
+                    }
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <span className={styles.navItemAccent} />
+                    <Icon size={20} />
+                    {!collapsed && <span>{item.label}</span>}
+                  </NavLink>
+                );
+              })}
+            </section>
+
+            {canManageContent && (
+              <section className={styles.quickActionsSection}>
+                {!collapsed && (
+                  <span className={styles.sectionLabel}>Quick Actions</span>
+                )}
+
+                <div className={styles.quickActionsList}>
+                  {contentQuickActions.map((item) => {
+                    const Icon = item.icon;
+
+                    return (
+                      <Link
+                        key={item.label}
+                        to={item.to}
+                        className={styles.quickActionItem}
+                        title={collapsed ? item.label : undefined}
+                      >
+                        <Icon size={18} />
+                        {!collapsed && <span>{item.label}</span>}
+                      </Link>
+                    );
+                  })}
                 </div>
-            </Link>
+              </section>
+            )}
 
-            <div className={styles.mainSections}>
-                <nav className={styles.navSection}>
-                    <section>
-                    {navItems.map((item) => {
-                        const Icon = item.icon;
-
-                        return (
-                            <NavLink
-                                key={item.label}
-                                to={item.to}
-                                end={item.end}
-                                className={({ isActive }) =>
-                                    `${styles.navItem} ${isActive ? styles.navItemActive : ""}`
-                                }
-                                title={collapsed ? item.label : undefined}
-                            >
-                                <span className={styles.navItemAccent} />
-                                <Icon size={20} />
-                                {!collapsed && <span>{item.label}</span>}
-                            </NavLink>
-                        );
-                    })}
-                    </section>
-
-                    {canManageContent && (
-                        <section className={styles.quickActionsSection}>
-                            {!collapsed && <span className={styles.sectionLabel}>Quick Actions</span>}
-
-                            <div className={styles.quickActionsList}>
-                                {contentQuickActions.map((item) => {
-                                    const Icon = item.icon;
-
-                                    return (
-                                        <Link
-                                            key={item.label}
-                                            to={item.to}
-                                            className={styles.quickActionItem}
-                                            title={collapsed ? item.label : undefined}
-                                        >
-                                            <Icon size={18} />
-                                            {!collapsed && <span>{item.label}</span>}
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        </section>
-                    )}
-                </nav>
-
-
-                {/* <section className={styles.connectSection}>
-                    {!collapsed && <span className={styles.sectionLabel}>Connect</span>}
-
-                    <div className={styles.connectRow}>
-                        <a
-                            href="https://github.com/SentinelMurphy"
-                            target="_blank"
-                            rel="noreferrer"
-                            className={styles.connectButton}
-                            aria-label="GitHub"
-                            title="GitHub"
-                        >
-                            <FiGithub size={20} />
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/"
-                            target="_blank"
-                            rel="noreferrer"
-                            className={styles.connectButton}
-                            aria-label="LinkedIn"
-                            title="LinkedIn"
-                        >
-                            <FiLinkedin size={20} />
-                        </a>
-
-                        <a
-                            href="mailto:hello@corkairportdojo.com"
-                            className={styles.connectButton}
-                            aria-label="Email"
-                            title="Email"
-                        >
-                            <Mail size={20} />
-                        </a>
-                    </div>
-                </section> */}
+            <div className={styles.mobileLogin}>
+              <LoginDropdown />
             </div>
-
-        </aside>
+          </nav>
+        </div>
+      </aside>
     );
 }

@@ -1,4 +1,4 @@
-import { ExternalLink, Files, MoreVertical, Pencil, Trash2, Users } from "lucide-react";
+import { ExternalLink, Files, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import type { ResourceRecord } from "~/lib/api/resources";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
@@ -34,7 +34,7 @@ export function ResourceCard({
                             alt={resource.title}
                             className={styles.logo}
                             onError={(event) => {
-                                event.currentTarget.src = "/logo.png";
+                                event.currentTarget.src = "/logo.webp";
                             }}
                         />}
                     </div>

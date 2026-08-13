@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { ArticlePage, type ArticlePagePost } from "~/components/blog/ArticlePage/ArticlePage";
 import { fetchArticleBySlug } from "~/lib/api/articles";
 import styles from "./ArticleDetailPage.module.scss";
-import { useProfileModulesStore } from "~/store/use-profile-modules-store";
 
 interface ArticleDetailPageProps {
     slug: string;
@@ -33,7 +32,7 @@ function mapArticleToPagePost(
         authorAvatarUrl: article.author_avatar_url ?? null,
         date: formatPublishedDate(article.created_at),
         readTime: article.read_time ?? "Article",
-        image: article.cover_image ?? "/logo.png",
+        image: article.cover_image ?? "/logo.webp",
         resources: article.resources ?? [],
         markdown: article.markdown ?? "",
         featured: article.featured,
@@ -45,7 +44,7 @@ function mapArticleToPagePost(
 function LoadingState() {
     return (
         <div className={styles.stateWrap}>
-            <Card className={styles.stateCard}>
+            {/* <Card className={styles.stateCard}>
                 <CardContent className={styles.stateBody}>
                     <div className={styles.skeletonCategory} />
                     <div className={styles.skeletonTitle} />
@@ -56,7 +55,7 @@ function LoadingState() {
                     <div className={styles.skeletonText} />
                     <div className={styles.skeletonTextShort} />
                 </CardContent>
-            </Card>
+            </Card> */}
         </div>
     );
 }

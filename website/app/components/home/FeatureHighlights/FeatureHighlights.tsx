@@ -1,27 +1,22 @@
-import { BookOpen, Layers3, PenTool, Users } from "lucide-react";
+import { BookOpen, PenTool, Users } from "lucide-react";
 import styles from "./FeatureHighlights.module.scss";
 
 const items = [
-    {
-        icon: PenTool,
-        title: "Expert Writers",
-        description: "Industry-focused insights",
-    },
-    {
-        icon: Layers3,
-        title: "Practical Examples",
-        description: "Real-world technical learning",
-    },
-    {
-        icon: BookOpen,
-        title: "Regular Updates",
-        description: "Fresh content every week",
-    },
-    {
-        icon: Users,
-        title: "Community Driven",
-        description: "Learn and build together",
-    },
+  {
+    icon: PenTool,
+    title: "Expert Writers",
+    description: "Industry-focused insights",
+  },
+  {
+    icon: BookOpen,
+    title: "Regular Updates",
+    description: "Fresh content every week",
+  },
+  {
+    icon: Users,
+    title: "Community Driven",
+    description: "Learn and build together",
+  },
 ];
 
 export function FeatureHighlights() {

@@ -157,8 +157,13 @@
     font-size: 0.92rem;
     font-weight: 600;
   }
+
 }
 
+div[data-highlighted] {
+  background-color: #fff1;
+  border: 1px solid white;
+}
 .optional {
   color: var(--color-text-muted);
   font-size: 0.82rem;

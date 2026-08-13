@@ -3,7 +3,7 @@
 .mobileOnly {
   display: none;
 
-  @include respond-down(xl) {
+  @include respond-down(lg) {
     display: inline-flex;
   }
 }
@@ -15,10 +15,11 @@
   background: var(--color-surface);
   color: var(--color-text);
   border-radius: 0 !important;
+  cursor: pointer;
 }
 
 .sheetContent {
-  width: 260px !important;
+  width: var(--layout-sidebar-width);
   padding: 0 !important;
   border-radius: 0 !important;
   border-right: 1px solid var(--color-border) !important;

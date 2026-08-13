@@ -1,9 +1,6 @@
 import { useEffect, useMemo } from "react";
 import {
-    Award,
-    FileText,
     Mail,
-    MapPin,
     ShieldCheck,
     UserCircle2,
 } from "lucide-react";

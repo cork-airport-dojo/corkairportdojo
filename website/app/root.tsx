@@ -43,8 +43,10 @@ export default function App() {
             <Meta />
             <Links />
             <link rel="stylesheet" href="/github-markdown-dark.css" />
+            <link rel="stylesheet" href="/starry-night-dark.css" />
+            
         </head>
-        <body>
+        <body className="dark">
         <QueryProvider>
             <AppBoot />
         </QueryProvider>

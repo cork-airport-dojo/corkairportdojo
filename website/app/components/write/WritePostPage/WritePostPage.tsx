@@ -17,7 +17,7 @@ import { fetchModules, type PublicModule } from "~/lib/api/modules";
 import { supabase } from "~/lib/supabase/browser";
 import { useAuthStore } from "~/store/use-auth-store";
 import { usePostEditorStore } from "~/store/use-post-editor-store";
-import { useEditorShortcuts } from "~/hooks/use-editor-shortcuts";
+// import { useEditorShortcuts } from "~/hooks/use-editor-shortcuts";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -37,7 +37,7 @@ import { Badge } from "~/components/ui/badge";
 import { PostEditorHeader } from "../PostEditorHeader/PostEditorHeader";
 import { PostEditorCard } from "../PostEditorCard/PostEditorCard";
 import { PostEditorSidebar } from "../PostEditorSidebar/PostEditorSidebar";
-import { CommandPalette } from "../CommandPalette/CommandPalette";
+// import { CommandPalette } from "../CommandPalette/CommandPalette";
 import styles from "./WritePostPage.module.scss";
 
 interface ArticleApiRecord {
@@ -54,17 +54,6 @@ interface ArticleApiRecord {
     markdown: string;
     resources: { resource_id: string }[];
     module: string | null;
-}
-
-function htmlToParagraphs(content: string) {
-    return content
-        .split(/\n{2,}/)
-        .map((chunk) => chunk.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim())
-        .filter(Boolean);
-}
-
-function paragraphsToEditorContent(paragraphs: string[]) {
-    return paragraphs.join("\n\n");
 }
 
 async function fetchArticleBySlugForEdit(slug: string) {
@@ -87,7 +76,7 @@ export function WritePostPage() {
     const titleInputRef = useRef<HTMLInputElement>(null);
     const editorAnchorRef = useRef<HTMLDivElement>(null);
 
-    const { user, userName, avatarUrl } = useAuthStore();
+    const { userName, avatarUrl } = useAuthStore();
     const [isHydrating, setIsHydrating] = useState(isEditMode);
     const [pageError, setPageError] = useState<string | null>(null);
 
@@ -107,7 +96,7 @@ export function WritePostPage() {
         content,
         markdownMode,
         status,
-        commandPaletteOpen,
+        // commandPaletteOpen,
         lastSavedAt,
         setTitle,
         setDescription,
@@ -118,10 +107,10 @@ export function WritePostPage() {
         setMarkdownMode,
         setStatus,
         saveDraft,
-        clearDraft,
+        // clearDraft,
         resetEditor,
         hydrateFromArticle,
-        setCommandPaletteOpen,
+        // setCommandPaletteOpen,
         setArticleIdentity,
     } = usePostEditorStore();
 
@@ -357,27 +346,27 @@ export function WritePostPage() {
         setMarkdownMode(!markdownMode);
     };
 
-    const handleOpenCommandPalette = () => setCommandPaletteOpen(true);
-    const handleCloseCommandPalette = () => setCommandPaletteOpen(false);
+    // const handleOpenCommandPalette = () => setCommandPaletteOpen(true);
+    // const handleCloseCommandPalette = () => setCommandPaletteOpen(false);
 
-    useEditorShortcuts({
-        onSaveDraft: handleSaveDraft,
-        onPublish: handlePublish,
-        onToggleCommandPalette: handleOpenCommandPalette,
-    });
+    // useEditorShortcuts({
+    //     onSaveDraft: handleSaveDraft,
+    //     onPublish: handlePublish,
+    //     // onToggleCommandPalette: handleOpenCommandPalette,
+    // });
 
-    useEffect(() => {
-        const onEsc = (event: KeyboardEvent) => {
-            if (event.key === "Escape") handleCloseCommandPalette();
-        };
+    // useEffect(() => {
+    //     const onEsc = (event: KeyboardEvent) => {
+    //         // if (event.key === "Escape") handleCloseCommandPalette();
+    //     };
 
-        window.addEventListener("keydown", onEsc);
-        return () => window.removeEventListener("keydown", onEsc);
-    }, []);
+    //     window.addEventListener("keydown", onEsc);
+    //     return () => window.removeEventListener("keydown", onEsc);
+    // }, []);
 
     return (
         <>
-            <CommandPalette
+            {/* <CommandPalette
                 open={commandPaletteOpen}
                 onClose={handleCloseCommandPalette}
                 onSaveDraft={handleSaveDraft}
@@ -391,7 +380,7 @@ export function WritePostPage() {
                     })
                 }
                 onClearDraft={clearDraft}
-            />
+            /> */}
 
             <div className={styles.page}>
                 <PostEditorHeader isEditMode={isEditMode} />

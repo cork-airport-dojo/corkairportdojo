@@ -78,7 +78,7 @@ export function ModuleManager() {
                                 <div className={styles.moduleActions}>
                                     <Button asChild type="button" variant="outline" size="icon">
                                         <Link
-                                            to={`/modules/${module.id}/edit`}
+                                            to={`/modules/${module.slug}/edit`}
                                             aria-label="Edit module"
                                         >
                                             <Pencil size={16} />

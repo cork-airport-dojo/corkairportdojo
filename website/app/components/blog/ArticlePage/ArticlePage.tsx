@@ -7,6 +7,7 @@ import { fetchModuleById, type PublicModule } from "~/lib/api/modules";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import ArticleView from "../ArticleView/ArticleView";
+import ScrollProgressBar from "./ScrollProgressBar";
 
 export interface ArticleLinkedResource {
     id: string;
@@ -56,18 +57,17 @@ export function ArticlePage({ post }: ArticlePageProps) {
             })()
         }
 
-    }, [addArticle, post.id, post.title]);
+    }, [addArticle, post.id, post.moduleId, post.title]);
 
     return (
         <div className={styles.page}>
+            <ScrollProgressBar />
 
             {module &&
                 <div>
-                    {/* <span className={styles.badge}> */}
                     <Button size="sm" className="p-0" variant="link">
                         <Link to={`/modules/${module.slug}`}>{module.title}</Link>
                     </Button>
-                    {/* </span> */}
                     /{post.slug}
                 </div>
 
@@ -77,16 +77,14 @@ export function ArticlePage({ post }: ArticlePageProps) {
                     <h1 className={styles.title}>{post.title}</h1>
 
                     <div className={styles.coverCard}>
-                        {post.image ?
-                            <img
-                                src={post.image}
-                                alt={post.title}
-                                className={styles.coverImage}
-                                onError={(event) => {
-                                    event.currentTarget.src = "/logo.png";
-                                }}
-                            />
-                            : <></>}
+                        <img
+                            src={post.image ? post.image : '/logo.webp'}
+                            alt={post.title}
+                            className={styles.coverImage}
+                            onError={(event) => {
+                                event.currentTarget.src = "/logo.webp";
+                            }}
+                        />
                     </div>
 
                     <p className={styles.excerpt}>{post.excerpt}</p>
@@ -94,11 +92,11 @@ export function ArticlePage({ post }: ArticlePageProps) {
                     <div className={styles.metaRow}>
                         <div className={styles.authorRow}>
                             <img
-                                src={post.authorAvatarUrl || "/logo.png"}
+                                src={post.authorAvatarUrl || "/logo.webp"}
                                 alt={post.author}
                                 className={styles.avatar}
                                 onError={(event) => {
-                                    event.currentTarget.src = "/logo.png";
+                                    event.currentTarget.src = "/logo.webp";
                                 }}
                             />
                             <div className={styles.authorMeta}>
@@ -126,10 +124,10 @@ export function ArticlePage({ post }: ArticlePageProps) {
                 <main className={styles.main}>
                     <ArticleView content={post.markdown ?? ""} />
                 </main>
-
-                <aside className={styles.aside}>
-                    {linkedResources.length > 0 && <ArticleResourcesAside resources={linkedResources} />}
-                </aside>
+                {linkedResources.length > 0 &&
+                    <aside className={styles.aside}>
+                        <ArticleResourcesAside resources={linkedResources} />
+                    </aside>}
             </div>
         </div>
     );

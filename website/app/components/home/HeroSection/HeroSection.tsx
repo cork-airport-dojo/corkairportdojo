@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { BookOpen, Users, PenTool, Boxes, Hammer, BanknoteX } from "lucide-react";
+import { Users, BanknoteX } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { useHeroCTAStore } from "~/store/use-hero-cta-store";
@@ -7,20 +7,10 @@ import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./HeroSection.module.scss";
 
 const highlights = [
-    // {
-    //     icon: PenTool,
-    //     title: "Expert Writers",
-    //     description: "Industry-focused insights",
-    // },
     {
         icon: BanknoteX,
         title: "Free service",
         description: "There will never be a requirement for fees",
-    },
-    {
-        icon: Hammer,
-        title: "Practical Examples",
-        description: "Classes are taught by professionals",
     },
     {
         icon: Users,
@@ -28,17 +18,6 @@ const highlights = [
         description: "This is a volunteer-led initiative",
     },
 ];
-
-function isGitHubSignInButton(label: string, href: string) {
-    const normalizedLabel = label.trim().toLowerCase();
-    const normalizedHref = href.trim().toLowerCase();
-
-    return (
-        normalizedHref === "/login" ||
-        normalizedLabel === "sign in with github" ||
-        normalizedLabel === "register next term"
-    );
-}
 
 export function HeroSection() {
     const { buttons, hydrate, getVisibleButtons } = useHeroCTAStore();
@@ -56,14 +35,14 @@ export function HeroSection() {
             <div className={styles.content}>
                 <div className={styles.copy}>
                     <h1 className={styles.title}>
-                        Code it.<span>Break it.</span>
+                        Code it. <span>Break it.</span>
                         <br />
                         Build it better.
                     </h1>
 
                     <p className={styles.description}>
-                        Practical articles, structured modules and real-world lessons for
-                        developers who want to sharpen how they build, debug and learn.
+                        A structured learning environment for young developers 
+                        to begin coding and to sharpen their skills.
                     </p>
 
                     <div className={styles.actions}>
@@ -74,11 +53,6 @@ export function HeroSection() {
                                     : button.variant === "secondary"
                                         ? "secondary"
                                         : "default";
-
-                            const shouldRenderGitHubSignIn =
-                                !isAuthenticated &&
-                                isGitHubSignInButton(button.label, button.href);
-
 
                             return (
                                 <Button
@@ -112,7 +86,7 @@ export function HeroSection() {
                 </div>
 
                 <div className={styles.visual}>
-                    <img src="/logo.png" alt="CorkAirportDojo hero visual" />
+                    <img src="/logo.webp" alt="CorkAirportDojo hero visual" />
                 </div>
             </div>
         </section>

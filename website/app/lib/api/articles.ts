@@ -28,12 +28,26 @@ export interface PublicArticle {
     resources?: PublicArticleResource[];
 }
 
-export async function fetchArticles(): Promise<PublicArticle[]> {
-    const { data, error } = await supabase
+interface FetchArticlesOptions {
+    page?: number;
+    pageSize?: number;
+}
+
+export async function fetchArticles(options?: FetchArticlesOptions): Promise<PublicArticle[]> {
+    let query = supabase
         .from("articles")
         .select("*, resources:article_resources(resource:resources(*))")
         .eq("published", true)
         .order("created_at", { ascending: false });
+
+    if (options?.pageSize) {
+        const page = options.page && options.page > 0 ? options.page : 1;
+        const from = (page - 1) * options.pageSize;
+        const to = from + options.pageSize - 1;
+        query = query.range(from, to);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(normalizeArticle);
@@ -52,13 +66,25 @@ export async function fetchArticleBySlug(slug: string): Promise<PublicArticle | 
     return normalizeArticle(data);
 }
 
-export async function fetchArticlesForModule(module_id: string): Promise<PublicArticle[]> {
-    const { data, error } = await supabase
+export async function fetchArticlesForModule(
+    module_id: string,
+    options?: FetchArticlesOptions,
+): Promise<PublicArticle[]> {
+    let query = supabase
         .from("articles")
         .select("*, resources:article_resources(resource:resources(*))")
         .eq("published", true)
         .eq("module", module_id)
         .order("created_at", { ascending: false });
+
+    if (options?.pageSize) {
+        const page = options.page && options.page > 0 ? options.page : 1;
+        const from = (page - 1) * options.pageSize;
+        const to = from + options.pageSize - 1;
+        query = query.range(from, to);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw new Error(error.message);
     return (data ?? []).map(normalizeArticle);
@@ -68,6 +94,6 @@ export async function fetchArticlesForModule(module_id: string): Promise<PublicA
 function normalizeArticle(row: Record<string, unknown>): PublicArticle {
     const rawResources = (row.resources ?? []) as { resource: PublicArticleResource }[];
     const resources = rawResources.map((r) => r.resource).filter(Boolean);
-    const { resources: _raw, ...rest } = row as PublicArticle & { resources: unknown };
+    const { ...rest } = row as PublicArticle & { resources: unknown };
     return { ...rest, resources };
 }

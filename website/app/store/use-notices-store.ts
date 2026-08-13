@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import { create } from "zustand";
 import { supabase } from "~/lib/supabase/browser";
 

@@ -1,5 +1,4 @@
 import { Link } from "react-router";
-import { BookOpen } from "lucide-react";
 import type { ModuleDifficulty } from "~/lib/constants/modules";
 import { Card, CardContent } from "~/components/ui/card";
 import styles from "./ModuleCard.module.scss";

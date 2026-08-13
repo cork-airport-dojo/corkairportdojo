@@ -1,26 +1,5 @@
-import {
-    Atom,
-    Boxes,
-    BrainCircuit,
-    Cloud,
-    Database,
-    Globe,
-    Server,
-    ShieldCheck,
-} from "lucide-react";
-import { DynamicIcon } from 'lucide-react/dynamic'
+import type { IconName } from "lucide-react/dynamic";
 import type { ModuleItem } from "~/lib/constants/modules";
-
-// export const moduleIconMap = {
-//     react: Atom,
-//     node: Server,
-//     typescript: Boxes,
-//     database: Database,
-//     nextjs: Globe,
-//     security: ShieldCheck,
-//     ai: BrainCircuit,
-//     cloud: Cloud,
-// } as const;
 
 export interface StoredModuleItem {
     id: string;
@@ -42,7 +21,7 @@ export function materializeStoredModule(module: StoredModuleItem): ModuleItem {
         description: module.description,
         difficulty: module.difficulty,
         topic: module.topic,
-        icon_key: module.iconKey,
+        icon_key: module.iconKey as IconName,
         featured: module.featured,
         overview: module.overview,
     };

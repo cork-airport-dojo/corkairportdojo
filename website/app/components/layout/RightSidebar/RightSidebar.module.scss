@@ -5,6 +5,7 @@
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  --card-spacing: 0;
 }
 
 .sidebarCard {
@@ -12,6 +13,12 @@
   background: #151922;
   box-shadow: none;
   border-radius: 0 !important;
+}
+
+.recentlyRead {
+  @include respond-down(xl) {
+    display: none;
+  }
 }
 
 .cardHeader {
@@ -101,6 +108,7 @@
 .weatherLink {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
   color: var(--color-brand-blue);
   font-size: 0.95rem;
@@ -207,10 +215,13 @@
 }
 
 .noticePanel {
-  display: flex;
-  align-items: flex-start;
-  padding: 12px;
+  padding: 8px;
   border: 1px solid;
+}
+
+.noticeHeader {
+  display: flex;
+  align-items: center;
 }
 
 .noticeSeverityIcon {
@@ -239,7 +250,7 @@
 .noticeBadges {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
