@@ -76,7 +76,7 @@ export function ArticleCard({
                 <CardContent className={styles.content}>
                     <h3 className={styles.title}>{title}</h3>
                     <p className={styles.excerpt}>
-                        <Truncated length={200}>
+                        <Truncated length={150}>
                         {excerpt || "No description provided yet."}
                         </Truncated>
                     </p>

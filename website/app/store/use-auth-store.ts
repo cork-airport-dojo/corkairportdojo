@@ -81,7 +81,6 @@ export const useAuthStore = create<AuthState>((set) => ({
             } = await supabase.auth.getUser();
 
             if (error) {
-                console.error("Failed to hydrate auth user:", error);
                 set({
                     isAuthenticated: false,
                     isLoading: false,

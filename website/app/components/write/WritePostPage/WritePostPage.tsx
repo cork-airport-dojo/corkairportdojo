@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router";
 import { Check, ChevronDown, FolderOpen, Search, X } from "lucide-react";
 import {
     calculateReadingTime,
-    calculateSeoScore,
     calculateWordCount,
     createSlug,
 } from "~/lib/post-editor";
@@ -224,20 +223,6 @@ export function WritePostPage() {
 
     const wordCount = useMemo(() => calculateWordCount(content), [content]);
     const readingTime = useMemo(() => calculateReadingTime(wordCount), [wordCount]);
-
-    const seoScore = useMemo(
-        () =>
-            calculateSeoScore({
-                title,
-                description,
-                tags,
-                coverImage,
-                content,
-                markdownMode,
-                status,
-            }),
-        [title, description, tags, coverImage, content, markdownMode, status]
-    );
 
     const filteredResources = useMemo(() => {
         const query = resourceSearch.trim().toLowerCase();
@@ -601,7 +586,6 @@ export function WritePostPage() {
                             <PostEditorSidebar
                                 wordCount={wordCount}
                                 readingTime={readingTime}
-                                seoScore={seoScore}
                                 status={status}
                                 lastSavedAt={lastSavedAt}
                                 markdownMode={markdownMode}

@@ -24,7 +24,7 @@ interface ModuleApiRecord {
   difficulty: ModuleDifficulty;
   featured: boolean;
   published: boolean;
-  overview: string[];
+  overview: string;
 }
 
 function slugify(value: string) {
@@ -45,7 +45,7 @@ async function createModule(payload: {
   difficulty: ModuleDifficulty;
   featured: boolean;
   published: boolean;
-  overview: string[];
+  overview: string;
 }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
@@ -69,7 +69,7 @@ async function updateModule(id: string, payload: {
   difficulty: ModuleDifficulty;
   featured: boolean;
   published: boolean;
-  overview: string[];
+  overview: string;
 }) {
   const { data, error } = await supabase
     .from("modules")
@@ -112,13 +112,6 @@ export function ModuleEditorPage() {
     const rest = iconNames.filter((name) => !name.startsWith(q) && name.includes(q));
     return [...prefix, ...rest].slice(0, ICON_VISIBLE_LIMIT);
   }, [iconSearch]);
-
-  const overviewParagraphs = useMemo(() => {
-    return overviewText
-      .split("\n")
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }, [overviewText]);
 
   useEffect(() => {
     if (!moduleSlug) return;
@@ -193,7 +186,7 @@ export function ModuleEditorPage() {
         difficulty: difficulty ?? "Beginner",
         featured,
         published: nextStatus === "published",
-        overview: overviewParagraphs,
+        overview: overviewText,
       };
 
       if (isEditMode && moduleSlug) {
@@ -475,13 +468,6 @@ export function ModuleEditorPage() {
                   <div>
                     <span className={styles.previewLabel}>Topic</span>
                     <strong>{topic || "Not set"}</strong>
-                  </div>
-
-                  <div>
-                    <span className={styles.previewLabel}>
-                      Overview paragraphs
-                    </span>
-                    <strong>{overviewParagraphs.length}</strong>
                   </div>
                 </div>
               </CardContent>

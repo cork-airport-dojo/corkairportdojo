@@ -122,9 +122,7 @@ export function ModulePage({ module }: ModulePageProps) {
 
                         <CardContent className={styles.panelBody}>
                             <div className={styles.prose}>
-                                {module.overview.map((paragraph) => (
-                                    <p key={paragraph}>{paragraph}</p>
-                                ))}
+                                {module.overview}
                             </div>
                         </CardContent>
                     </Card>

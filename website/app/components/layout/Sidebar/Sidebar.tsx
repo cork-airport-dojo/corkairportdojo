@@ -29,7 +29,7 @@ const contentQuickActions = [
     { to: "/write", label: "Create Article", icon: PenSquare },
     { to: "/modules/new", label: "Create Module", icon: Layers3 },
     { to: "/resources", label: "Add Resource", icon: FolderPlus },
-    { to: "/profile", label: "Create Event", icon: CalendarPlus },
+    { to: "/profile#events", label: "Create Event", icon: CalendarPlus },
 ];
 
 interface SidebarProps {

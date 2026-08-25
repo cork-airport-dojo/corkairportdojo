@@ -14,12 +14,8 @@ export function RichTextEditor({
     onChange,
 }: RichTextEditorProps) {
 
-    const [content, setContent] = useState('')
+    const [content, setContent] = useState(value)
     const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-    useLayoutEffect(() => {
-        setContent(value ?? "")
-    }, [value])
 
     useEffect(() => {onChange(content)}, [content])
 
