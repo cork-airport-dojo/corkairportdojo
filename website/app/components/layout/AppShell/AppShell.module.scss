@@ -6,13 +6,13 @@
 }
 
 .layout {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   grid-template-columns: var(--layout-sidebar-width) minmax(0, 1fr);
   transition: grid-template-columns var(--transition-base);
 
-  @include respond-down(xl) {
-    grid-template-columns: 1fr;
+  @include respond-down(lg) {
+    display: flex;
   }
 }
 
@@ -25,12 +25,13 @@
 }
 
 .sidebarColumn {
-  min-width: 0;
+  display: block;
+  width: var(--layout-sidebar-width);
   min-height: 100vh;
   border-right: 1px solid var(--color-border);
 
-  @include respond-down(xl) {
-    display: none;
+  @include respond-down(lg) {
+    display: none !important;
   }
 }
 
@@ -90,12 +91,14 @@
 }
 
 .aside {
-  min-width: 0;
   position: sticky;
   top: 108px;
   align-self: start;
 
   @include respond-down(xl) {
-    display: none;
+    order: -1;
+    position: relative;
+    top: 0;
+    width: 100%;
   }
 }

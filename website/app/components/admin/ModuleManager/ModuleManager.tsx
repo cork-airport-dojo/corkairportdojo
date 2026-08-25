@@ -73,17 +73,12 @@ export function ModuleManager() {
                                     {module.description && (
                                         <span>{module.description}</span>
                                     )}
-
-                                    <div className={styles.secondaryMeta}>
-                                        {module.topic && <span>{module.topic}</span>}
-                                        <span>{module.lessons} lessons</span>
-                                    </div>
                                 </div>
 
                                 <div className={styles.moduleActions}>
                                     <Button asChild type="button" variant="outline" size="icon">
                                         <Link
-                                            to={`/modules/${module.id}/edit`}
+                                            to={`/modules/${module.slug}/edit`}
                                             aria-label="Edit module"
                                         >
                                             <Pencil size={16} />

@@ -75,7 +75,7 @@
 
 .contentLayout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  // grid-template-columns: minmax(0, 1fr) 320px;
   gap: 24px;
   align-items: start;
 
@@ -87,7 +87,11 @@
 .mainColumn,
 .rail {
   min-width: 0;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
 }
+
 
 .panel {
   border: 1px solid var(--color-border);
@@ -96,11 +100,13 @@
 
 .panelHeader {
   padding-bottom: 0 !important;
+  display: flex;
 }
 
 .panelTitleRow {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
 
   h2 {
@@ -109,6 +115,12 @@
     font-size: 1.05rem;
     font-weight: 700;
   }
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .panelIcon {
@@ -120,6 +132,16 @@
   align-items: center;
   justify-content: center;
   color: var(--color-text-secondary);
+}
+
+.toggleView {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggleView button[data-state="checked"] {
+  background-color: white;
 }
 
 .panelBody {
@@ -169,4 +191,58 @@
     color: var(--color-text-secondary);
     font-size: 0.92rem;
   }
+}
+
+.articleGrid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+
+  @include respond-down(2xl) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include respond-down(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include respond-down(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.articleList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resourceGrid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+
+  @include respond-down(2xl) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include respond-down(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include respond-down(md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resourceList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pagination {
+  margin-top: 4px;
 }

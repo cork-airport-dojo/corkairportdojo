@@ -1,11 +1,11 @@
 import { create } from "zustand";
+import { supabase } from "~/lib/supabase/browser";
 
 export interface ProfileArticleRecord {
     id: string;
     slug: string;
     title: string;
     excerpt: string | null;
-    category: string | null;
     author_name: string | null;
     read_time: string | null;
     featured: boolean;
@@ -13,10 +13,6 @@ export interface ProfileArticleRecord {
     created_by: string | null;
     created_at: string;
     updated_at: string;
-}
-
-interface ProfileArticlesResponse {
-    articles?: ProfileArticleRecord[];
 }
 
 interface ProfileArticlesState {
@@ -30,42 +26,22 @@ interface ProfileArticlesState {
 }
 
 async function fetchProfileArticles(): Promise<ProfileArticleRecord[]> {
-    const response = await fetch("/api/profile/articles", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-            Accept: "application/json",
-        },
-    });
+    const { data, error } = await supabase
+        .from("articles")
+        .select("id, slug, title, excerpt, author_name, read_time, featured, published, created_by, created_at, updated_at")
+        .order("created_at", { ascending: false });
 
-    if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as
-            | { message?: string }
-            | null;
-
-        throw new Error(payload?.message || "Failed to load profile articles.");
-    }
-
-    const payload = (await response.json()) as ProfileArticlesResponse;
-    return payload.articles ?? [];
+    if (error) throw new Error(error.message);
+    return data ?? [];
 }
 
 async function deleteProfileArticle(id: string): Promise<void> {
-    const response = await fetch(`/api/profile/articles/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-            Accept: "application/json",
-        },
-    });
+    const { error } = await supabase
+        .from("articles")
+        .delete()
+        .eq("id", id);
 
-    if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as
-            | { message?: string }
-            | null;
-
-        throw new Error(payload?.message || "Failed to delete article.");
-    }
+    if (error) throw new Error(error.message);
 }
 
 export const useProfileArticlesStore = create<ProfileArticlesState>((set) => ({
@@ -74,29 +50,16 @@ export const useProfileArticlesStore = create<ProfileArticlesState>((set) => ({
     error: null,
 
     hydrate: async () => {
-        set({
-            isLoading: true,
-            error: null,
-        });
-
+        set({ isLoading: true, error: null });
         try {
             const articles = await fetchProfileArticles();
-
-            set({
-                articles,
-                isLoading: false,
-                error: null,
-            });
+            set({ articles, isLoading: false, error: null });
         } catch (error) {
             console.error("Failed to hydrate profile articles:", error);
-
             set({
                 articles: [],
                 isLoading: false,
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to load articles.",
+                error: error instanceof Error ? error.message : "Failed to load articles.",
             });
         }
     },
@@ -104,34 +67,14 @@ export const useProfileArticlesStore = create<ProfileArticlesState>((set) => ({
     removeArticle: async (id: string) => {
         try {
             await deleteProfileArticle(id);
-
-            set((state) => ({
-                articles: state.articles.filter((article) => article.id !== id),
-                error: null,
-            }));
+            set((state) => ({ articles: state.articles.filter((a) => a.id !== id), error: null }));
         } catch (error) {
             console.error(`Failed to delete article "${id}":`, error);
-
-            set({
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to delete article.",
-            });
-
+            set({ error: error instanceof Error ? error.message : "Failed to delete article." });
             throw error;
         }
     },
 
-    setArticles: (articles) => {
-        set({
-            articles,
-        });
-    },
-
-    clearError: () => {
-        set({
-            error: null,
-        });
-    },
+    setArticles: (articles) => set({ articles }),
+    clearError: () => set({ error: null }),
 }));

@@ -27,23 +27,24 @@ function mapArticleToPagePost(
     return {
         id: article.slug,
         title: article.title,
-        category: article.category ?? "General",
         excerpt: article.excerpt ?? "",
         author: article.author_name ?? "CorkAirportDojo",
         authorAvatarUrl: article.author_avatar_url ?? null,
         date: formatPublishedDate(article.created_at),
         readTime: article.read_time ?? "Article",
-        image: article.cover_image ?? "/logo.png",
+        image: article.cover_image ?? "/logo.webp",
         resources: article.resources ?? [],
-        body: Array.isArray(article.body) ? article.body : [],
+        markdown: article.markdown ?? "",
         featured: article.featured,
+        moduleId: article.module ?? undefined,
+        slug: article.slug,
     };
 }
 
 function LoadingState() {
     return (
         <div className={styles.stateWrap}>
-            <Card className={styles.stateCard}>
+            {/* <Card className={styles.stateCard}>
                 <CardContent className={styles.stateBody}>
                     <div className={styles.skeletonCategory} />
                     <div className={styles.skeletonTitle} />
@@ -54,7 +55,7 @@ function LoadingState() {
                     <div className={styles.skeletonText} />
                     <div className={styles.skeletonTextShort} />
                 </CardContent>
-            </Card>
+            </Card> */}
         </div>
     );
 }

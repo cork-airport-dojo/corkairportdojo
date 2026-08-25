@@ -1,4 +1,4 @@
-import { ExternalLink, Files, MoreVertical, Pencil, Trash2, Users } from "lucide-react";
+import { ExternalLink, Files, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import type { ResourceRecord } from "~/lib/api/resources";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
@@ -29,14 +29,14 @@ export function ResourceCard({
             <CardContent className={styles.content}>
                 <div className={styles.headerRow}>
                     <div className={styles.logoWrap}>
-                        <img
+                        {resource.image && <img
                             src={resource.image}
                             alt={resource.title}
                             className={styles.logo}
                             onError={(event) => {
-                                event.currentTarget.src = "/logo.png";
+                                event.currentTarget.src = "/logo.webp";
                             }}
-                        />
+                        />}
                     </div>
 
                     <div className={styles.headerMeta}>
@@ -78,25 +78,14 @@ export function ResourceCard({
 
                 <p className={styles.description}>{resource.description}</p>
 
-                <div className={styles.usageMeta}>
-                    <span>0 B used</span>
-                    <div className={styles.progressTrack}>
-                        <div className={styles.progressBar} />
-                    </div>
-                </div>
-
                 <div className={styles.footerRow}>
-                    <div className={styles.metaItem}>
-                        <Users size={14} />
-                        <span>0</span>
-                    </div>
 
                     <div className={styles.metaItem}>
                         <Files size={14} />
                         <span>{resource.provider}</span>
                     </div>
 
-                    <Button asChild variant="outline" size="sm" className={styles.link}>
+                    <Button asChild variant="outline" size="sm" className={`${styles.link} ${styles.gradientBtn}`}>
                         <a href={resource.href} target="_blank" rel="noreferrer">
                             <span>Open</span>
                             <ExternalLink size={14} />

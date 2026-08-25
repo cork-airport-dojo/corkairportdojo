@@ -1,8 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Clock3, FolderOpen } from "lucide-react";
 import { ArticleResourcesAside } from "~/components/resources/ArticleResourcesAside/ArticleResourcesAside";
 import { useRecentArticlesStore } from "~/store/use-recent-articles-store";
 import styles from "./ArticlePage.module.scss";
+import { fetchModuleById, type PublicModule } from "~/lib/api/modules";
+import { Link } from "react-router";
+import { Button } from "~/components/ui/button";
+import ArticleView from "../ArticleView/ArticleView";
+import ScrollProgressBar from "./ScrollProgressBar";
 
 export interface ArticleLinkedResource {
     id: string;
@@ -17,16 +22,17 @@ export interface ArticleLinkedResource {
 export interface ArticlePagePost {
     id: string;
     title: string;
-    category: string;
     excerpt: string;
     author: string;
     authorAvatarUrl?: string | null;
     date: string;
+    slug: string;
     readTime: string;
     image: string;
     featured?: boolean;
     resources?: ArticleLinkedResource[];
-    body: string[];
+    markdown?: string;
+    moduleId?: string;
 }
 
 interface ArticlePageProps {
@@ -36,32 +42,61 @@ interface ArticlePageProps {
 export function ArticlePage({ post }: ArticlePageProps) {
     const linkedResources = post.resources ?? [];
     const { addArticle } = useRecentArticlesStore();
+    const [module, setModule] = useState<PublicModule | undefined>(undefined)
 
     useEffect(() => {
         addArticle({
             id: post.id,
             title: post.title,
-            category: post.category,
             href: `/blog/${post.id}`,
         });
-    }, [addArticle, post.id, post.title, post.category]);
+
+        if (post.moduleId !== undefined) {
+            (async () => {
+                setModule(await fetchModuleById(post.moduleId!) ?? undefined)
+            })()
+        }
+
+    }, [addArticle, post.id, post.moduleId, post.title]);
 
     return (
         <div className={styles.page}>
+            <ScrollProgressBar />
+
+            {module &&
+                <div>
+                    <Button size="sm" className="p-0" variant="link">
+                        <Link to={`/modules/${module.slug}`}>{module.title}</Link>
+                    </Button>
+                    /{post.slug}
+                </div>
+
+            }
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
-                    <span className={styles.category}>{post.category}</span>
                     <h1 className={styles.title}>{post.title}</h1>
+
+                    <div className={styles.coverCard}>
+                        <img
+                            src={post.image ? post.image : '/logo.webp'}
+                            alt={post.title}
+                            className={styles.coverImage}
+                            onError={(event) => {
+                                event.currentTarget.src = "/logo.webp";
+                            }}
+                        />
+                    </div>
+
                     <p className={styles.excerpt}>{post.excerpt}</p>
 
                     <div className={styles.metaRow}>
                         <div className={styles.authorRow}>
                             <img
-                                src={post.authorAvatarUrl || "/logo.png"}
+                                src={post.authorAvatarUrl || "/logo.webp"}
                                 alt={post.author}
                                 className={styles.avatar}
                                 onError={(event) => {
-                                    event.currentTarget.src = "/logo.png";
+                                    event.currentTarget.src = "/logo.webp";
                                 }}
                             />
                             <div className={styles.authorMeta}>
@@ -87,27 +122,12 @@ export function ArticlePage({ post }: ArticlePageProps) {
 
             <div className={styles.layout}>
                 <main className={styles.main}>
-                    <article className={styles.article}>
-                        {post.body.map((paragraph) => (
-                            <p key={paragraph}>{paragraph}</p>
-                        ))}
-                    </article>
+                    <ArticleView content={post.markdown ?? ""} />
                 </main>
-
-                <aside className={styles.aside}>
-                    <div className={styles.coverCard}>
-                        <img
-                            src={post.image}
-                            alt={post.title}
-                            className={styles.coverImage}
-                            onError={(event) => {
-                                event.currentTarget.src = "/logo.png";
-                            }}
-                        />
-                    </div>
-
-                    <ArticleResourcesAside resources={linkedResources} />
-                </aside>
+                {linkedResources.length > 0 &&
+                    <aside className={styles.aside}>
+                        <ArticleResourcesAside resources={linkedResources} />
+                    </aside>}
             </div>
         </div>
     );

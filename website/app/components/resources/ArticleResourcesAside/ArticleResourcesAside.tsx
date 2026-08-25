@@ -1,5 +1,4 @@
-import { ExternalLink, FolderOpen } from "lucide-react";
-import { Link } from "react-router";
+import { ExternalLink} from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
 import styles from "./ArticleResourcesAside.module.scss";
@@ -55,11 +54,11 @@ export function ArticleResourcesAside({
                         >
                             <div className={styles.resourceImageWrap}>
                                 <img
-                                    src={resource.image || "/logo.png"}
+                                    src={resource.image || "/logo.webp"}
                                     alt={resource.title}
                                     className={styles.resourceImage}
                                     onError={(event) => {
-                                        event.currentTarget.src = "/logo.png";
+                                        event.currentTarget.src = "/logo.webp";
                                     }}
                                 />
                             </div>

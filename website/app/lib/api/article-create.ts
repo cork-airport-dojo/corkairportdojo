@@ -1,9 +1,10 @@
+import { supabase } from "~/lib/supabase/browser";
+
 export interface CreateArticleRequest {
     slug: string;
     title: string;
     excerpt: string;
-    body: string[];
-    category: string;
+    markdown: string;
     author_name: string;
     author_avatar_url?: string;
     cover_image: string;
@@ -11,6 +12,7 @@ export interface CreateArticleRequest {
     resource_ids?: string[];
     featured?: boolean;
     published: boolean;
+    module?: string | null;
 }
 
 export interface UpdateArticleRequest extends CreateArticleRequest {
@@ -23,7 +25,6 @@ export interface ArticleMutationResponse {
         slug: string;
         title: string;
         excerpt: string | null;
-        category: string | null;
         author_name: string | null;
         author_avatar_url: string | null;
         cover_image: string | null;
@@ -36,40 +37,50 @@ export interface ArticleMutationResponse {
     };
 }
 
-async function handleResponse(response: Response) {
-    const payload = (await response.json()) as
-        | ArticleMutationResponse
-        | { message?: string };
+export async function createArticleRequest(input: CreateArticleRequest): Promise<ArticleMutationResponse["article"]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
 
-    if (!response.ok) {
-        throw new Error(payload?.message || "Article request failed.");
+    const { resource_ids, module, ...fields } = input;
+
+    const { data, error } = await supabase
+        .from("articles")
+        .insert({ ...fields, module: module ?? null, created_by: user.id })
+        .select()
+        .single();
+
+    if (error) throw new Error(error.message);
+
+    if (resource_ids?.length) {
+        await syncArticleResources(data.id, resource_ids);
     }
 
-    return (payload as ArticleMutationResponse).article;
+    return data;
 }
 
-export async function createArticleRequest(input: CreateArticleRequest) {
-    const response = await fetch("/api/articles", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(input),
-    });
+export async function updateArticleRequest(input: UpdateArticleRequest): Promise<ArticleMutationResponse["article"]> {
+    const { id, resource_ids, module, ...fields } = input;
 
-    return handleResponse(response);
+    const { data, error } = await supabase
+        .from("articles")
+        .update({ ...fields, module: module ?? null })
+        .eq("id", id)
+        .select()
+        .single();
+
+    if (error) throw new Error(error.message);
+
+    if (resource_ids !== undefined) {
+        await syncArticleResources(id, resource_ids);
+    }
+
+    return data;
 }
 
-export async function updateArticleRequest(input: UpdateArticleRequest) {
-    const response = await fetch("/api/articles", {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(input),
-    });
-
-    return handleResponse(response);
+async function syncArticleResources(articleId: string, resourceIds: string[]) {
+    await supabase.from("article_resources").delete().eq("article_id", articleId);
+    if (resourceIds.length === 0) return;
+    const rows = resourceIds.map((resource_id) => ({ article_id: articleId, resource_id }));
+    const { error } = await supabase.from("article_resources").insert(rows);
+    if (error) throw new Error(error.message);
 }

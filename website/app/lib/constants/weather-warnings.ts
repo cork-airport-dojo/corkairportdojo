@@ -59,6 +59,7 @@ export interface DojoClosureNotice {
 const CORK_FIPS_CODE = "EI04";
 const CORK_WARNING_URL = "https://www.met.ie/Open_Data/json/warning_EI04.json";
 const CORK_WARNING_PAGE_URL = "https://www.met.ie/warnings/today/cork";
+const WEATHER_ALERT_IGNORE_STRINGS = ["blight"]
 
 const levelPriority: Record<Exclude<WeatherAlertLevel, null>, number> = {
     red: 3,
@@ -67,7 +68,6 @@ const levelPriority: Record<Exclude<WeatherAlertLevel, null>, number> = {
 };
 
 const FORCE_WEATHER_ALERT: WeatherAlertLevel = null;
-
 
 function createWeatherKindScoreMap(): WeatherKindScoreMap {
     return {
@@ -457,7 +457,14 @@ export async function getCorkWeatherAlert(
 
         const payload = await response.json();
         const warnings = normalizeWarnings(payload);
-        const corkWarnings = warnings.filter(isCorkWarning).sort(compareWarnings);
+        const corkWarnings = warnings.filter(isCorkWarning).filter(warning => {
+            const desc = warning?.description?.toLowerCase() ?? '';   // safe → empty string if no description
+            return !WEATHER_ALERT_IGNORE_STRINGS.some(ignored =>
+                desc.includes(ignored.toLowerCase())
+            );
+        }).sort(compareWarnings);
+
+
 
         if (!corkWarnings.length) {
             return {

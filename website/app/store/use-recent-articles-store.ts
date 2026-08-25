@@ -6,7 +6,6 @@ const MAX_RECENT_ARTICLES = 5;
 export interface RecentArticleItem {
     id: string;
     title: string;
-    category: string;
     href: string;
     readAt: string;
 }

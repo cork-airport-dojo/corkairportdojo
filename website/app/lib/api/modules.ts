@@ -1,3 +1,5 @@
+import { supabase } from "~/lib/supabase/browser";
+
 export interface PublicModule {
     id: string;
     slug: string;
@@ -5,39 +7,60 @@ export interface PublicModule {
     description: string | null;
     topic: string | null;
     difficulty: string | null;
-    lessons: number;
     featured: boolean;
     published: boolean;
-    views: number;
     overview: string[];
     created_at: string;
     updated_at: string;
+    icon_key: string;
 }
+
+const MODULE_FIELDS = "id, slug, title, description, topic, difficulty, featured, published, overview, created_at, updated_at, icon_key";
 
 export async function fetchModules(): Promise<PublicModule[]> {
-    const response = await fetch("/api/modules/published");
+    const { data, error } = await supabase
+        .from("modules")
+        .select(MODULE_FIELDS)
+        .eq("published", true)
+        .order("created_at", { ascending: false });
 
-    if (!response.ok) {
-        throw new Error("Failed to fetch modules");
-    }
-
-    const payload = (await response.json()) as { modules?: PublicModule[] };
-    return payload.modules ?? [];
+    if (error) throw new Error(error.message);
+    return data ?? [];
 }
 
-export async function fetchModuleBySlug(
-    slug: string
-): Promise<PublicModule | null> {
-    const response = await fetch(`/api/modules/published/${slug}`);
+export async function fetchFeaturedModules(): Promise<PublicModule[]> {
+    const { data, error } = await supabase
+        .from("modules")
+        .select(MODULE_FIELDS)
+        .eq("published", true)
+        .eq("featured", true)
+        .order("created_at", { ascending: false });
 
-    if (response.status === 404) {
-        return null;
-    }
-
-    if (!response.ok) {
-        throw new Error("Failed to fetch module");
-    }
-
-    const payload = (await response.json()) as { module?: PublicModule | null };
-    return payload.module ?? null;
+    if (error) throw new Error(error.message);
+    return data ?? [];
 }
+
+export async function fetchModuleById(id: string): Promise<PublicModule | null> {
+    const { data, error } = await supabase
+        .from("modules")
+        .select(MODULE_FIELDS)
+        .eq("id", id)
+        .eq("published", true)
+        .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    return data ?? null;
+}
+
+export async function fetchModuleBySlug(slug: string): Promise<PublicModule | null> {
+    const { data, error } = await supabase
+        .from("modules")
+        .select(MODULE_FIELDS)
+        .eq("slug", slug)
+        .eq("published", true)
+        .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    return data ?? null;
+}
+

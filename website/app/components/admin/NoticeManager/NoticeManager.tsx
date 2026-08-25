@@ -124,7 +124,7 @@ export function NoticeManager() {
     };
 
     return (
-        <Card className={styles.card}>
+        <Card id="events" className={styles.card}>
             <CardHeader className={styles.header}>
                 <div className={styles.titleRow}>
                     <div className={styles.iconWrap}>

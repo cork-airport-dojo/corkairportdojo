@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import { RightSidebar } from "../RightSidebar/RightSidebar";
 import { DojoClosureBanner } from "~/components/weather/DojoClosureBanner/DojoClosureBanner";
-import type { CorkWeatherAlert, DojoClosureNotice } from "~/lib/constants/weather-warnings";
+import { getDojoClosureNotice } from "~/lib/constants/weather-warnings";
+import { useWeatherStore } from "~/store/use-weather-store";
 import styles from "./AppShell.module.scss";
 
 interface AppShellProps {
     children: React.ReactNode;
     hideDefaultRightSidebar?: boolean;
-    weatherAlert?: CorkWeatherAlert | null;
-    closureNotice?: DojoClosureNotice | null;
 }
 
 const SIDEBAR_STORAGE_KEY = "corkairportdojo.sidebar.collapsed";
@@ -18,11 +17,15 @@ const SIDEBAR_STORAGE_KEY = "corkairportdojo.sidebar.collapsed";
 export function AppShell({
                              children,
                              hideDefaultRightSidebar = false,
-                             weatherAlert = null,
-                             closureNotice = null,
                          }: AppShellProps) {
+    const { alert: weatherAlert, hydrate } = useWeatherStore();
+    const closureNotice = useMemo(() => getDojoClosureNotice(weatherAlert), [weatherAlert]);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [hasLoadedSidebarPreference, setHasLoadedSidebarPreference] = useState(false);
+
+    useEffect(() => {
+        void hydrate();
+    }, [hydrate]);
 
     useEffect(() => {
         const storedValue = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
@@ -63,7 +66,6 @@ export function AppShell({
                 >
                     <Sidebar
                         collapsed={sidebarCollapsed}
-                        onToggleCollapse={toggleSidebarCollapsed}
                     />
                 </div>
 
@@ -87,7 +89,7 @@ export function AppShell({
 
                         {!hideDefaultRightSidebar && (
                             <aside className={styles.aside}>
-                                <RightSidebar weatherAlert={weatherAlert} />
+                                <RightSidebar />
                             </aside>
                         )}
                     </div>

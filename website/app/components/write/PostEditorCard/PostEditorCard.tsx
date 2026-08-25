@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ImagePlus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { createSlug } from "~/lib/post-editor";
@@ -10,14 +10,12 @@ import styles from "./PostEditorCard.module.scss";
 interface PostEditorCardProps {
     title: string;
     description: string;
-    category: string;
     tags: string[];
     coverImage: string;
     content: string;
     markdownMode: boolean;
     onTitleChange: (value: string) => void;
     onDescriptionChange: (value: string) => void;
-    onCategoryChange: (value: string) => void;
     onAddTag: (value: string) => void;
     onRemoveTag: (value: string) => void;
     onCoverImageChange: (value: string) => void;
@@ -27,24 +25,21 @@ interface PostEditorCardProps {
 }
 
 export function PostEditorCard({
-                                   title,
-                                   description,
-                                   category,
-                                   tags,
-                                   coverImage,
-                                   content,
-                                   markdownMode,
-                                   onTitleChange,
-                                   onDescriptionChange,
-                                   onCategoryChange,
-                                   onAddTag,
-                                   onRemoveTag,
-                                   onCoverImageChange,
-                                   onContentChange,
-                                   onToggleMarkdownMode,
-                                   titleInputRef,
-                               }: PostEditorCardProps) {
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    title,
+    description,
+    tags,
+    coverImage,
+    content,
+    markdownMode,
+    onTitleChange,
+    onDescriptionChange,
+    onAddTag,
+    onRemoveTag,
+    onCoverImageChange,
+    onContentChange,
+    onToggleMarkdownMode,
+    titleInputRef,
+}: PostEditorCardProps) {
     const [tagInput, setTagInput] = useState("");
     const slug = createSlug(title);
 
@@ -95,16 +90,7 @@ export function PostEditorCard({
                 <div className={styles.metaBlock}>
                     <label className={styles.label}>Tags</label>
 
-                    <div className={styles.tagList}>
-                        {tags.map((tag) => (
-                            <span key={tag} className={styles.tagChip}>
-                                {tag}
-                                <button type="button" onClick={() => onRemoveTag(tag)}>
-                                    <X size={13} />
-                                </button>
-                            </span>
-                        ))}
-                    </div>
+
 
                     <div className={styles.tagInputRow}>
                         <Input
@@ -128,63 +114,35 @@ export function PostEditorCard({
                             Add Tag
                         </Button>
                     </div>
+
+                    <div className={styles.tagList}>
+                        {tags.map((tag) => (
+                            <span key={tag} className={styles.tagChip}>
+                                {tag}
+                                <button type="button" onClick={() => onRemoveTag(tag)}>
+                                    <X size={13} />
+                                </button>
+                            </span>
+                        ))}
+                    </div>
                 </div>
 
-                <div className={styles.categoryBlock}>
-                    <label className={styles.label}>Category</label>
-                    <select
-                        value={category}
-                        onChange={(event) => onCategoryChange(event.target.value)}
-                        className={styles.select}
-                    >
-                        <option>React</option>
-                        <option>Next.js</option>
-                        <option>TypeScript</option>
-                        <option>Node.js</option>
-                        <option>Security</option>
-                        <option>Database</option>
-                        <option>AI</option>
-                        <option>Cloud</option>
-                        <option>Web Development</option>
-                    </select>
-                </div>
             </div>
 
             <div className={styles.coverBlock}>
                 <label className={styles.label}>Cover Image</label>
                 <p className={styles.helpText}>
-                    Best results: use a wide banner-style image. Avoid screenshots with small text,
+                    Paste a URL to a wide banner-style image. Avoid screenshots with small text,
                     dashboards, or dense UI captures, as they can look blurry and oversized on the
                     article page.
                 </p>
 
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className={styles.hiddenInput}
-                    onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        if (!file) return;
-
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                            if (typeof reader.result === "string") {
-                                onCoverImageChange(reader.result);
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    }}
+                <Input
+                    value={coverImage}
+                    onChange={(event) => onCoverImageChange(event.target.value)}
+                    placeholder="https://example.com/image.png"
+                    className={styles.coverUrlInput}
                 />
-
-                <button
-                    type="button"
-                    className={styles.coverUpload}
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <ImagePlus size={18} />
-                    <span>{coverImage ? "Change cover image" : "Upload cover image"}</span>
-                </button>
 
                 <div className={styles.coverPreview}>
                     {coverImage ? (
@@ -198,7 +156,7 @@ export function PostEditorCard({
             <div className={styles.editorSection}>
                 <div className={styles.editorSectionHeader}>
                     <div>
-                        <h2>TipTap Editor</h2>
+                        <h2>Article Body</h2>
                         <p>Write your article using the structured editor or preview markdown.</p>
                     </div>
 
@@ -215,7 +173,7 @@ export function PostEditorCard({
                             className={markdownMode ? styles.modeActive : ""}
                             onClick={() => onToggleMarkdownMode(true)}
                         >
-                            Markdown
+                           Preview 
                         </button>
                     </div>
                 </div>
@@ -225,11 +183,6 @@ export function PostEditorCard({
                     markdownMode={markdownMode}
                     onChange={onContentChange}
                 />
-
-                <div className={styles.bottomBar}>
-                    <span>Words update as you type.</span>
-                    <span>Use the command palette for quick actions.</span>
-                </div>
             </div>
         </motion.section>
     );

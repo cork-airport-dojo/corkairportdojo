@@ -1,9 +1,10 @@
+import type { IconName } from "lucide-react/dynamic";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { AppShell } from "~/components/layout/AppShell/AppShell";
 import { ModulePage } from "~/components/modules/ModulePage/ModulePage";
 import { fetchModuleBySlug, type PublicModule } from "~/lib/api/modules";
-import { moduleIconMap } from "~/lib/modules";
+import type { ModuleDifficulty } from "~/lib/constants/modules";
 
 export default function ModuleRoute() {
     const { moduleId } = useParams();
@@ -51,21 +52,18 @@ export default function ModuleRoute() {
         );
     }
 
-    const icon =  moduleIconMap.react;
-
     return (
         <AppShell>
             <ModulePage
                 module={{
-                    id: moduleItem.slug,
+                    id: moduleItem.id,
+                    slug: moduleItem.slug,
                     title: moduleItem.title,
                     description: moduleItem.description ?? "",
-                    lessons: moduleItem.lessons,
-                    difficulty: moduleItem.difficulty ?? "Beginner",
+                    difficulty: moduleItem.difficulty as ModuleDifficulty ?? "Beginner",
                     topic: moduleItem.topic ?? "",
-                    icon,
+                    icon_key: moduleItem.icon_key as IconName ?? "hammer",
                     featured: moduleItem.featured,
-                    views: moduleItem.views,
                     overview: moduleItem.overview ?? [],
                 }}
             />

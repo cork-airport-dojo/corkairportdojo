@@ -2,10 +2,11 @@ import { useEffect, useRef, useMemo, useState } from "react";
 import { BookOpen, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { SectionHeader } from "../../common/SectionHeader/SectionHeader";
 import { fetchModules, type PublicModule } from "~/lib/api/modules";
-import { moduleIconMap } from "~/lib/modules";
 import { ModuleCard } from "../../modules/ModuleCard/ModuleCard";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import styles from "./FeaturedModulesSection.module.scss";
+import type { ModuleDifficulty } from "~/lib/constants/modules";
+import type { IconName } from "lucide-react/dynamic";
 
 function FeaturedModulesLoadingState() {
     return (
@@ -242,7 +243,6 @@ export function FeaturedModulesSection() {
             <div className={styles.trackWrap}>
                 <div className={styles.track} ref={trackRef}>
                     {featuredModules.map((module) => {
-                        const icon = moduleIconMap.react;
 
                         return (
                             <div key={module.id} className={styles.slide}>
@@ -250,9 +250,8 @@ export function FeaturedModulesSection() {
                                     id={module.slug}
                                     title={module.title}
                                     description={module.description ?? ""}
-                                    lessons={module.lessons}
-                                    difficulty={module.difficulty ?? "Beginner"}
-                                    icon={icon}
+                                    difficulty={module.difficulty as ModuleDifficulty ?? "Beginner"}
+                                    icon_key={module.icon_key as IconName ?? "hammer"}
                                 />
                             </div>
                         );

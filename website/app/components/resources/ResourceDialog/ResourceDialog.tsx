@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { FiGithub } from "react-icons/fi";
 import type { ResourceRecord } from "~/lib/api/resources";
+import { fetchModules, type PublicModule } from "~/lib/api/modules";
 import { Button } from "~/components/ui/button";
 import {
     Dialog,
@@ -21,6 +22,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import styles from "./ResourceDialog.module.scss";
+import { ScrollArea } from "~/components/ui/scroll-area";
 
 interface ResourceDialogProps {
     open: boolean;
@@ -34,6 +36,7 @@ interface ResourceDialogProps {
         provider: "Google Drive" | "OneDrive" | "GitHub" | "External";
         href: string;
         active: boolean;
+        module: string | null;
     }) => Promise<void>;
     initialResource?: ResourceRecord | null;
 }
@@ -80,11 +83,11 @@ function getProviderIcon(provider: ProviderValue) {
 }
 
 export function ResourceDialog({
-                                   open,
-                                   onOpenChange,
-                                   onSubmit,
-                                   initialResource,
-                               }: ResourceDialogProps) {
+    open,
+    onOpenChange,
+    onSubmit,
+    initialResource,
+}: ResourceDialogProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
@@ -93,9 +96,15 @@ export function ResourceDialog({
     const [provider, setProvider] = useState<ProviderValue>("External");
     const [href, setHref] = useState("");
     const [active, setActive] = useState(true);
+    const [moduleId, setModuleId] = useState<string>("");
     const [isSaving, setIsSaving] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+    const [modules, setModules] = useState<PublicModule[]>([]);
+    useEffect(() => {
+        fetchModules().then(setModules).catch(() => setModules([]));
+    }, []);
 
     useEffect(() => {
         if (!initialResource) {
@@ -107,6 +116,7 @@ export function ResourceDialog({
             setProvider("External");
             setHref("");
             setActive(true);
+            setModuleId("");
             setSubmitError(null);
             setFieldErrors({});
             return;
@@ -120,6 +130,7 @@ export function ResourceDialog({
         setProvider(initialResource.provider);
         setHref(initialResource.href);
         setActive(initialResource.active);
+        setModuleId(initialResource.module ?? "");
         setSubmitError(null);
         setFieldErrors({});
     }, [initialResource, open]);
@@ -173,6 +184,7 @@ export function ResourceDialog({
                 provider,
                 href: normalizeUrl(href),
                 active,
+                module: moduleId || null,
             });
 
             onOpenChange(false);
@@ -188,188 +200,214 @@ export function ResourceDialog({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className={styles.dialog}>
-                <DialogHeader>
-                    <DialogTitle>
-                        {initialResource ? "Edit Resource" : "Add New Resource"}
-                    </DialogTitle>
-                    <DialogDescription>
-                        Required fields are marked with <span className={styles.requiredMark}>*</span>.
-                    </DialogDescription>
-                </DialogHeader>
+        <ScrollArea className="h-[80%]">
 
-                {submitError && (
-                    <Alert variant="destructive">
-                        <AlertCircle size={16} />
-                        <AlertTitle>Could not save resource</AlertTitle>
-                        <AlertDescription>{submitError}</AlertDescription>
-                    </Alert>
-                )}
+            <Dialog open={open} onOpenChange={onOpenChange}>
+                <DialogContent className={styles.dialog}>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {initialResource ? "Edit Resource" : "Add New Resource"}
+                        </DialogTitle>
+                        <DialogDescription>
+                            Required fields are marked with <span className={styles.requiredMark}>*</span>.
+                        </DialogDescription>
+                    </DialogHeader>
 
-                <div className={styles.form}>
-                    <div className={styles.field}>
-                        <Label htmlFor="resource-title">
-                            Title <span className={styles.requiredMark}>*</span>
-                        </Label>
-                        <Input
-                            id="resource-title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            aria-invalid={Boolean(fieldErrors.title)}
-                            className={fieldErrors.title ? styles.invalidInput : ""}
-                        />
-                        <p className={styles.helpText}>Short, clear name for the resource.</p>
-                        {fieldErrors.title && (
-                            <p className={styles.errorText}>{fieldErrors.title}</p>
-                        )}
-                    </div>
+                    {submitError && (
+                        <Alert variant="destructive">
+                            <AlertCircle size={16} />
+                            <AlertTitle>Could not save resource</AlertTitle>
+                            <AlertDescription>{submitError}</AlertDescription>
+                        </Alert>
+                    )}
 
-                    <div className={styles.field}>
-                        <Label htmlFor="resource-description">
-                            Description <span className={styles.requiredMark}>*</span>
-                        </Label>
-                        <Input
-                            id="resource-description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            aria-invalid={Boolean(fieldErrors.description)}
-                            className={fieldErrors.description ? styles.invalidInput : ""}
-                        />
-                        <p className={styles.helpText}>
-                            Brief explanation of what the resource is for.
-                        </p>
-                        {fieldErrors.description && (
-                            <p className={styles.errorText}>{fieldErrors.description}</p>
-                        )}
-                    </div>
 
-                    <div className={styles.fieldGrid}>
+                    <div className={styles.form}>
                         <div className={styles.field}>
-                            <Label htmlFor="resource-category">
-                                Category <span className={styles.requiredMark}>*</span>
+                            <Label htmlFor="resource-title">
+                                Title <span className={styles.requiredMark}>*</span>
                             </Label>
                             <Input
-                                id="resource-category"
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                aria-invalid={Boolean(fieldErrors.category)}
-                                className={fieldErrors.category ? styles.invalidInput : ""}
+                                id="resource-title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                aria-invalid={Boolean(fieldErrors.title)}
+                                className={fieldErrors.title ? styles.invalidInput : ""}
                             />
-                            <p className={styles.helpText}>Example: AI, React, Security.</p>
-                            {fieldErrors.category && (
-                                <p className={styles.errorText}>{fieldErrors.category}</p>
+                            <p className={styles.helpText}>Short, clear name for the resource.</p>
+                            {fieldErrors.title && (
+                                <p className={styles.errorText}>{fieldErrors.title}</p>
                             )}
                         </div>
 
                         <div className={styles.field}>
-                            <Label htmlFor="resource-provider">
-                                Provider <span className={styles.requiredMark}>*</span>
+                            <Label htmlFor="resource-description">
+                                Description <span className={styles.requiredMark}>*</span>
                             </Label>
-                            <div className={styles.providerSelectWrap}>
-                                <span className={styles.providerIcon}>{providerIcon}</span>
-                                <select
-                                    id="resource-provider"
-                                    className={styles.select}
-                                    value={provider}
-                                    onChange={(e) => setProvider(e.target.value as ProviderValue)}
-                                >
-                                    <option>Google Drive</option>
-                                    <option>OneDrive</option>
-                                    <option>GitHub</option>
-                                    <option>External</option>
-                                </select>
-                            </div>
+                            <Input
+                                id="resource-description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                aria-invalid={Boolean(fieldErrors.description)}
+                                className={fieldErrors.description ? styles.invalidInput : ""}
+                            />
                             <p className={styles.helpText}>
-                                Choose where this resource lives or is managed.
+                                Brief explanation of what the resource is for.
+                            </p>
+                            {fieldErrors.description && (
+                                <p className={styles.errorText}>{fieldErrors.description}</p>
+                            )}
+                        </div>
+
+                        <div className={styles.fieldGrid}>
+                            <div className={styles.field}>
+                                <Label htmlFor="resource-category">
+                                    Category <span className={styles.requiredMark}>*</span>
+                                </Label>
+                                <Input
+                                    id="resource-category"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    aria-invalid={Boolean(fieldErrors.category)}
+                                    className={fieldErrors.category ? styles.invalidInput : ""}
+                                />
+                                <p className={styles.helpText}>Example: AI, React, Security.</p>
+                                {fieldErrors.category && (
+                                    <p className={styles.errorText}>{fieldErrors.category}</p>
+                                )}
+                            </div>
+
+                            <div className={styles.field}>
+                                <Label htmlFor="resource-provider">
+                                    Provider <span className={styles.requiredMark}>*</span>
+                                </Label>
+                                <div className={styles.providerSelectWrap}>
+                                    <span className={styles.providerIcon}>{providerIcon}</span>
+                                    <select
+                                        id="resource-provider"
+                                        className={styles.select}
+                                        value={provider}
+                                        onChange={(e) => setProvider(e.target.value as ProviderValue)}
+                                    >
+                                        <option>Google Drive</option>
+                                        <option>OneDrive</option>
+                                        <option>GitHub</option>
+                                        <option>External</option>
+                                    </select>
+                                </div>
+                                <p className={styles.helpText}>
+                                    Choose where this resource lives or is managed.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className={styles.field}>
+                            <Label htmlFor="resource-tags">Tags</Label>
+                            <Input
+                                id="resource-tags"
+                                value={tags}
+                                onChange={(e) => setTags(e.target.value)}
+                                placeholder="Comma separated"
+                            />
+                            <p className={styles.helpText}>
+                                Optional. Example: docs, starter, api
                             </p>
                         </div>
-                    </div>
 
-                    <div className={styles.field}>
-                        <Label htmlFor="resource-tags">Tags</Label>
-                        <Input
-                            id="resource-tags"
-                            value={tags}
-                            onChange={(e) => setTags(e.target.value)}
-                            placeholder="Comma separated"
-                        />
-                        <p className={styles.helpText}>
-                            Optional. Example: docs, starter, api
-                        </p>
-                    </div>
+                        <div className={styles.field}>
+                            <Label htmlFor="resource-image">
+                                Image URL <span className={styles.requiredMark}>*</span>
+                            </Label>
+                            <Input
+                                id="resource-image"
+                                value={image}
+                                onChange={(e) => setImage(e.target.value)}
+                                aria-invalid={Boolean(fieldErrors.image)}
+                                className={fieldErrors.image ? styles.invalidInput : ""}
+                                placeholder="https://example.com/preview.png"
+                            />
+                            <p className={styles.helpText}>
+                                Required. Use a full URL including https://
+                            </p>
+                            {fieldErrors.image && (
+                                <p className={styles.errorText}>{fieldErrors.image}</p>
+                            )}
+                        </div>
 
-                    <div className={styles.field}>
-                        <Label htmlFor="resource-image">
-                            Image URL <span className={styles.requiredMark}>*</span>
-                        </Label>
-                        <Input
-                            id="resource-image"
-                            value={image}
-                            onChange={(e) => setImage(e.target.value)}
-                            aria-invalid={Boolean(fieldErrors.image)}
-                            className={fieldErrors.image ? styles.invalidInput : ""}
-                            placeholder="https://example.com/preview.png"
-                        />
-                        <p className={styles.helpText}>
-                            Required. Use a full URL including https://
-                        </p>
-                        {fieldErrors.image && (
-                            <p className={styles.errorText}>{fieldErrors.image}</p>
+                        <div className={styles.field}>
+                            <Label htmlFor="resource-href">
+                                Resource URL <span className={styles.requiredMark}>*</span>
+                            </Label>
+                            <Input
+                                id="resource-href"
+                                value={href}
+                                onChange={(e) => setHref(e.target.value)}
+                                aria-invalid={Boolean(fieldErrors.href)}
+                                className={fieldErrors.href ? styles.invalidInput : ""}
+                                placeholder="https://example.com"
+                            />
+                            <p className={styles.helpText}>
+                                Required. This is the link users will open.
+                            </p>
+                            {fieldErrors.href && (
+                                <p className={styles.errorText}>{fieldErrors.href}</p>
+                            )}
+                        </div>
+
+                        <div className={styles.field}>
+                            <Label htmlFor="resource-module">Module</Label>
+                            <select
+                                id="resource-module"
+                                className={styles.select}
+                                style={{ paddingLeft: 12 }}
+                                value={moduleId}
+                                onChange={(e) => setModuleId(e.target.value)}
+                            >
+                                <option value="">None</option>
+                                {modules.map((m) => (
+                                    <option key={m.id} value={m.id}>
+                                        {m.title}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className={styles.helpText}>
+                                Optional. Link this resource to a specific module.
+                            </p>
+                        </div>
+
+                        <label className={styles.checkboxRow}>
+                            <input
+                                type="checkbox"
+                                checked={active}
+                                onChange={(e) => setActive(e.target.checked)}
+                            />
+                            <span>
+                                Active resource <em>(optional)</em>
+                            </span>
+                        </label>
+
+                        {!Object.keys(fieldErrors).length && (
+                            <Alert>
+                                <CheckCircle2 size={16} />
+                                <AlertTitle>Ready to save</AlertTitle>
+                                <AlertDescription>
+                                    Required fields are complete and optional fields can be added later.
+                                </AlertDescription>
+                            </Alert>
                         )}
                     </div>
 
-                    <div className={styles.field}>
-                        <Label htmlFor="resource-href">
-                            Resource URL <span className={styles.requiredMark}>*</span>
-                        </Label>
-                        <Input
-                            id="resource-href"
-                            value={href}
-                            onChange={(e) => setHref(e.target.value)}
-                            aria-invalid={Boolean(fieldErrors.href)}
-                            className={fieldErrors.href ? styles.invalidInput : ""}
-                            placeholder="https://example.com"
-                        />
-                        <p className={styles.helpText}>
-                            Required. This is the link users will open.
-                        </p>
-                        {fieldErrors.href && (
-                            <p className={styles.errorText}>{fieldErrors.href}</p>
-                        )}
-                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => onOpenChange(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={() => void handleSave()} disabled={isSaving}>
+                            {isSaving ? "Saving..." : "Save Resource"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </ScrollArea>
 
-                    <label className={styles.checkboxRow}>
-                        <input
-                            type="checkbox"
-                            checked={active}
-                            onChange={(e) => setActive(e.target.checked)}
-                        />
-                        <span>
-                            Active resource <em>(optional)</em>
-                        </span>
-                    </label>
-
-                    {!Object.keys(fieldErrors).length && (
-                        <Alert>
-                            <CheckCircle2 size={16} />
-                            <AlertTitle>Ready to save</AlertTitle>
-                            <AlertDescription>
-                                Required fields are complete and optional fields can be added later.
-                            </AlertDescription>
-                        </Alert>
-                    )}
-                </div>
-
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
-                        Cancel
-                    </Button>
-                    <Button onClick={() => void handleSave()} disabled={isSaving}>
-                        {isSaving ? "Saving..." : "Save Resource"}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
     );
 }

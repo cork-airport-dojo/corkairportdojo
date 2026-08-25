@@ -1,0 +1,9 @@
+.scrollbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 1.5px;
+  background-color: var(--primary);
+  z-index: 9999;
+  transition: width 0.05s ease-out;
+}

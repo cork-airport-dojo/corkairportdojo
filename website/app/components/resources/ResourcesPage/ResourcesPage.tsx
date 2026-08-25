@@ -86,6 +86,7 @@ export function ResourcesPage() {
         provider: "Google Drive" | "OneDrive" | "GitHub" | "External";
         href: string;
         active: boolean;
+        module: string | null;
     }) => {
         if (editingResource) {
             await updateResource({

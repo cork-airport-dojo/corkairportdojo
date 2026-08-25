@@ -5,7 +5,6 @@ import styles from "./PostEditorSidebar.module.scss";
 interface PostEditorSidebarProps {
     wordCount: number;
     readingTime: number;
-    seoScore: number;
     status: "draft" | "review" | "published";
     lastSavedAt: string | null;
     markdownMode: boolean;
@@ -18,7 +17,6 @@ interface PostEditorSidebarProps {
 export function PostEditorSidebar({
                                       wordCount,
                                       readingTime,
-                                      seoScore,
                                       status,
                                       lastSavedAt,
                                       markdownMode,
@@ -38,11 +36,6 @@ export function PostEditorSidebar({
                 <h2>Post Settings</h2>
 
                 <div className={styles.metricStack}>
-                    <div className={styles.metric}>
-                        <span>SEO Score</span>
-                        <strong>{seoScore}/100</strong>
-                    </div>
-
                     <div className={styles.metric}>
                         <span>Reading Time</span>
                         <strong>{readingTime} min</strong>

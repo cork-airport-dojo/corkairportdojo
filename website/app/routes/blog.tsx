@@ -3,7 +3,7 @@ import { ArticlesPage } from "~/components/articles/ArticlesPage/ArticlesPage";
 
 export default function BlogRoute() {
     return (
-        <AppShell hideDefaultRightSidebar>
+        <AppShell>
             <ArticlesPage />
         </AppShell>
     );
