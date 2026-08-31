@@ -28,7 +28,7 @@ export function ModuleManager() {
                     <div>
                         <h2>Manage Modules</h2>
                         <p className={styles.subtitle}>
-                            {role === "admin"
+                            {role === "admin" || role === "editor"
                                 ? "You can see all modules, including drafts."
                                 : "You can see only modules you created, including drafts."}
                         </p>

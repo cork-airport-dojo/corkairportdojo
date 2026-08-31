@@ -9,8 +9,18 @@ import { supabase } from "~/lib/supabase/browser";
 import styles from "./ModuleEditorPage.module.scss";
 import { fetchModuleBySlug } from "~/lib/api/modules";
 import { DynamicIcon, iconNames, type IconName } from "lucide-react/dynamic";
-import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxTrigger, ComboboxValue } from "~/components/ui/combobox";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxTrigger,
+  ComboboxValue,
+} from "~/components/ui/combobox";
 import { Textarea } from "~/components/ui/textarea";
+import { RichTextEditor } from "~/components/write/RichTextEditor/RichTextEditor";
 
 type ModuleStatus = "draft" | "published";
 
@@ -47,7 +57,9 @@ async function createModule(payload: {
   published: boolean;
   overview: string;
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
   const { data, error } = await supabase
@@ -60,17 +72,20 @@ async function createModule(payload: {
   return data as ModuleApiRecord;
 }
 
-async function updateModule(id: string, payload: {
-  title: string;
-  slug: string;
-  description: string;
-  topic: string;
-  icon_key: string;
-  difficulty: ModuleDifficulty;
-  featured: boolean;
-  published: boolean;
-  overview: string;
-}) {
+async function updateModule(
+  id: string,
+  payload: {
+    title: string;
+    slug: string;
+    description: string;
+    topic: string;
+    icon_key: string;
+    difficulty: ModuleDifficulty;
+    featured: boolean;
+    published: boolean;
+    overview: string;
+  },
+) {
   const { data, error } = await supabase
     .from("modules")
     .update(payload)
@@ -97,7 +112,9 @@ export function ModuleEditorPage() {
   const [topic, setTopic] = useState("");
   const [iconKey, setIconKey] = useState<string | IconName | null>("hammer");
   const [iconSearch, setIconSearch] = useState("");
-  const [difficulty, setDifficulty] = useState<ModuleDifficulty | null>("Beginner");
+  const [difficulty, setDifficulty] = useState<ModuleDifficulty | null>(
+    "Beginner",
+  );
   const [featured, setFeatured] = useState(false);
   const [status, setStatus] = useState<ModuleStatus>("draft");
   const [overviewText, setOverviewText] = useState("");
@@ -109,7 +126,9 @@ export function ModuleEditorPage() {
     const q = iconSearch.trim().toLowerCase();
     if (!q) return iconNames.slice(0, ICON_VISIBLE_LIMIT);
     const prefix = iconNames.filter((name) => name.startsWith(q));
-    const rest = iconNames.filter((name) => !name.startsWith(q) && name.includes(q));
+    const rest = iconNames.filter(
+      (name) => !name.startsWith(q) && name.includes(q),
+    );
     return [...prefix, ...rest].slice(0, ICON_VISIBLE_LIMIT);
   }, [iconSearch]);
 
@@ -127,7 +146,7 @@ export function ModuleEditorPage() {
 
         if (!module || cancelled) return;
 
-        setId(module.id)
+        setId(module.id);
         setTitle(module.title);
         setSlug(module.slug);
         setDescription(module.description ?? "");
@@ -136,15 +155,13 @@ export function ModuleEditorPage() {
         setDifficulty(module.difficulty as ModuleDifficulty);
         setFeatured(module.featured);
         setStatus(module.published ? "published" : "draft");
-        setOverviewText((module.overview ?? []).join("\n\n"));
+        setOverviewText(module.overview ?? "");
       } catch (error) {
         console.error("Failed to hydrate module editor:", error);
 
         if (!cancelled) {
           setSubmitMessage(
-            error instanceof Error
-              ? error.message
-              : "Failed to load module."
+            error instanceof Error ? error.message : "Failed to load module.",
           );
         }
       } finally {
@@ -166,8 +183,9 @@ export function ModuleEditorPage() {
   };
 
   const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
-    nextStatus: ModuleStatus
+    event:
+      React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
+    nextStatus: ModuleStatus,
   ) => {
     event.preventDefault();
 
@@ -208,7 +226,7 @@ export function ModuleEditorPage() {
       setSubmitMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong while saving the module."
+          : "Something went wrong while saving the module.",
       );
     } finally {
       setIsSubmitting(false);
@@ -236,10 +254,11 @@ export function ModuleEditorPage() {
 
         <div className={styles.headerStatus}>
           <span
-            className={`${styles.statusPill} ${status === "published"
+            className={`${styles.statusPill} ${
+              status === "published"
                 ? styles.statusPublished
                 : styles.statusDraft
-              }`}
+            }`}
           >
             {status === "published" ? "Published" : "Draft"}
           </span>
@@ -302,17 +321,32 @@ export function ModuleEditorPage() {
                 </div>
 
                 <div className={styles.field}>
-                  <label htmlFor="module-icon-key">Icon Key <span className={styles.optional}>(optional)</span></label>
+                  <label htmlFor="module-icon-key">
+                    Icon Key <span className={styles.optional}>(optional)</span>
+                  </label>
 
-                  <Combobox autoHighlight value={iconKey} items={filteredIconNames} onValueChange={setIconKey} onInputValueChange={setIconSearch}>
-                    <ComboboxTrigger render={
-                      <Button variant="outline" className="justify-start w-64 font-normal">
-                        <DynamicIcon name={iconKey as IconName} /> <ComboboxValue /></Button>
-                    } />
+                  <Combobox
+                    autoHighlight
+                    value={iconKey}
+                    items={filteredIconNames}
+                    onValueChange={setIconKey}
+                    onInputValueChange={setIconSearch}
+                  >
+                    <ComboboxTrigger
+                      render={
+                        <Button
+                          variant="outline"
+                          className="justify-start w-64 font-normal"
+                        >
+                          <DynamicIcon name={iconKey as IconName} />{" "}
+                          <ComboboxValue />
+                        </Button>
+                      }
+                    />
 
                     <ComboboxContent className="bg-black max-h-[30dvh]">
-                        <ComboboxInput showTrigger={false} placeholder="Search" />
-                        <ComboboxEmpty>No items found.</ComboboxEmpty>
+                      <ComboboxInput showTrigger={false} placeholder="Search" />
+                      <ComboboxEmpty>No items found.</ComboboxEmpty>
 
                       <ComboboxList>
                         {(item) => (
@@ -326,7 +360,11 @@ export function ModuleEditorPage() {
 
                   <p className={styles.fieldHint}>
                     Find icon names at{" "}
-                    <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://lucide.dev/icons/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       lucide.dev/icons
                     </a>
                   </p>
@@ -379,12 +417,11 @@ export function ModuleEditorPage() {
               <CardContent className={styles.cardBody}>
                 <div className={styles.field}>
                   <label htmlFor="module-overview">Overview Paragraphs</label>
-                  <Textarea
-                    id="module-overview"
-                    className={styles.textarea}
+                  <RichTextEditor
                     value={overviewText}
-                    onChange={(event) => setOverviewText(event.target.value)}
-                    placeholder="Write one or more paragraphs. Separate paragraphs with a new line."
+                    markdownMode={false}
+                    onChange={setOverviewText}
+                    placeholder="Overview of what the module will cover."
                   />
                 </div>
               </CardContent>

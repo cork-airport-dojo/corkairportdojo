@@ -28,7 +28,7 @@ export function ArticleManager() {
                     <div>
                         <h2>Manage Articles</h2>
                         <p className={styles.subtitle}>
-                            {role === "admin"
+                            {role === "admin" ||role === "editor"
                                 ? "You can see all articles, including drafts."
                                 : "You can see only articles you created, including drafts."}
                         </p>

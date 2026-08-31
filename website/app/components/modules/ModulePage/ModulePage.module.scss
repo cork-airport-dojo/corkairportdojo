@@ -151,18 +151,6 @@
   padding-top: 16px !important;
 }
 
-.prose {
-  p {
-    margin: 0 0 1rem;
-    color: var(--color-text-secondary);
-    line-height: 1.8;
-  }
-
-  p:last-child {
-    margin-bottom: 0;
-  }
-}
-
 .detailList {
   display: flex;
   flex-direction: column;

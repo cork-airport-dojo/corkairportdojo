@@ -9,7 +9,7 @@ export interface PublicModule {
     difficulty: string | null;
     featured: boolean;
     published: boolean;
-    overview: string[];
+    overview: string;
     created_at: string;
     updated_at: string;
     icon_key: string;

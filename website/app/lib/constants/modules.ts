@@ -11,7 +11,7 @@ export interface ModuleItem {
     topic: string;
     icon_key?: IconName;
     featured: boolean;
-    overview: string[];
+    overview: string;
 }
 
 export const modules: ModuleItem[] = [
