@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Cork Airport Dojo</title>
+  <script>
+      const path = window.location.pathname;
+      
+      // Redirect to index.html with the path as a query parameter
+      window.location.href = `${window.location.origin}/?url=${encodeURIComponent(path)}`;
+  </script>
+</head>
+
+<body></body>
+
+</html>
