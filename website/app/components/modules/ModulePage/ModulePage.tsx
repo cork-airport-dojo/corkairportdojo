@@ -10,6 +10,7 @@ import { ArticleCard } from "~/components/blog/ArticleCard/ArticleCard";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { Switch } from "~/components/ui/switch";
 import { PaginationControls } from "~/components/ui/pagination";
+import ArticleView from "~/components/blog/ArticleView/ArticleView";
 
 interface ModulePageProps {
     module: ModuleItem;
@@ -62,27 +63,27 @@ export function ModulePage({ module }: ModulePageProps) {
     }, [resourcePage, module.id]);
 
     return (
-        <div className={styles.page}>
-            <section className={styles.hero}>
-                <div className={styles.heroIcon}>
-                    <DynamicIcon name={module.icon_key ?? "layers-3"} size={32} />
-                </div>
+      <div className={styles.page}>
+        <section className={styles.hero}>
+          <div className={styles.heroIcon}>
+            <DynamicIcon name={module.icon_key ?? "layers-3"} size={32} />
+          </div>
 
-                <div className={styles.heroContent}>
-                    <span className={styles.topic}>{module.topic}</span>
-                    <h1 className={styles.title}>{module.title}</h1>
-                    <p className={styles.description}>{module.description}</p>
+          <div className={styles.heroContent}>
+            <span className={styles.topic}>{module.topic}</span>
+            <h1 className={styles.title}>{module.title}</h1>
+            <p className={styles.description}>{module.description}</p>
 
-                    <div className={styles.metaRow}>
-                        <span>
-                            <BarChart3 size={15} />
-                            {module.difficulty}
-                        </span>
-                    </div>
-                </div>
-            </section>
+            <div className={styles.metaRow}>
+              <span>
+                <BarChart3 size={15} />
+                {module.difficulty}
+              </span>
+            </div>
+          </div>
+        </section>
 
-            {/* <aside className={styles.rail}>
+        {/* <aside className={styles.rail}>
                 <Card className={styles.panel}>
                     <CardHeader className={styles.panelHeader}>
                         <div className={styles.panelTitle}>
@@ -108,115 +109,125 @@ export function ModulePage({ module }: ModulePageProps) {
                 </Card>
             </aside> */}
 
-            <div className={styles.contentLayout}>
-                <div className={styles.mainColumn}>
-                    <Card className={styles.panel}>
-                        <CardHeader className={styles.panelHeader}>
-                            <div className={styles.panelTitle}>
-                                <div className={styles.panelIcon}>
-                                    <Layers3 size={16} />
-                                </div>
-                                <h2>Overview</h2>
-                            </div>
-                        </CardHeader>
-
-                        <CardContent className={styles.panelBody}>
-                            <div className={styles.prose}>
-                                {module.overview}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {articles.length > 0 && (
-                        <Card className={styles.panel}>
-                            <CardHeader className={styles.panelHeader}>
-                                <div className={styles.panelTitleRow}>
-                                    <div className={styles.panelTitle}>
-                                        <div className={styles.panelIcon}>
-                                            <Newspaper size={16} />
-                                        </div>
-                                        <h2>Articles</h2>
-                                    </div>
-                                    <div className={styles.toggleView}>
-                                        <Grid size={16} />
-                                        <Switch
-                                            checked={isArticleListView}
-                                            onCheckedChange={setIsArticleListView}
-                                        />
-                                        <List size={16} />
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className={styles.panelBody}>
-                                <div className={isArticleListView ? styles.articleList : styles.articleGrid}>
-                                    {articles.map((article) => (
-                                        <ArticleCard
-                                            key={article.id}
-                                            id={article.slug}
-                                            title={article.title}
-                                            excerpt={article.excerpt ?? ""}
-                                            image={article.cover_image ?? "/logo.webp"}
-                                            author={article.author_name ?? "CorkAirportDojo"}
-                                            authorAvatarUrl={article.author_avatar_url}
-                                            date={new Intl.DateTimeFormat("en-IE", {
-                                                day: "numeric",
-                                                month: "short",
-                                                year: "numeric",
-                                            }).format(new Date(article.created_at))}
-                                            readTime={article.read_time ?? ""}
-                                            resourceCount={article.resources?.length ?? 0}
-                                        />
-                                    ))}
-                                </div>
-                                <PaginationControls
-                                    className={styles.pagination}
-                                    currentPage={articlePage}
-                                    itemCount={articles.length}
-                                    pageSize={PAGE_SIZE}
-                                    onPageChange={setArticlePage}
-                                />
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {resources.length > 0 && (
-                        <Card className={styles.panel}>
-                            <CardHeader className={styles.panelHeader}>
-                                <div className={styles.panelTitleRow}>
-                                    <div className={styles.panelTitle}>
-                                        <div className={styles.panelIcon}>
-                                            <FolderOpen size={16} />
-                                        </div>
-                                        <h2>Resources</h2>
-                                    </div>
-                                    <div className={styles.toggleView}>
-                                        <Grid size={16} />
-                                        <Switch
-                                            checked={isResourceListView}
-                                            onCheckedChange={setIsResourceListView}
-                                        />
-                                        <List size={16} />
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className={styles.panelBody}>
-                                <div className={isResourceListView ? styles.resourceList : styles.resourceGrid}>
-                                    {resources.map((resource) => (
-                                        <ResourceCard key={resource.id} resource={resource} />
-                                    ))}
-                                </div>
-                                <PaginationControls
-                                    className={styles.pagination}
-                                    currentPage={resourcePage}
-                                    itemCount={resources.length}
-                                    pageSize={PAGE_SIZE}
-                                    onPageChange={setResourcePage}
-                                />
-                            </CardContent>
-                        </Card>
-                    )}
+        <div className={styles.contentLayout}>
+          <div className={styles.mainColumn}>
+            <Card className={styles.panel}>
+              <CardHeader className={styles.panelHeader}>
+                <div className={styles.panelTitle}>
+                  <div className={styles.panelIcon}>
+                    <Layers3 size={16} />
+                  </div>
+                  <h2>Overview</h2>
                 </div>
-            </div>
+              </CardHeader>
+
+              <CardContent className={styles.panelBody}>
+                  <ArticleView content={module.overview} />
+              </CardContent>
+            </Card>
+
+            {articles.length > 0 && (
+              <Card className={styles.panel}>
+                <CardHeader className={styles.panelHeader}>
+                  <div className={styles.panelTitleRow}>
+                    <div className={styles.panelTitle}>
+                      <div className={styles.panelIcon}>
+                        <Newspaper size={16} />
+                      </div>
+                      <h2>Articles</h2>
+                    </div>
+                    <div className={styles.toggleView}>
+                      <Grid size={16} />
+                      <Switch
+                        checked={isArticleListView}
+                        onCheckedChange={setIsArticleListView}
+                      />
+                      <List size={16} />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className={styles.panelBody}>
+                  <div
+                    className={
+                      isArticleListView
+                        ? styles.articleList
+                        : styles.articleGrid
+                    }
+                  >
+                    {articles.map((article) => (
+                      <ArticleCard
+                        key={article.id}
+                        id={article.slug}
+                        title={article.title}
+                        excerpt={article.excerpt ?? ""}
+                        image={article.cover_image ?? "/logo.webp"}
+                        author={article.author_name ?? "CorkAirportDojo"}
+                        authorAvatarUrl={article.author_avatar_url}
+                        date={new Intl.DateTimeFormat("en-IE", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        }).format(new Date(article.created_at))}
+                        readTime={article.read_time ?? ""}
+                        resourceCount={article.resources?.length ?? 0}
+                      />
+                    ))}
+                  </div>
+                  <PaginationControls
+                    className={styles.pagination}
+                    currentPage={articlePage}
+                    itemCount={articles.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setArticlePage}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {resources.length > 0 && (
+              <Card className={styles.panel}>
+                <CardHeader className={styles.panelHeader}>
+                  <div className={styles.panelTitleRow}>
+                    <div className={styles.panelTitle}>
+                      <div className={styles.panelIcon}>
+                        <FolderOpen size={16} />
+                      </div>
+                      <h2>Resources</h2>
+                    </div>
+                    <div className={styles.toggleView}>
+                      <Grid size={16} />
+                      <Switch
+                        checked={isResourceListView}
+                        onCheckedChange={setIsResourceListView}
+                      />
+                      <List size={16} />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className={styles.panelBody}>
+                  <div
+                    className={
+                      isResourceListView
+                        ? styles.resourceList
+                        : styles.resourceGrid
+                    }
+                  >
+                    {resources.map((resource) => (
+                      <ResourceCard key={resource.id} resource={resource} />
+                    ))}
+                  </div>
+                  <PaginationControls
+                    className={styles.pagination}
+                    currentPage={resourcePage}
+                    itemCount={resources.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setResourcePage}
+                  />
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
+      </div>
     );
 }
