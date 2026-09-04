@@ -64,7 +64,7 @@ export default function ModuleRoute() {
                     topic: moduleItem.topic ?? "",
                     icon_key: moduleItem.icon_key as IconName ?? "hammer",
                     featured: moduleItem.featured,
-                    overview: moduleItem.overview ?? [],
+                    overview: moduleItem.overview ?? '',
                 }}
             />
         </AppShell>
