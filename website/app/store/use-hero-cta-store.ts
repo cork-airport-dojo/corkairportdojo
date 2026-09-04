@@ -76,22 +76,14 @@ export const useHeroCTAStore = create<HeroCTAState>((set, get) => ({
 
         const current = buttons[index];
         const previous = buttons[index - 1];
-        const newCurrentOrder = previous.order;
-        const newPreviousOrder = current.order;
 
         await Promise.all([
-            updateHeroCTAButton(current.id, { order: newCurrentOrder }),
-            updateHeroCTAButton(previous.id, { order: newPreviousOrder }),
+            updateHeroCTAButton(current.id, { order: previous.order }),
+            updateHeroCTAButton(previous.id, { order: current.order }),
         ]);
 
-        const next = sortButtons(
-            buttons.map((b) => {
-                if (b.id === current.id) return { ...b, order: newCurrentOrder };
-                if (b.id === previous.id) return { ...b, order: newPreviousOrder };
-                return b;
-            })
-        );
-        set({ buttons: next });
+        const fresh = await fetchHeroCTAButtons();
+        set({ buttons: sortButtons(fresh) });
     },
 
     moveButtonDown: async (id) => {
@@ -101,22 +93,14 @@ export const useHeroCTAStore = create<HeroCTAState>((set, get) => ({
 
         const current = buttons[index];
         const nextButton = buttons[index + 1];
-        const newCurrentOrder = nextButton.order;
-        const newNextOrder = current.order;
 
         await Promise.all([
-            updateHeroCTAButton(current.id, { order: newCurrentOrder }),
-            updateHeroCTAButton(nextButton.id, { order: newNextOrder }),
+            updateHeroCTAButton(current.id, { order: nextButton.order }),
+            updateHeroCTAButton(nextButton.id, { order: current.order }),
         ]);
 
-        const next = sortButtons(
-            buttons.map((b) => {
-                if (b.id === current.id) return { ...b, order: newCurrentOrder };
-                if (b.id === nextButton.id) return { ...b, order: newNextOrder };
-                return b;
-            })
-        );
-        set({ buttons: next });
+        const fresh = await fetchHeroCTAButtons();
+        set({ buttons: sortButtons(fresh) });
     },
 
     getVisibleButtons: () => {
