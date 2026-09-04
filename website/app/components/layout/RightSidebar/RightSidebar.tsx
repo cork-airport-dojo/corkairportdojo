@@ -28,6 +28,7 @@ import { useNoticesStore, type ImportantNotice } from "~/store/use-notices-store
 import { useCustomModulesStore } from "~/store/use-custom-modules-store";
 import { useRecentArticlesStore } from "~/store/use-recent-articles-store";
 import { useWeatherStore } from "~/store/use-weather-store";
+import { ContactUs } from "~/components/contactUs/ContactUs/ContactUs";
 import styles from "./RightSidebar.module.scss";
 import { DynamicIcon } from "lucide-react/dynamic";
 
@@ -279,6 +280,7 @@ export function RightSidebar() {
           </CardContent>
         </Card>
       )}
+        <ContactUs />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { QueryProvider } from "~/components/providers/QueryProvider";
 import { useAuthStore } from "~/store/use-auth-store";
 import { supabase } from "~/lib/supabase/browser";
+import emailjs from "@emailjs/browser";
 
 import "./app.css";
 import "./styles/app.scss";
@@ -31,6 +32,10 @@ function AppBoot() {
       subscription.unsubscribe();
     };
   }, [hydrate]);
+
+    useEffect(() => {
+        emailjs.init("bNwktbc4EGNVF_zWT");
+    }, []);
 
   return <Outlet />;
 }
