@@ -116,7 +116,7 @@ export function ModuleEditorPage() {
     "Beginner",
   );
   const [featured, setFeatured] = useState(false);
-  const [status, setStatus] = useState<ModuleStatus>("draft");
+  const [status, setStatus] = useState<ModuleStatus>("published");
   const [overviewText, setOverviewText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHydrating, setIsHydrating] = useState(isEditMode);
@@ -245,9 +245,7 @@ export function ModuleEditorPage() {
             <span className={styles.eyebrow}>Module Editor</span>
             <h1>{isEditMode ? "Edit Module" : "Create New Module"}</h1>
             <p>
-              {isEditMode
-                ? "Update your module content, structure and publishing state."
-                : "Create a structured learning module with draft and publish support."}
+              Update your module content, structure and publishing state.
             </p>
           </div>
         </div>
@@ -445,23 +443,11 @@ export function ModuleEditorPage() {
                       setStatus(event.target.value as ModuleStatus)
                     }
                   >
-                    <option value="draft">Draft</option>
                     <option value="published">Published</option>
                   </select>
                 </div>
 
                 <div className={styles.actionStack}>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className={styles.actionButton}
-                    disabled={isSubmitting}
-                    onClick={(event) => void handleSubmit(event, "draft")}
-                  >
-                    <Save size={16} />
-                    <span>{isSubmitting ? "Saving..." : "Save Draft"}</span>
-                  </Button>
-
                   <Button
                     type="button"
                     className={styles.actionButton}
