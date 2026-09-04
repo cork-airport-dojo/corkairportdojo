@@ -1,6 +1,10 @@
 import { create } from "zustand";
-
-const HERO_CTA_STORAGE_KEY = "corkairportdojo-hero-cta-buttons";
+import {
+    fetchHeroCTAButtons,
+    insertHeroCTAButton,
+    updateHeroCTAButton,
+    deleteHeroCTAButton,
+} from "~/lib/api/hero-cta-buttons";
 
 export type HeroButtonVariant = "primary" | "secondary" | "outline";
 
@@ -11,67 +15,18 @@ export interface HeroCTAButton {
     enabled: boolean;
     variant: HeroButtonVariant;
     order: number;
-    isCustom: boolean;
 }
 
 interface HeroCTAState {
     buttons: HeroCTAButton[];
-    hydrate: () => void;
-    resetDefaults: () => void;
-    addButton: (input: Omit<HeroCTAButton, "id" | "isCustom">) => void;
-    updateButton: (id: string, input: Omit<HeroCTAButton, "id" | "isCustom">) => void;
-    removeButton: (id: string) => void;
-    toggleEnabled: (id: string) => void;
-    moveButtonUp: (id: string) => void;
-    moveButtonDown: (id: string) => void;
+    hydrate: () => Promise<void>;
+    addButton: (input: Omit<HeroCTAButton, "id">) => Promise<void>;
+    updateButton: (id: string, input: Omit<HeroCTAButton, "id">) => Promise<void>;
+    removeButton: (id: string) => Promise<void>;
+    toggleEnabled: (id: string) => Promise<void>;
+    moveButtonUp: (id: string) => Promise<void>;
+    moveButtonDown: (id: string) => Promise<void>;
     getVisibleButtons: () => HeroCTAButton[];
-}
-
-const defaultButtons: HeroCTAButton[] = [
-    {
-        id: "browse-modules",
-        label: "Browse Modules",
-        href: "/modules",
-        enabled: true,
-        variant: "primary",
-        order: 1,
-        isCustom: false,
-    },
-    {
-        id: "read-articles",
-        label: "Read Articles",
-        href: "/blog",
-        enabled: true,
-        variant: "outline",
-        order: 2,
-        isCustom: false,
-    },
-    {
-        id: "register-next-term",
-        label: "Register next term",
-        href: "/login",
-        enabled: true,
-        variant: "secondary",
-        order: 3,
-        isCustom: false,
-    },
-
-];
-
-function readStoredButtons(): HeroCTAButton[] {
-    const raw = localStorage.getItem(HERO_CTA_STORAGE_KEY);
-    if (!raw) return defaultButtons;
-
-    try {
-        const parsed = JSON.parse(raw) as HeroCTAButton[];
-        return Array.isArray(parsed) && parsed.length ? parsed : defaultButtons;
-    } catch {
-        return defaultButtons;
-    }
-}
-
-function writeStoredButtons(buttons: HeroCTAButton[]) {
-    localStorage.setItem(HERO_CTA_STORAGE_KEY, JSON.stringify(buttons));
 }
 
 function sortButtons(buttons: HeroCTAButton[]) {
@@ -79,101 +34,92 @@ function sortButtons(buttons: HeroCTAButton[]) {
 }
 
 export const useHeroCTAStore = create<HeroCTAState>((set, get) => ({
-    buttons: defaultButtons,
+    buttons: [],
 
-    hydrate: () => {
-        set({ buttons: sortButtons(readStoredButtons()) });
+    hydrate: async () => {
+        const buttons = await fetchHeroCTAButtons();
+        set({ buttons: sortButtons(buttons) });
     },
 
-    resetDefaults: () => {
-        writeStoredButtons(defaultButtons);
-        set({ buttons: sortButtons(defaultButtons) });
+    addButton: async (input) => {
+        const next = await insertHeroCTAButton(input);
+        set({ buttons: sortButtons([...get().buttons, next]) });
     },
 
-    addButton: (input) => {
-        const next: HeroCTAButton = {
-            id: crypto.randomUUID(),
-            label: input.label.trim(),
-            href: input.href.trim(),
-            enabled: input.enabled,
-            variant: input.variant,
-            order: input.order,
-            isCustom: true,
-        };
-
-        const buttons = sortButtons([...get().buttons, next]);
-        writeStoredButtons(buttons);
-        set({ buttons });
-    },
-
-    updateButton: (id, input) => {
+    updateButton: async (id, input) => {
+        const updated = await updateHeroCTAButton(id, input);
         const buttons = sortButtons(
-            get().buttons.map((button) =>
-                button.id === id
-                    ? {
-                        ...button,
-                        label: input.label.trim(),
-                        href: input.href.trim(),
-                        enabled: input.enabled,
-                        variant: input.variant,
-                        order: input.order,
-                    }
-                    : button
-            )
+            get().buttons.map((b) => (b.id === id ? updated : b))
         );
-
-        writeStoredButtons(buttons);
         set({ buttons });
     },
 
-    removeButton: (id) => {
-        const buttons = get().buttons.filter((button) => button.id !== id);
-        writeStoredButtons(buttons);
-        set({ buttons: sortButtons(buttons) });
+    removeButton: async (id) => {
+        await deleteHeroCTAButton(id);
+        set({ buttons: sortButtons(get().buttons.filter((b) => b.id !== id)) });
     },
 
-    toggleEnabled: (id) => {
-        const buttons = get().buttons.map((button) =>
-            button.id === id ? { ...button, enabled: !button.enabled } : button
+    toggleEnabled: async (id) => {
+        const button = get().buttons.find((b) => b.id === id);
+        if (!button) return;
+        const updated = await updateHeroCTAButton(id, { enabled: !button.enabled });
+        const buttons = sortButtons(
+            get().buttons.map((b) => (b.id === id ? updated : b))
         );
-
-        writeStoredButtons(buttons);
-        set({ buttons: sortButtons(buttons) });
+        set({ buttons });
     },
 
-    moveButtonUp: (id) => {
+    moveButtonUp: async (id) => {
         const buttons = sortButtons([...get().buttons]);
-        const index = buttons.findIndex((button) => button.id === id);
+        const index = buttons.findIndex((b) => b.id === id);
         if (index <= 0) return;
 
         const current = buttons[index];
         const previous = buttons[index - 1];
+        const newCurrentOrder = previous.order;
+        const newPreviousOrder = current.order;
 
-        current.order = previous.order;
-        previous.order += 1;
+        await Promise.all([
+            updateHeroCTAButton(current.id, { order: newCurrentOrder }),
+            updateHeroCTAButton(previous.id, { order: newPreviousOrder }),
+        ]);
 
-        const next = sortButtons([...buttons]);
-        writeStoredButtons(next);
+        const next = sortButtons(
+            buttons.map((b) => {
+                if (b.id === current.id) return { ...b, order: newCurrentOrder };
+                if (b.id === previous.id) return { ...b, order: newPreviousOrder };
+                return b;
+            })
+        );
         set({ buttons: next });
     },
 
-    moveButtonDown: (id) => {
+    moveButtonDown: async (id) => {
         const buttons = sortButtons([...get().buttons]);
-        const index = buttons.findIndex((button) => button.id === id);
+        const index = buttons.findIndex((b) => b.id === id);
         if (index === -1 || index >= buttons.length - 1) return;
 
         const current = buttons[index];
         const nextButton = buttons[index + 1];
+        const newCurrentOrder = nextButton.order;
+        const newNextOrder = current.order;
 
-        current.order = nextButton.order;
-        nextButton.order -= 1;
+        await Promise.all([
+            updateHeroCTAButton(current.id, { order: newCurrentOrder }),
+            updateHeroCTAButton(nextButton.id, { order: newNextOrder }),
+        ]);
 
-        const next = sortButtons([...buttons]);
-        writeStoredButtons(next);
+        const next = sortButtons(
+            buttons.map((b) => {
+                if (b.id === current.id) return { ...b, order: newCurrentOrder };
+                if (b.id === nextButton.id) return { ...b, order: newNextOrder };
+                return b;
+            })
+        );
         set({ buttons: next });
     },
 
     getVisibleButtons: () => {
-        return sortButtons(get().buttons).filter((button) => button.enabled);
+        return sortButtons(get().buttons).filter((b) => b.enabled);
     },
 }));

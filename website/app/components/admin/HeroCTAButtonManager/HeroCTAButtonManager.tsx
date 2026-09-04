@@ -6,7 +6,6 @@ import { Input } from "~/components/ui/input";
 import {
     useHeroCTAStore,
     type HeroButtonVariant,
-    type HeroCTAButton,
 } from "~/store/use-hero-cta-store";
 import styles from "./HeroCTAButtonManager.module.scss";
 
@@ -14,7 +13,6 @@ export function HeroCTAButtonManager() {
     const {
         buttons,
         hydrate,
-        resetDefaults,
         addButton,
         updateButton,
         removeButton,
@@ -34,7 +32,7 @@ export function HeroCTAButtonManager() {
         hydrate();
     }, [hydrate]);
 
-    const editingButton = useMemo<HeroCTAButton | null>(() => {
+    const editingButton = useMemo(() => {
         return buttons.find((button) => button.id === editingId) ?? null;
     }, [buttons, editingId]);
 
@@ -159,9 +157,6 @@ export function HeroCTAButtonManager() {
                             </Button>
                         )}
 
-                        <Button type="button" variant="outline" onClick={resetDefaults}>
-                            Reset Defaults
-                        </Button>
                     </div>
                 </form>
 
@@ -174,9 +169,6 @@ export function HeroCTAButtonManager() {
                                     <span className={styles.badge}>
                                         {button.enabled ? "Enabled" : "Disabled"}
                                     </span>
-                                    {button.isCustom && (
-                                        <span className={styles.badge}>Custom</span>
-                                    )}
                                 </div>
 
                                 <strong>{button.label}</strong>
@@ -225,17 +217,15 @@ export function HeroCTAButtonManager() {
                                     <Pencil size={16} />
                                 </Button>
 
-                                {button.isCustom && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() => removeButton(button.id)}
-                                        aria-label="Delete button"
-                                    >
-                                        <Trash2 size={16} />
-                                    </Button>
-                                )}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => removeButton(button.id)}
+                                    aria-label="Delete button"
+                                >
+                                    <Trash2 size={16} />
+                                </Button>
                             </div>
                         </div>
                     ))}
