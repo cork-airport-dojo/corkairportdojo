@@ -441,3 +441,43 @@
     display: block;
   }
 }
+
+.navItemDisabled {
+  cursor: not-allowed;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+  pointer-events: none;
+
+  &:hover {
+    background: transparent;
+    color: var(--color-text-muted);
+  }
+}
+
+.navItemLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+
+  span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.comingSoonBadge {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-brand-purple);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 2px 6px;
+  border-radius: 0 !important;
+}
