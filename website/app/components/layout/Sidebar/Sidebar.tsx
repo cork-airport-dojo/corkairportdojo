@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
     BookOpen,
     Home,
@@ -9,23 +10,33 @@ import {
     FolderOpen,
     CalendarPlus,
     FolderPlus,
+    Form,
 } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router";
 import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./Sidebar.module.scss";
 import LoginDropdown from "~/components/LoginDropdown/LoginDropdown";
 
-const publicNavItems = [
+interface NavItem {
+    to: string;
+    label: string;
+    icon: LucideIcon;
+    end?: boolean;
+    comingSoon?: boolean;
+}
+
+const publicNavItems: NavItem[] = [
     { to: "/", label: "Home", icon: Home, end: true },
     { to: "/modules", label: "Modules", icon: Layers3 },
     { to: "/blog", label: "Articles", icon: BookOpen },
     { to: "/resources", label: "Resources", icon: FolderOpen },
     { to: "/about", label: "About", icon: Info },
+    { to: "/work-experience", label: "TY Work Exp", icon: Form, comingSoon: true }
 ];
 
-const privateNavItems = [{ to: "/profile", label: "Profile", icon: User }];
+const privateNavItems: NavItem[] = [{ to: "/profile", label: "Profile", icon: User }];
 
-const contentQuickActions = [
+const contentQuickActions: NavItem[] = [
     { to: "/write", label: "Create Article", icon: PenSquare },
     { to: "/modules/new", label: "Create Module", icon: Layers3 },
     { to: "/resources", label: "Add Resource", icon: FolderPlus },
@@ -41,8 +52,6 @@ export function Sidebar({ collapsed }: SidebarProps) {
     const navigate = useNavigate();
     const {
         isAuthenticated,
-        userName,
-        avatarUrl,
         canManageContent,
         hydrate,
         signOut,
@@ -60,7 +69,6 @@ export function Sidebar({ collapsed }: SidebarProps) {
         await signOut();
         navigate("/", { replace: true });
     };
-
     return (
       <aside
         className={`${styles.sidebar} ${
@@ -86,7 +94,27 @@ export function Sidebar({ collapsed }: SidebarProps) {
             <section>
               {navItems.map((item) => {
                 const Icon = item.icon;
-
+                  if (item.comingSoon) {
+                      return (
+                          <span
+                              key={item.label}
+                              className={`${styles.navItem} ${styles.navItemDisabled}`}
+                              title={collapsed ? item.label : undefined}
+                              aria-disabled="true"
+                          >
+                      <span className={styles.navItemAccent} />
+                      <Icon size={20} />
+                              {!collapsed && (
+                                  <span className={styles.navItemLabelRow}>
+                          <span>{item.label}</span>
+                          <span className={styles.comingSoonBadge}>
+                            Coming Soon
+                          </span>
+                        </span>
+                              )}
+                    </span>
+                      );
+                  }
                 return (
                   <NavLink
                     key={item.label}
