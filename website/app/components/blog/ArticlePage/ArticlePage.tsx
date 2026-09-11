@@ -8,6 +8,7 @@ import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import ArticleView from "../ArticleView/ArticleView";
 import ScrollProgressBar from "./ScrollProgressBar";
+import { useAuthStore } from "~/store/use-auth-store";
 
 export interface ArticleLinkedResource {
     id: string;
@@ -43,6 +44,8 @@ export function ArticlePage({ post }: ArticlePageProps) {
     const linkedResources = post.resources ?? [];
     const { addArticle } = useRecentArticlesStore();
     const [module, setModule] = useState<PublicModule | undefined>(undefined)
+
+    const { canManageContent } = useAuthStore();
 
     useEffect(() => {
         addArticle({
@@ -106,6 +109,9 @@ export function ArticlePage({ post }: ArticlePageProps) {
                         </div>
 
                         <div className={styles.metaGroup}>
+                            <Button variant="link">
+                                <Link to={`/blog/${post.slug}/edit`}>Edit article</Link>
+                            </Button>
                             <div className={styles.readMeta}>
                                 <Clock3 size={15} />
                                 <span>{post.readTime}</span>
