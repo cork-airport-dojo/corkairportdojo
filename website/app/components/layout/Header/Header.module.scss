@@ -20,11 +20,14 @@
   }
 }
 
+.searchWrap {
+  width: 80%;
+}
+
 .leftZone {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
   min-width: 0;
 }
 
@@ -32,44 +35,6 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-}
-
-.searchWrap {
-  flex: 1;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 14px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  min-width: 0;
-  transition:
-          border-color var(--transition-base),
-          background-color var(--transition-base);
-
-  &:focus-within {
-    border-color: var(--color-brand-purple);
-    background: #171b24;
-  }
-}
-
-.searchIcon {
-  color: var(--color-text-muted);
-  flex-shrink: 0;
-}
-
-.searchInput {
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  color: var(--color-text) !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-
-  &::placeholder {
-    color: var(--color-text-muted) !important;
-  }
 }
 
 .shortcut {

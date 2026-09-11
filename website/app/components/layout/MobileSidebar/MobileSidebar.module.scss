@@ -2,6 +2,7 @@
 
 .mobileOnly {
   display: none;
+  padding-right: 1em; // space for search
 
   @include respond-down(lg) {
     display: inline-flex;

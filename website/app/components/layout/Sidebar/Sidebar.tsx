@@ -17,7 +17,7 @@ import { useAuthStore } from "~/store/use-auth-store";
 import styles from "./Sidebar.module.scss";
 import LoginDropdown from "~/components/LoginDropdown/LoginDropdown";
 
-interface NavItem {
+export interface NavItem {
     to: string;
     label: string;
     icon: LucideIcon;
@@ -25,7 +25,7 @@ interface NavItem {
     comingSoon?: boolean;
 }
 
-const publicNavItems: NavItem[] = [
+export const publicNavItems: NavItem[] = [
     { to: "/", label: "Home", icon: Home, end: true },
     { to: "/modules", label: "Modules", icon: Layers3 },
     { to: "/blog", label: "Articles", icon: BookOpen },
@@ -34,9 +34,9 @@ const publicNavItems: NavItem[] = [
     { to: "/work-experience", label: "TY Work Exp", icon: Form, comingSoon: true }
 ];
 
-const privateNavItems: NavItem[] = [{ to: "/profile", label: "Profile", icon: User }];
+export const privateNavItems: NavItem[] = [{ to: "/profile", label: "Profile", icon: User }];
 
-const contentQuickActions: NavItem[] = [
+export const contentQuickActions: NavItem[] = [
     { to: "/write", label: "Create Article", icon: PenSquare },
     { to: "/modules/new", label: "Create Module", icon: Layers3 },
     { to: "/resources", label: "Add Resource", icon: FolderPlus },
@@ -65,10 +65,6 @@ export function Sidebar({ collapsed }: SidebarProps) {
         ? [...publicNavItems, ...privateNavItems]
         : publicNavItems;
 
-    const handleLogout = async () => {
-        await signOut();
-        navigate("/", { replace: true });
-    };
     return (
       <aside
         className={`${styles.sidebar} ${
