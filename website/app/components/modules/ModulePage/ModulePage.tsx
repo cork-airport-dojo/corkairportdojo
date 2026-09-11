@@ -1,6 +1,7 @@
 import { useLayoutEffect, useState } from "react";
 import {
   BarChart3,
+  Edit,
   FolderOpen,
   Grid,
   Layers3,
@@ -94,7 +95,8 @@ export function ModulePage({ module }: ModulePageProps) {
               {module.difficulty}
             </span>
             {canManageContent && (
-              <Button variant="link">
+              <Button variant="outline">
+                <Edit />
                 <Link to={`/modules/${module.slug}/edit`}>Edit module</Link>
               </Button>
             )}

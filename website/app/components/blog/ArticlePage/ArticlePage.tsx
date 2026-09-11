@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Clock3, FolderOpen } from "lucide-react";
+import { Clock3, Edit, FolderOpen } from "lucide-react";
 import { ArticleResourcesAside } from "~/components/resources/ArticleResourcesAside/ArticleResourcesAside";
 import { useRecentArticlesStore } from "~/store/use-recent-articles-store";
 import styles from "./ArticlePage.module.scss";
@@ -109,7 +109,8 @@ export function ArticlePage({ post }: ArticlePageProps) {
                         </div>
 
                         <div className={styles.metaGroup}>
-                            <Button variant="link">
+                            <Button variant="outline">
+                                <Edit />
                                 <Link to={`/blog/${post.slug}/edit`}>Edit article</Link>
                             </Button>
                             <div className={styles.readMeta}>
