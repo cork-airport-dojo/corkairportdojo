@@ -33,9 +33,9 @@ function AppBoot() {
     };
   }, [hydrate]);
 
-    useEffect(() => {
-        emailjs.init("bNwktbc4EGNVF_zWT");
-    }, []);
+  useEffect(() => {
+    emailjs.init("bNwktbc4EGNVF_zWT");
+  }, []);
 
   return <Outlet />;
 }

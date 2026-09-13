@@ -1,9 +1,7 @@
-import { useEffect } from "react";
-import { Search } from "lucide-react";
-import { Input } from "~/components/ui/input";
 import { MobileSidebar } from "../MobileSidebar/MobileSidebar";
 import styles from "./Header.module.scss";
 import LoginDropdown from "~/components/LoginDropdown/LoginDropdown";
+import { Spotlight } from "~/components/spotlight/Spotlight";
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
@@ -25,13 +23,7 @@ export function Header({
         </div>
 
         <div className={styles.searchWrap}>
-          <Search size={18} className={styles.searchIcon} />
-          <Input
-            disabled
-            className={styles.searchInput}
-            placeholder="Search coming soon"
-            aria-label="Search articles, modules, topics"
-          />
+          <Spotlight />
         </div>
       </div>
 
