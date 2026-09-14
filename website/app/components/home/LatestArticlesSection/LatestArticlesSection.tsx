@@ -129,24 +129,39 @@ export function LatestArticlesSection() {
 
     const cardArticles = useMemo(
         () =>
-            articles.map((article) => ({
-                id: article.slug,
-                title: article.title,
-                excerpt: article.excerpt ?? "",
-                image: article.cover_image ?? "/logo.webp",
-                author: article.author_name ?? "CorkAirportDojo",
-                authorAvatarUrl: article.author_avatar_url ?? null,
-                date: new Date(article.created_at).toLocaleDateString("en-IE", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                }),
-                readTime: article.read_time ?? "Article",
-                resourceCount:
-                    article.resources?.length ??
-                    article.resource_ids?.length ??
-                    0,
-            })),
+            articles.map((article) => {
+                const createdAt = new Date(article.created_at);
+                const updatedAt = new Date(article.updated_at);
+
+                const wasUpdated = updatedAt.getTime() - createdAt.getTime() > 60_000;
+
+                const formatDate = (d: Date) =>
+                    d.toLocaleDateString("en-IE", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                    });
+                return {
+                    id: article.slug,
+                    title: article.title,
+                    excerpt: article.excerpt ?? "",
+                    image: article.cover_image ?? "/logo.webp",
+                    author: article.author_name ?? "CorkAirportDojo",
+                    authorAvatarUrl: article.author_avatar_url ?? null,
+                    date: new Date(article.created_at).toLocaleDateString("en-IE", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                    }),
+                    updatedDate: wasUpdated ? formatDate(updatedAt): null,
+                    wasUpdated,
+                    readTime: article.read_time ?? "Article",
+                    resourceCount:
+                        article.resources?.length ??
+                        article?.resource_ids?.length ??
+                        0,
+                };
+            }),
         [articles]
     );
 

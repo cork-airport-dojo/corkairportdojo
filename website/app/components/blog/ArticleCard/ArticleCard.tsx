@@ -13,6 +13,8 @@ interface ArticleCardProps {
     author: string;
     authorAvatarUrl?: string | null;
     date: string;
+    updatedDate?: string | null;
+    wasUpdated?: boolean;
     readTime: string;
     resourceCount?: number;
 }
@@ -57,6 +59,8 @@ export function ArticleCard({
     author,
     authorAvatarUrl,
     date,
+    updatedDate,
+    wasUpdated,
     readTime,
 }: ArticleCardProps) {
     return (
@@ -93,7 +97,11 @@ export function ArticleCard({
                             />
                             <div className={styles.authorMeta}>
                                 <strong>{author}</strong>
-                                <span>{date}</span>
+                                {wasUpdated && updatedDate ? (
+                                    <span>Updated {updatedDate}</span>
+                                ) : (
+                                    <span>{date}</span>
+                                )}
                             </div>
                         </div>
 
