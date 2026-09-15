@@ -27,18 +27,6 @@ export function WorkExperiencePage() {
 
             <Card className={styles.section}>
                 <CardHeader>
-                    <CardTitle>When Does It Take Place?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p>
-                        Please check with your school directly for the exact dates, as these can vary
-                        year to year.
-                    </p>
-                </CardContent>
-            </Card>
-
-            <Card className={styles.section}>
-                <CardHeader>
                     <CardTitle>How to Apply</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -48,21 +36,15 @@ export function WorkExperiencePage() {
                     </p>
                     <ol className={styles.list}>
                         <li>
-                            <strong>Get in touch with us first.</strong> Reach out to let us know you're
-                            interested in a work experience placement. We'll talk you through what's
-                            involved and answer any questions you have.
+                            <strong>Get in touch with us first.</strong> Let us know the dates the work 
+                            experience program takes place on for your school.
                         </li>
                         <li>
                             <strong>Send us your CV.</strong> This isn't about having loads of experience
                             it just helps us understand your current level of knowledge and skills, so we
                             can make the placement as useful as possible for you.
                         </li>
-                        <li>
-                            <strong>Get a letter from your school.</strong> Your school needs to confirm
-                            that you're insured for the duration of your placement. This is a requirement
-                            before any placement can go ahead.
-                        </li>
-                    </ol>
+                   </ol>
                     <p>
                         Once we have all of this, we'll be in touch to confirm the details of your
                         placement.
@@ -129,7 +111,7 @@ export function WorkExperiencePage() {
                 </CardHeader>
                 <CardContent className={styles.ctaContent}>
                     <p>
-                        Get in touch with us to start the process. We look forward to hearing from you!
+                        Get in touch with us by sending an email, or use the 'Send us a message' button in the 'Contact us' widget.
                     </p>
                 </CardContent>
             </Card>
