@@ -85,12 +85,24 @@ export function ResourceCard({
                         <span>{resource.provider}</span>
                     </div>
 
-                    <Button asChild variant="outline" size="sm" className={`${styles.link} ${styles.gradientBtn}`}>
-                        <a href={resource.href} target="_blank" rel="noreferrer">
+                    {resource.active ? (
+                        <Button asChild variant="outline" size="sm" className={`${styles.link} ${styles.gradientBtn}`}>
+                            <a href={resource.href} target="_blank" rel="noreferrer">
+                                <span>Open</span>
+                                <ExternalLink size={14} />
+                            </a>
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled
+                            className={`${styles.link} ${styles.disabledBtn}`}
+                        >
                             <span>Open</span>
                             <ExternalLink size={14} />
-                        </a>
-                    </Button>
+                        </Button>
+                    )}
                 </div>
             </CardContent>
         </Card>

@@ -38,7 +38,7 @@ export async function fetchArticles(options?: FetchArticlesOptions): Promise<Pub
         .from("articles")
         .select("*, resources:article_resources(resource:resources(*))")
         .eq("published", true)
-        .order("created_at", { ascending: false });
+        .order("updated_at", { ascending: false });
 
     if (options?.pageSize) {
         const page = options.page && options.page > 0 ? options.page : 1;
@@ -75,7 +75,7 @@ export async function fetchArticlesForModule(
         .select("*, resources:article_resources(resource:resources(*))")
         .eq("published", true)
         .eq("module", module_id)
-        .order("created_at", { ascending: false });
+        .order("updated_at", { ascending: false });
 
     if (options?.pageSize) {
         const page = options.page && options.page > 0 ? options.page : 1;

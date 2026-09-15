@@ -13,6 +13,7 @@ export interface CreateArticleRequest {
     featured?: boolean;
     published: boolean;
     module?: string | null;
+    tags?: string[];
 }
 
 export interface UpdateArticleRequest extends CreateArticleRequest {
@@ -32,6 +33,7 @@ export interface ArticleMutationResponse {
         featured: boolean;
         published: boolean;
         body: string[];
+        tags?: string[];
         created_at: string;
         updated_at: string;
     };
@@ -41,11 +43,11 @@ export async function createArticleRequest(input: CreateArticleRequest): Promise
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
-    const { resource_ids, module, ...fields } = input;
+    const { resource_ids, module, tags, ...fields } = input;
 
     const { data, error } = await supabase
         .from("articles")
-        .insert({ ...fields, module: module ?? null, created_by: user.id })
+        .insert({ ...fields, module: module ?? null, tags: tags ?? [], created_by: user.id })
         .select()
         .single();
 
@@ -59,11 +61,11 @@ export async function createArticleRequest(input: CreateArticleRequest): Promise
 }
 
 export async function updateArticleRequest(input: UpdateArticleRequest): Promise<ArticleMutationResponse["article"]> {
-    const { id, resource_ids, module, ...fields } = input;
+    const { id, resource_ids, module, tags, ...fields } = input;
 
     const { data, error } = await supabase
         .from("articles")
-        .update({ ...fields, module: module ?? null })
+        .update({ ...fields, module: module ?? null, tags: tags ?? [], updated_at: new Date().toISOString() })
         .eq("id", id)
         .select()
         .single();

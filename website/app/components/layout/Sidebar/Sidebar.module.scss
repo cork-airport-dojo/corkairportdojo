@@ -177,6 +177,13 @@
   gap: 4px;
 }
 
+/*.quickActionItemActive {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}*/
+
+/*
 .quickActionItem {
   min-height: 44px;
   padding: 0 14px;
@@ -198,7 +205,6 @@
   }
 
   svg {
-    color: var(--color-brand-purple);
     flex-shrink: 0;
   }
 
@@ -207,7 +213,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-}
+}*/
 
 .connectSection {
   display: flex;

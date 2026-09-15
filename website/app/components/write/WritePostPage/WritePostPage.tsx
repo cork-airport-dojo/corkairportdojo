@@ -16,7 +16,6 @@ import { fetchModules, type PublicModule } from "~/lib/api/modules";
 import { supabase } from "~/lib/supabase/browser";
 import { useAuthStore } from "~/store/use-auth-store";
 import { usePostEditorStore } from "~/store/use-post-editor-store";
-// import { useEditorShortcuts } from "~/hooks/use-editor-shortcuts";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
@@ -36,7 +35,6 @@ import { Badge } from "~/components/ui/badge";
 import { PostEditorHeader } from "../PostEditorHeader/PostEditorHeader";
 import { PostEditorCard } from "../PostEditorCard/PostEditorCard";
 import { PostEditorSidebar } from "../PostEditorSidebar/PostEditorSidebar";
-// import { CommandPalette } from "../CommandPalette/CommandPalette";
 import styles from "./WritePostPage.module.scss";
 
 interface ArticleApiRecord {
@@ -53,12 +51,13 @@ interface ArticleApiRecord {
     markdown: string;
     resources: { resource_id: string }[];
     module: string | null;
+    tags: string[] | null;
 }
 
 async function fetchArticleBySlugForEdit(slug: string) {
     const { data, error } = await supabase
         .from("articles")
-        .select("id, slug, title, excerpt, markdown, author_name, author_avatar_url, cover_image, read_time, featured, published, module, resources:article_resources(resource_id)")
+        .select("id, slug, title, excerpt, markdown, author_name, author_avatar_url, cover_image, read_time, featured, published, module, tags, resources:article_resources(resource_id)")
         .eq("slug", slug)
         .maybeSingle();
 
@@ -167,7 +166,7 @@ export function WritePostPage() {
                     articleSlug: article.slug,
                     title: article.title,
                     description: article.excerpt ?? "",
-                    tags: [],
+                    tags: article.tags ?? [],
                     coverImage: article.cover_image ?? "",
                     content: article.markdown,
                     markdownMode: false,
@@ -285,7 +284,9 @@ export function WritePostPage() {
                 featured: false,
                 resource_ids: selectedResourceIds,
                 module: moduleId || null,
+                tags,
                 published,
+                ...(articleSlugFromRoute ? { updated_at: new Date().toISOString() } : {}),
             };
 
             if (articleSlugFromRoute) {

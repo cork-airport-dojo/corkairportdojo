@@ -47,7 +47,7 @@ interface PostEditorState extends PostEditorFormData {
 const initialState: PostEditorFormData = {
     title: "",
     description: "",
-    tags: ["Next.js", "React", "TypeScript"],
+    tags: [],
     coverImage: "",
     content: "",
     markdownMode: false,

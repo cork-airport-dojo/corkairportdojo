@@ -57,6 +57,25 @@ function ArticlesEmptyState() {
   );
 }
 
+function getArticleDates(article: PublicArticle) {
+    const createdAt = new Date(article.created_at);
+    const updatedAt = new Date(article.updated_at);
+    const wasUpdated = updatedAt.getTime() - createdAt.getTime() > 60_000;
+
+    const formatDate = (d: Date) =>
+        new Intl.DateTimeFormat("en-IE", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+        }).format(d);
+
+    return {
+        date: formatDate(createdAt),
+        updatedDate: wasUpdated ? formatDate(updatedAt) : null,
+        wasUpdated,
+    };
+}
+
 export function ArticlesPage() {
   const [articles, setArticles] = useState<PublicArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,7 +140,9 @@ export function ArticlesPage() {
 
       {!loading && !error && articles.length > 0 && (
         <section className={styles.grid}>
-          {articles.map((article) => (
+          {articles.map((article) => {
+              const {date, updatedDate, wasUpdated} = getArticleDates(article);
+            return (
             <ArticleCard
               key={`article-${article.id}`}
               id={article.slug}
@@ -130,15 +151,14 @@ export function ArticlesPage() {
               image={article.cover_image ?? "/logo.webp"}
               author={article.author_name ?? "CorkAirportDojo"}
               authorAvatarUrl={article.author_avatar_url}
-              date={new Intl.DateTimeFormat("en-IE", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }).format(new Date(article.created_at))}
+              date={date}
+              updatedDate={updatedDate}
+              wasUpdated={wasUpdated}
               readTime={article.read_time ?? ""}
               resourceCount={article.resources?.length ?? 0}
             />
-          ))}
+              );
+          })}
         </section>
       )}
 

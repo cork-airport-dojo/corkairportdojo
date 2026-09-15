@@ -27,11 +27,11 @@ export interface NavItem {
 
 export const publicNavItems: NavItem[] = [
     { to: "/", label: "Home", icon: Home, end: true },
-    { to: "/modules", label: "Modules", icon: Layers3 },
-    { to: "/blog", label: "Articles", icon: BookOpen },
-    { to: "/resources", label: "Resources", icon: FolderOpen },
+    { to: "/modules", label: "Modules", icon: Layers3, end: true },
+    { to: "/blog", label: "Articles", icon: BookOpen, end: true },
+    { to: "/resources", label: "Resources", icon: FolderOpen, end: true },
     { to: "/about", label: "About", icon: Info },
-    { to: "/work-experience", label: "TY Work Exp", icon: Form, comingSoon: true }
+    { to: "/work-experience", label: "TY Work Exp", icon: Form }
 ];
 
 export const privateNavItems: NavItem[] = [{ to: "/profile", label: "Profile", icon: User }];
@@ -45,7 +45,6 @@ export const contentQuickActions: NavItem[] = [
 
 interface SidebarProps {
     collapsed: boolean;
-    // onToggleCollapse: () => void;
 }
 
 export function Sidebar({ collapsed }: SidebarProps) {
@@ -140,15 +139,17 @@ export function Sidebar({ collapsed }: SidebarProps) {
                     const Icon = item.icon;
 
                     return (
-                      <Link
+                      <NavLink
                         key={item.label}
                         to={item.to}
-                        className={styles.quickActionItem}
+                        className={({ isActive }) =>
+                            `${styles.navItem} ${styles.quickActionItem} ${isActive ? styles.navItemActive : ""}`
+                        }
                         title={collapsed ? item.label : undefined}
                       >
                         <Icon size={18} />
                         {!collapsed && <span>{item.label}</span>}
-                      </Link>
+                      </NavLink>
                     );
                   })}
                 </div>
